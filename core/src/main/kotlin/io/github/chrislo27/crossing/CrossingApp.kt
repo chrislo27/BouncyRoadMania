@@ -140,6 +140,11 @@ class CrossingApp(logger: Logger, logToFile: File?)
         super.postRender()
     }
 
+    override fun dispose() {
+        super.dispose()
+        httpClient.close()
+    }
+
     private fun createDefaultTTFParameter(): FreeTypeFontGenerator.FreeTypeFontParameter {
         return FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             magFilter = Texture.TextureFilter.Nearest
