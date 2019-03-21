@@ -43,8 +43,9 @@ project(":desktop") {
         
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         implementation "commons-io:commons-io:2.6"
         implementation "com.github.oshi:oshi-core:3.4.4"
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -69,8 +70,9 @@ project(":core") {
     dependencies {
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         implementation "commons-io:commons-io:2.6"
         implementation "com.github.oshi:oshi-core:3.4.4"
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

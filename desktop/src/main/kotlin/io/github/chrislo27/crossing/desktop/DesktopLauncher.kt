@@ -1,9 +1,10 @@
 package io.github.chrislo27.crossing.desktop
 
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.crossing.Crossing
 import io.github.chrislo27.crossing.CrossingApp
-import io.github.chrislo27.toolboks.desktop.ToolboksDesktopLauncher
+import io.github.chrislo27.toolboks.desktop.ToolboksDesktopLauncher3
 import io.github.chrislo27.toolboks.lazysound.LazySound
 import io.github.chrislo27.toolboks.logging.Logger
 import java.io.File
@@ -19,14 +20,15 @@ object DesktopLauncher {
 
         val logger = Logger()
         val app = CrossingApp(logger, File(System.getProperty("user.home") + "/.crossing/logs/"))
-        ToolboksDesktopLauncher(app)
+        ToolboksDesktopLauncher3(app)
                 .editConfig {
-                    this.width = app.emulatedSize.first
-                    this.height = app.emulatedSize.second
-                    this.title = app.getTitle()
-                    this.fullscreen = false
+                    this.setAutoIconify(true)
+                    this.setWindowedMode(app.emulatedSize.first, app.emulatedSize.second)
+                    this.setWindowSizeLimits(640, 360, -1, -1)
+                    this.setTitle(app.getTitle())
+//                    this.fullscreen = false
                     val fpsArg = args.find { it.startsWith("--fps=") }
-                    this.foregroundFPS = (if (fpsArg != null) {
+                    val idleFps = (if (fpsArg != null) {
                         val num = fpsArg.substringAfter('=')
                         val parsed = num.toIntOrNull()
                         val adjusted = parsed?.coerceAtLeast(30) ?: 60
@@ -37,13 +39,12 @@ object DesktopLauncher {
                         }
                         adjusted
                     } else 60).coerceAtLeast(30)
-                    this.backgroundFPS = this.foregroundFPS.coerceIn(30, 60)
-                    this.resizable = true
-                    this.vSyncEnabled = this.foregroundFPS <= 60
-                    this.initialBackgroundColor = Color(0f, 0f, 0f, 1f)
-                    this.allowSoftwareMode = true
-                    this.audioDeviceSimultaneousSources = 250
-                    this.useHDPI = true
+                    this.setIdleFPS(idleFps)
+                    this.setResizable(true)
+                    this.useVsync(idleFps <= 60)
+                    this.setInitialBackgroundColor(Color(0f, 0f, 0f, 1f))
+                    this.setAudioConfig(250, 1024, 9)
+                    this.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Logical)
 
                     LazySound.loadLazilyWithAssetManager = "--force-lazy-sound-load" !in args
 
