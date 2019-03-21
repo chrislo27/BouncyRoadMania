@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.ToolboksGame
@@ -14,6 +15,8 @@ import io.github.chrislo27.toolboks.font.FreeTypeFont
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.logging.Logger
 import io.github.chrislo27.toolboks.ui.UIPalette
+import io.github.chrislo27.toolboks.util.MathHelper
+import io.github.chrislo27.toolboks.util.gdxutils.setHSB
 import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import org.asynchttpclient.Dsl
@@ -30,6 +33,7 @@ class CrossingApp(logger: Logger, logToFile: File?)
         val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).setCompressionEnforced(true))
 
         private const val RAINBOW_STR = "RAINBOW"
+        private val rainbowColor: Color = Color()
 
         init {
             Colors.put("X", Color.CLEAR)
@@ -69,6 +73,8 @@ class CrossingApp(logger: Logger, logToFile: File?)
 
     lateinit var preferences: Preferences
         private set
+    var versionTextWidth: Float = -1f
+        private set
 
     override fun getTitle(): String = "${Crossing.TITLE} ${Crossing.VERSION}"
 
@@ -100,6 +106,38 @@ class CrossingApp(logger: Logger, logToFile: File?)
 
         // preferences
         preferences = Gdx.app.getPreferences("Crossing")
+    }
+
+    override fun preRender() {
+        rainbowColor.setHSB(MathHelper.getSawtoothWave(2f), 0.8f, 0.8f)
+        Colors.put(RAINBOW_STR, rainbowColor)
+        super.preRender()
+    }
+
+    override fun postRender() {
+        val screen = screen
+        if (screen !is HidesVersionText || !screen.hidesVersionText) {
+            val font = defaultBorderedFont
+            font.data.setScale(0.5f)
+
+            font.setColor(1f, 1f, 1f, 1f)
+
+            val oldProj = batch.projectionMatrix
+            batch.projectionMatrix = defaultCamera.combined
+            batch.begin()
+            val layout = font.draw(batch, Crossing.VERSION.toString(),
+                                   0f,
+                                   (font.capHeight) + (2f / Crossing.HEIGHT) * defaultCamera.viewportHeight,
+                                   defaultCamera.viewportWidth, Align.right, false)
+            versionTextWidth = layout.width
+            batch.end()
+            batch.projectionMatrix = oldProj
+            font.setColor(1f, 1f, 1f, 1f)
+
+            font.data.setScale(1f)
+        }
+
+        super.postRender()
     }
 
     private fun createDefaultTTFParameter(): FreeTypeFontGenerator.FreeTypeFontParameter {
