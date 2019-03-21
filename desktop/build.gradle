@@ -6,7 +6,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/main/kotlin/" ]
 
-project.ext.mainClassName = "io.github.chrislo27.rhre3.DesktopLauncher"
+project.ext.mainClassName = "io.github.chrislo27.crossing.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets");
 
 task run(dependsOn: classes, type: JavaExec) {
@@ -52,13 +52,13 @@ repositories {
 }
 
 shadowJar {
-    baseName = "RHRE"
+    baseName = "crossing"
     classifier = null
     version = null
 }
 jar {
     manifest {
-        attributes "Main-Class": "io.github.chrislo27.rhre3.desktop.DesktopLauncher"
+        attributes "Main-Class": "io.github.chrislo27.crossing.desktop.DesktopLauncher"
     }
 
     from {
