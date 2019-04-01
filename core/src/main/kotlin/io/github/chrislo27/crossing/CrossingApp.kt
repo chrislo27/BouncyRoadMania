@@ -8,12 +8,15 @@ import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.crossing.assetload.InitialAssetLoader
+import io.github.chrislo27.crossing.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.ToolboksGame
 import io.github.chrislo27.toolboks.font.FreeTypeFont
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.logging.Logger
+import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.UIPalette
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.setHSB
@@ -102,6 +105,13 @@ class CrossingApp(logger: Logger, logToFile: File?)
             fonts[defaultFontLargeKey] = createDefaultLargeFont()
             fonts[defaultBorderedFontLargeKey] = createDefaultLargeBorderedFont()
             fonts.loadUnloaded(defaultCamera.viewportWidth, defaultCamera.viewportHeight)
+        }
+
+        AssetRegistry.addAssetLoader(InitialAssetLoader())
+
+        // screen
+        run {
+            this.screen = AssetRegistryLoadingScreen(this).setNextScreen { null }
         }
 
         // preferences
