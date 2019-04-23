@@ -58,7 +58,7 @@ shadowJar {
 }
 jar {
     manifest {
-        attributes "Main-Class": "io.github.chrislo27.crossing.desktop.DesktopLauncher"
+        attributes "Main-Class": "io.github.chrislo27.bouncyroadmania.desktop.DesktopLauncher"
     }
 
     from {
