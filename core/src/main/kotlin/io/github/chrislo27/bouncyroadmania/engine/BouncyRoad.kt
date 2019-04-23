@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class BouncyRoad {
+class BouncyRoad(val clock: Clock) {
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
