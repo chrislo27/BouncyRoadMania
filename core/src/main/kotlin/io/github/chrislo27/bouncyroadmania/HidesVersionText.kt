@@ -1,4 +1,4 @@
-package io.github.chrislo27.crossing
+package io.github.chrislo27.bouncyroadmania
 
 
 interface HidesVersionText {

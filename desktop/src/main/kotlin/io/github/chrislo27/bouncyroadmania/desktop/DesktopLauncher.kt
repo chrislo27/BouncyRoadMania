@@ -1,9 +1,9 @@
-package io.github.chrislo27.crossing.desktop
+package io.github.chrislo27.bouncyroadmania.desktop
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
-import io.github.chrislo27.crossing.Crossing
-import io.github.chrislo27.crossing.CrossingApp
+import io.github.chrislo27.bouncyroadmania.BRMania
+import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.toolboks.desktop.ToolboksDesktopLauncher3
 import io.github.chrislo27.toolboks.lazysound.LazySound
 import io.github.chrislo27.toolboks.logging.Logger
@@ -16,10 +16,10 @@ object DesktopLauncher {
         // https://github.com/chrislo27/RhythmHeavenRemixEditor/issues/273
         System.setProperty("jna.nosys", "true")
 
-        Crossing.launchArguments = args.toList()
+        BRMania.launchArguments = args.toList()
 
         val logger = Logger()
-        val app = CrossingApp(logger, File(System.getProperty("user.home") + "/.crossing/logs/"))
+        val app = BRManiaApp(logger, File(System.getProperty("user.home") + "/.bouncyroadmania/logs/"))
         ToolboksDesktopLauncher3(app)
                 .editConfig {
                     this.setAutoIconify(true)

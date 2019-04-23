@@ -1,4 +1,4 @@
-package io.github.chrislo27.crossing.assetload
+package io.github.chrislo27.bouncyroadmania.assetload
 
 import com.badlogic.gdx.assets.AssetManager
 import io.github.chrislo27.toolboks.registry.AssetRegistry

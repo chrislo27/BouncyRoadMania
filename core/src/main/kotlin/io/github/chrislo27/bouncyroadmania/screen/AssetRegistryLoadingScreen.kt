@@ -1,19 +1,19 @@
-package io.github.chrislo27.crossing.screen
+package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.graphics.OrthographicCamera
-import io.github.chrislo27.crossing.Crossing
-import io.github.chrislo27.crossing.CrossingApp
+import io.github.chrislo27.bouncyroadmania.BRMania
+import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 
-class AssetRegistryLoadingScreen(main: CrossingApp)
-    : ToolboksScreen<CrossingApp, AssetRegistryLoadingScreen>(main) {
+class AssetRegistryLoadingScreen(main: BRManiaApp)
+    : ToolboksScreen<BRManiaApp, AssetRegistryLoadingScreen>(main) {
 
     private val camera: OrthographicCamera = OrthographicCamera().apply {
-        setToOrtho(false, Crossing.WIDTH * 1f, Crossing.HEIGHT * 1f)
+        setToOrtho(false, BRMania.WIDTH * 1f, BRMania.HEIGHT * 1f)
     }
     private var nextScreen: (() -> ToolboksScreen<*, *>?)? = null
 
