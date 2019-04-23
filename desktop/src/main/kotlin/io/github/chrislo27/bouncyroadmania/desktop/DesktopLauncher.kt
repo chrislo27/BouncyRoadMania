@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.desktop
 
+import com.badlogic.gdx.Files
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.BRMania
@@ -48,14 +49,8 @@ object DesktopLauncher {
 
                     LazySound.loadLazilyWithAssetManager = "--force-lazy-sound-load" !in args
 
-                    val sizes: List<Int> = listOf(256, 128, 64, 32, 24, 16)
-//                    sizes.forEach {
-//                        this.addIcon("images/icon/$it.png", Files.FileType.Internal)
-//                    }
-//
-//                    listOf(24, 16).forEach {
-//                        this.addIcon("images/icon/$it.png", Files.FileType.Internal)
-//                    }
+                    val sizes: List<Int> = listOf(32, 24, 16)
+                    this.setWindowIcon(Files.FileType.Internal, *sizes.map { "images/icon/$it.png" }.toTypedArray())
                 }
                 .launch()
     }
