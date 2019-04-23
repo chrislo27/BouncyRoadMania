@@ -1,4 +1,4 @@
-package io.github.chrislo27.crossing
+package io.github.chrislo27.bouncyroadmania
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.crossing.assetload.InitialAssetLoader
-import io.github.chrislo27.crossing.screen.AssetRegistryLoadingScreen
+import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
+import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.ToolboksGame
@@ -26,11 +26,11 @@ import org.asynchttpclient.Dsl
 import java.io.File
 
 
-class CrossingApp(logger: Logger, logToFile: File?)
-    : ToolboksGame(logger, logToFile, Crossing.VERSION, Crossing.WIDTH to Crossing.HEIGHT, ResizeAction.KEEP_ASPECT_RATIO, Crossing.WIDTH to Crossing.HEIGHT) {
+class BRManiaApp(logger: Logger, logToFile: File?)
+    : ToolboksGame(logger, logToFile, BRMania.VERSION, BRMania.WIDTH to BRMania.HEIGHT, ResizeAction.KEEP_ASPECT_RATIO, BRMania.WIDTH to BRMania.HEIGHT) {
 
     companion object {
-        lateinit var instance: CrossingApp
+        lateinit var instance: BRManiaApp
             private set
 
         val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).setCompressionEnforced(true))
@@ -79,14 +79,14 @@ class CrossingApp(logger: Logger, logToFile: File?)
     var versionTextWidth: Float = -1f
         private set
 
-    override fun getTitle(): String = "${Crossing.TITLE} ${Crossing.VERSION}"
+    override fun getTitle(): String = "${BRMania.TITLE} ${BRMania.VERSION}"
 
     override val programLaunchArguments: List<String>
-        get() = Crossing.launchArguments
+        get() = BRMania.launchArguments
 
     override fun create() {
         super.create()
-        Toolboks.LOGGER.info("${Crossing.TITLE} $versionString is starting...")
+        Toolboks.LOGGER.info("${BRMania.TITLE} $versionString is starting...")
         // 1.8.0_144
         // 9.X.Y(extra)
         val javaVersion = System.getProperty("java.version").trim()
@@ -135,9 +135,9 @@ class CrossingApp(logger: Logger, logToFile: File?)
             val oldProj = batch.projectionMatrix
             batch.projectionMatrix = defaultCamera.combined
             batch.begin()
-            val layout = font.draw(batch, Crossing.VERSION.toString(),
+            val layout = font.draw(batch, BRMania.VERSION.toString(),
                                    0f,
-                                   (font.capHeight) + (2f / Crossing.HEIGHT) * defaultCamera.viewportHeight,
+                                   (font.capHeight) + (2f / BRMania.HEIGHT) * defaultCamera.viewportHeight,
                                    defaultCamera.viewportWidth, Align.right, false)
             versionTextWidth = layout.width
             batch.end()
