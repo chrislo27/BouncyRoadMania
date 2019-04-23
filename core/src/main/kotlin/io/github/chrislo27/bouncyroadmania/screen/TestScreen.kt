@@ -50,7 +50,7 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
             sprite.y = ((-MathUtils.sinDeg(angle) + 1) / 2f * 440f) + 180
 
             sprite.x = x
-            sprite.z = z
+            sprite.posZ = z
 
             projector.sprites.add(sprite)
         }
@@ -60,7 +60,7 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-		sprite.z = WaveUtils.getBounceWave(MathHelper.getSawtoothWave(1.25f))
+		sprite.posZ = WaveUtils.getBounceWave(MathHelper.getSawtoothWave(1.25f))
 
         val batch = main.batch
         batch.begin()

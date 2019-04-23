@@ -11,74 +11,94 @@ import java.util.*
  */
 open class PaperProjection(var scaleCoeff: Float = 1.0f) {
 
-	val sprites: MutableList<PaperSpriteable> = mutableListOf()
-	val comparator: Comparator<PaperSpriteable> = PaperSpriteComparator().reversed()
+    val sprites: MutableList<PaperSpriteable> = mutableListOf()
+    val comparator: Comparator<PaperSpriteable> = PaperSpriteComparator().reversed()
 
-	open fun render(batch: SpriteBatch, sprites: MutableList<out PaperSpriteable>) {
-		// ensure Z-order
-		sprites.sortWith(comparator)
+    open fun render(batch: SpriteBatch, sprites: MutableList<out PaperSpriteable>) {
+        // ensure Z-order
+        sprites.sortWith(comparator)
 
-		sprites.forEach { able ->
-			val it = able.getPaperSprite()
-			val oldScaleX = it.scaleX
-			val oldScaleY = it.scaleY
+        sprites.forEach { able ->
+            if (able.posZ >= 0f) {
+                able.render(batch, scaleCoeff)
+            }
+        }
+    }
 
-			if (it.z < 0f) {
-				return@forEach
-			}
-			val realZ = it.z + 1f
-
-			// set new projection scale
-			it.setScale((oldScaleX / realZ) * scaleCoeff, (oldScaleY / realZ) * scaleCoeff)
-
-			// render
-			it.draw(batch)
-
-			// reset scale
-			it.setScale(oldScaleX, oldScaleY)
-		}
-	}
-
-	fun render(batch: SpriteBatch) {
-		render(batch, sprites)
-	}
+    fun render(batch: SpriteBatch) {
+        render(batch, sprites)
+    }
 
 }
 
 class PaperSprite : Sprite, PaperSpriteable {
 
-	var z: Float = 0f
+    override var posX: Float
+        get() = this.x
+        set(value) {
+            this.x = value
+        }
+    override var posY: Float
+        get() = this.y
+        set(value) {
+            this.y = value
+        }
+    override var posZ: Float = 1f
 
-	constructor() : super()
-	constructor(texture: Texture?) : super(texture)
-	constructor(texture: Texture?, srcWidth: Int, srcHeight: Int) : super(texture, srcWidth, srcHeight)
-	constructor(texture: Texture?, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: Int) : super(texture, srcX, srcY,
-																								srcWidth, srcHeight)
-	constructor(region: TextureRegion?) : super(region)
-	constructor(region: TextureRegion?, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: Int) : super(region, srcX, srcY,
-																									 srcWidth,
-																									 srcHeight)
-	constructor(sprite: Sprite?) : super(sprite)
+    constructor() : super()
+    constructor(texture: Texture?) : super(texture)
+    constructor(texture: Texture?, srcWidth: Int, srcHeight: Int) : super(texture, srcWidth, srcHeight)
+    constructor(texture: Texture?, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: Int) : super(texture, srcX, srcY,
+            srcWidth, srcHeight)
 
-	init {
-		setOriginCenter()
-	}
+    constructor(region: TextureRegion?) : super(region)
+    constructor(region: TextureRegion?, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: Int) : super(region, srcX, srcY,
+            srcWidth,
+            srcHeight)
 
-	fun setZ(z: Float): PaperSprite {
-		this.z = z
-		return this
-	}
+    constructor(sprite: Sprite?) : super(sprite)
 
-	fun setPosition(x: Float, y: Float, z: Float) {
-		return setZ(z).setPosition(x, y)
-	}
+    init {
+        setOriginCenter()
+    }
 
-	override fun getPaperSprite(): PaperSprite = this
+    fun setZ(z: Float): PaperSprite {
+        this.posZ = z
+        return this
+    }
+
+    fun setPosition(x: Float, y: Float, z: Float) {
+        return setZ(z).setPosition(x, y)
+    }
+
+    override fun render(batch: SpriteBatch, scale: Float) {
+        val oldScaleX = scaleX
+        val oldScaleY = scaleY
+
+        if (posZ < 0f) {
+            return
+        }
+        val realZ = posZ + 1f
+
+        // set new projection scale
+        setScale((oldScaleX / realZ) * scale, (oldScaleY / realZ) * scale)
+
+        // render
+        draw(batch)
+
+        // reset scale
+        setScale(oldScaleX, oldScaleY)
+    }
+
 }
 
 interface PaperSpriteable {
 
-	fun getPaperSprite(): PaperSprite
+    var posX: Float
+    var posY: Float
+    var posZ: Float
+
+    fun render(batch: SpriteBatch, scale: Float)
 
 }
 
@@ -87,23 +107,23 @@ interface PaperSpriteable {
  */
 private class PaperSpriteComparator : Comparator<PaperSpriteable> {
 
-	override fun compare(o1: PaperSpriteable?, o2: PaperSpriteable?): Int {
-		if (o1 == null) {
-			if (o2 == null)
-				return 0
-			else
-				return 1
-		}
-		if (o2 == null)
-			return -1
+    override fun compare(o1: PaperSpriteable?, o2: PaperSpriteable?): Int {
+        if (o1 == null) {
+            return if (o2 == null)
+                0
+            else
+                1
+        }
+        if (o2 == null)
+            return -1
 
-		if (o1.getPaperSprite().z > o2.getPaperSprite().z)
-			return 1
+        if (o1.posZ > o2.posZ)
+            return 1
 
-		if (o1.getPaperSprite().z < o2.getPaperSprite().z)
-			return -1
+        if (o1.posZ < o2.posZ)
+            return -1
 
-		return 0
-	}
+        return 0
+    }
 
 }
