@@ -14,15 +14,15 @@ class BouncyRoad(val clock: Clock) {
     val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
+    val entities: MutableList<Entity> = mutableListOf()
     val projector = PaperProjection(2f)
 
     fun render(batch: SpriteBatch) {
         camera.update()
         batch.projectionMatrix = camera.combined
         batch.begin()
-        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat())
-        projector.render(batch)
+        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        projector.render(batch, entities)
         batch.end()
     }
 

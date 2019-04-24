@@ -11,7 +11,6 @@ import java.util.*
  */
 open class PaperProjection(var scaleCoeff: Float = 1.0f) {
 
-    val sprites: MutableList<PaperRenderable> = mutableListOf()
     val comparator: Comparator<PaperRenderable>
         get() = PaperRenderableComparator
 
@@ -24,10 +23,6 @@ open class PaperProjection(var scaleCoeff: Float = 1.0f) {
                 able.render(batch, scaleCoeff)
             }
         }
-    }
-
-    fun render(batch: SpriteBatch) {
-        render(batch, sprites)
     }
 
 }
@@ -104,7 +99,7 @@ interface PaperRenderable {
 }
 
 /**
- * Compares PaperSprites from farthest having priority
+ * Compares [PaperRenderable]s, higher [PaperRenderable.posZ] are first when sorted
  */
 object PaperRenderableComparator : Comparator<PaperRenderable> {
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
+import io.github.chrislo27.bouncyroadmania.renderer.PaperRenderable
 import io.github.chrislo27.bouncyroadmania.renderer.PaperSprite
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.ToolboksScreen
@@ -17,6 +18,7 @@ import io.github.chrislo27.toolboks.util.MathHelper
 class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main) {
 
     val projector = PaperProjection(2f)
+    val sprites = mutableListOf<PaperRenderable>()
     val sprite: PaperSprite
 
     init {
@@ -26,9 +28,9 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
     }
 
     fun reload() {
-        projector.sprites.clear()
+        sprites.clear()
         sprite.setPosition(500f, 400f)
-        projector.sprites += sprite
+        sprites += sprite
 
         val radius = 1200f
         for (i in 0 until 15) {
@@ -52,7 +54,7 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
             sprite.x = x
             sprite.posZ = z
 
-            projector.sprites.add(sprite)
+            sprites.add(sprite)
         }
     }
 
@@ -64,9 +66,8 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
 
         val batch = main.batch
         batch.begin()
-        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat())
-        projector.render(batch)
+        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        projector.render(batch, sprites)
         batch.end()
     }
 
