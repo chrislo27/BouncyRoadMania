@@ -9,13 +9,19 @@ import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class BouncyRoad(val clock: Clock) {
+class Engine(val clock: Clock) {
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
     val entities: MutableList<Entity> = mutableListOf()
     val projector = PaperProjection(2f)
+
+    fun renderUpdate(delta: Float) {
+        entities.forEach {
+            it.renderUpdate(delta)
+        }
+    }
 
     fun render(batch: SpriteBatch) {
         camera.update()
