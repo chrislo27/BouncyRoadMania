@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.engine.clock.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.clock.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
-import io.github.chrislo27.bouncyroadmania.engine.clock.TempoUtils
+import io.github.chrislo27.bouncyroadmania.util.TempoUtils
 import java.util.*
 
 

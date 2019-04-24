@@ -1,4 +1,6 @@
-package io.github.chrislo27.bouncyroadmania.engine.clock
+package io.github.chrislo27.bouncyroadmania.util
+
+import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
 
 
 object TempoUtils {
