@@ -16,7 +16,7 @@ class Clock {
         private set
 
     fun update(delta: Float) {
-
+        seconds += delta
     }
 
 }
