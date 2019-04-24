@@ -21,13 +21,13 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
 
     init {
         sprite = PaperSprite(AssetRegistry.get<Texture>("tex_bouncer_red"))
-        sprite.setPosition(400f, 300f)
 
         reload()
     }
 
     fun reload() {
         projector.sprites.clear()
+        sprite.setPosition(500f, 400f)
         projector.sprites += sprite
 
         val radius = 1200f
@@ -60,7 +60,7 @@ class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-		sprite.posZ = WaveUtils.getBounceWave(MathHelper.getSawtoothWave(1.25f))
+		sprite.posZ = WaveUtils.getBounceWave(MathHelper.getSawtoothWave(2f))
 
         val batch = main.batch
         batch.begin()

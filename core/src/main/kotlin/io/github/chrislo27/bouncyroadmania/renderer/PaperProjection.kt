@@ -11,10 +11,11 @@ import java.util.*
  */
 open class PaperProjection(var scaleCoeff: Float = 1.0f) {
 
-    val sprites: MutableList<PaperSpriteable> = mutableListOf()
-    val comparator: Comparator<PaperSpriteable> = PaperSpriteComparator().reversed()
+    val sprites: MutableList<PaperRenderable> = mutableListOf()
+    val comparator: Comparator<PaperRenderable>
+        get() = PaperRenderableComparator
 
-    open fun render(batch: SpriteBatch, sprites: MutableList<out PaperSpriteable>) {
+    open fun render(batch: SpriteBatch, sprites: MutableList<out PaperRenderable>) {
         // ensure Z-order
         sprites.sortWith(comparator)
 
@@ -31,7 +32,7 @@ open class PaperProjection(var scaleCoeff: Float = 1.0f) {
 
 }
 
-class PaperSprite : Sprite, PaperSpriteable {
+class PaperSprite : Sprite, PaperRenderable {
 
     override var posX: Float
         get() = this.x
@@ -92,7 +93,7 @@ class PaperSprite : Sprite, PaperSpriteable {
 
 }
 
-interface PaperSpriteable {
+interface PaperRenderable {
 
     var posX: Float
     var posY: Float
@@ -105,23 +106,23 @@ interface PaperSpriteable {
 /**
  * Compares PaperSprites from farthest having priority
  */
-private class PaperSpriteComparator : Comparator<PaperSpriteable> {
+object PaperRenderableComparator : Comparator<PaperRenderable> {
 
-    override fun compare(o1: PaperSpriteable?, o2: PaperSpriteable?): Int {
+    override fun compare(o1: PaperRenderable?, o2: PaperRenderable?): Int {
         if (o1 == null) {
             return if (o2 == null)
                 0
             else
-                1
+                -1
         }
         if (o2 == null)
-            return -1
-
-        if (o1.posZ > o2.posZ)
             return 1
 
-        if (o1.posZ < o2.posZ)
+        if (o1.posZ > o2.posZ)
             return -1
+
+        if (o1.posZ < o2.posZ)
+            return 1
 
         return 0
     }
