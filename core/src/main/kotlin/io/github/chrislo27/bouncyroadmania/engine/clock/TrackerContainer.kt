@@ -1,4 +1,4 @@
-package io.github.chrislo27.bouncyroadmania.engine.clock.tracker
+package io.github.chrislo27.bouncyroadmania.engine.clock
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import java.util.*
