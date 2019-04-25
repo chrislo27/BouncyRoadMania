@@ -15,7 +15,7 @@ import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.MathHelper
 
 
-class TestScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestScreen>(main) {
+class TestLayoutScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestLayoutScreen>(main) {
 
     val projector = PaperProjection(2f)
     val sprites = mutableListOf<PaperRenderable>()

@@ -12,7 +12,7 @@ abstract class Entity(val engine: Engine) : PaperRenderable {
     override var posY: Float by position
     override var posZ: Float by position
 
-    fun renderUpdate(delta: Float) {
+    open fun renderUpdate(delta: Float) {
 
     }
 

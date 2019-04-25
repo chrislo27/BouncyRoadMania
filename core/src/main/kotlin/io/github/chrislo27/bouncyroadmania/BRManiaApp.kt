@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
-import io.github.chrislo27.bouncyroadmania.screen.TestScreen
+import io.github.chrislo27.bouncyroadmania.screen.TestEngineScreen
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.ToolboksGame
@@ -113,7 +113,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         // screen
         run {
             this.screen = AssetRegistryLoadingScreen(this).setNextScreen {
-                TestScreen(this)
+                TestEngineScreen(this)
             }
         }
 
