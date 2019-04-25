@@ -33,7 +33,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         // Position is based on centre, top
 
         val bounceTop: Float = MathUtils.lerp(0f, 8f, bounceAmt)
-        val bounceBottom: Float = MathUtils.lerp(0f, topTexture.regionHeight + 4f, bounceAmt)
+        val bounceBottom: Float = MathUtils.lerp(0f, topTexture.regionHeight * scale + 4f, bounceAmt)
 
         // Render bottom first
         batch.draw(bottomTexture, posX - origin.x, posY - (origin.y + bottomTexture.regionHeight * scale) + bounceBottom,
