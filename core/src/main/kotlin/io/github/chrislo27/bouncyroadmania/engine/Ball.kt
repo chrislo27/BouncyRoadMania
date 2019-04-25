@@ -2,6 +2,7 @@ package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -33,7 +34,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
 
         // Set position
         val a = (((beat - sentOutAt) - (bouncerIndex * beatsPerBounce)) / beatsPerBounce).coerceIn(0f, 1f)
-        val arcHeight = MathUtils.lerp(0f, 96f, beatsPerBounce)
+        val arcHeight = Interpolation.linear.apply(8f, 96f, beatsPerBounce)
         val fromBouncer = engine.bouncers[bouncerIndex]
         val toBouncer = engine.bouncers[bouncerIndex + 1]
 
