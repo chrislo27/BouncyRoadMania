@@ -16,11 +16,13 @@ class Engine(val clock: Clock) {
     }
     val entities: MutableList<Entity> = mutableListOf()
     val projector = PaperProjection(2f)
+    var bouncers: List<Bouncer> = listOf()
 
     fun renderUpdate(delta: Float) {
         entities.forEach {
             it.renderUpdate(delta)
         }
+        entities.removeIf { it.kill }
     }
 
     fun render(batch: SpriteBatch) {

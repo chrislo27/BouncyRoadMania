@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 
 open class Bouncer(engine: Engine) : Entity(engine) {
@@ -33,7 +32,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         // Position is based on centre, top
 
         val bounceTop: Float = MathUtils.lerp(0f, 8f, bounceAmt)
-        val bounceBottom: Float = MathUtils.lerp(0f, topTexture.regionHeight * scale + 4f, bounceAmt)
+        val bounceBottom: Float = MathUtils.lerp(0f, topTexture.regionHeight * scale, bounceAmt)
 
         // Render bottom first
         batch.draw(bottomTexture, posX - origin.x, posY - (origin.y + bottomTexture.regionHeight * scale) + bounceBottom,
@@ -46,9 +45,9 @@ open class Bouncer(engine: Engine) : Entity(engine) {
                 topTexture.regionWidth.toFloat(), topTexture.regionHeight.toFloat(),
                 scale, scale, 0f)
 
-        batch.setColor(0f, 1f, 0f, 1f)
-        batch.fillRect(posX - 2f, posY - 2f, 4f, 4f)
-        batch.setColor(1f, 1f, 1f, 1f)
+//        batch.setColor(0f, 1f, 0f, 1f)
+//        batch.fillRect(posX - 2f, posY - 2f, 4f, 4f)
+//        batch.setColor(1f, 1f, 1f, 1f)
     }
 
     override fun renderUpdate(delta: Float) {

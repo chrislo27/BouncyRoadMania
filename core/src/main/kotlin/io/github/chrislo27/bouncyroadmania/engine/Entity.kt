@@ -7,6 +7,7 @@ import io.github.chrislo27.bouncyroadmania.util.Position
 abstract class Entity(val engine: Engine) : PaperRenderable {
 
     val position: Position = Position(0f, 0f, 0f)
+    var kill: Boolean = false
 
     override var posX: Float by position
     override var posY: Float by position
