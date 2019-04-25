@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.bouncyroadmania.screen.TestEngineScreen
@@ -128,27 +127,27 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     }
 
     override fun postRender() {
-        val screen = screen
-        if (screen !is HidesVersionText || !screen.hidesVersionText) {
-            val font = defaultBorderedFont
-            font.data.setScale(0.5f)
-
-            font.setColor(1f, 1f, 1f, 1f)
-
-            val oldProj = batch.projectionMatrix
-            batch.projectionMatrix = defaultCamera.combined
-            batch.begin()
-            val layout = font.draw(batch, BRMania.VERSION.toString(),
-                                   0f,
-                                   (font.capHeight) + (2f / BRMania.HEIGHT) * defaultCamera.viewportHeight,
-                                   defaultCamera.viewportWidth, Align.right, false)
-            versionTextWidth = layout.width
-            batch.end()
-            batch.projectionMatrix = oldProj
-            font.setColor(1f, 1f, 1f, 1f)
-
-            font.data.setScale(1f)
-        }
+//        val screen = screen
+//        if (screen !is HidesVersionText || !screen.hidesVersionText) {
+//            val font = defaultBorderedFont
+//            font.data.setScale(0.5f)
+//
+//            font.setColor(1f, 1f, 1f, 1f)
+//
+//            val oldProj = batch.projectionMatrix
+//            batch.projectionMatrix = defaultCamera.combined
+//            batch.begin()
+//            val layout = font.draw(batch, BRMania.VERSION.toString(),
+//                                   0f,
+//                                   (font.capHeight) + (2f / BRMania.HEIGHT) * defaultCamera.viewportHeight,
+//                                   defaultCamera.viewportWidth, Align.right, false)
+//            versionTextWidth = layout.width
+//            batch.end()
+//            batch.projectionMatrix = oldProj
+//            font.setColor(1f, 1f, 1f, 1f)
+//
+//            font.data.setScale(1f)
+//        }
 
         super.postRender()
     }
