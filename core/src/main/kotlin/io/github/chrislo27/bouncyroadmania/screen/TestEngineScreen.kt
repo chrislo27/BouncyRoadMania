@@ -11,6 +11,7 @@ import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
 import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
 import io.github.chrislo27.toolboks.ToolboksScreen
+import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
 
 class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngineScreen>(main) {
@@ -40,6 +41,13 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 
         val batch = main.batch
         engine.render(batch)
+
+        batch.begin()
+        val comet = main.cometBorderedFont
+        comet.scaleMul(0.5f)
+//        comet.drawCompressed(batch, "Bouncy Road Mania   ", engine.camera.viewportWidth - 600f, comet.lineHeight, 600f, Align.right)
+        comet.scaleMul(1f / 0.5f)
+        batch.end()
     }
 
     override fun renderUpdate() {
@@ -52,7 +60,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         if (clock.beat > ballCycle * sendBallCycle) {
             sendBallCycle++
 //            engine.entities += Ball(engine, if (MathUtils.randomBoolean(0.25f)) 2f else 0.5f).apply {
-//                val first = engine.entities.first()
+//                val first = engine.bouncers.first()
 //                posX = first.posX
 //                posY = first.posY
 //            }
@@ -65,7 +73,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             engine.entities += Ball(engine, 0.5f).apply {
-                val first = engine.entities.first()
+                val first = engine.bouncers.first()
                 posX = first.posX
                 posY = first.posY
             }

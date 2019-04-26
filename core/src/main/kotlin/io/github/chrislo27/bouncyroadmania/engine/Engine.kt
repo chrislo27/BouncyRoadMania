@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Interpolation
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -25,8 +25,9 @@ class Engine(val clock: Clock) {
 
         val radius = 1200f
         val bouncers = mutableListOf<Bouncer>()
+        // midpoint index = 8
         for (i in -1..15) {
-            val angle = (180 * (i / 14f)) - 90
+            val angle = (180.0 * (i / 14.0)) - 90
             val bouncer: Bouncer = if (i == 13) {
                 RedBouncer(this)
             } else if (i == 12) {
@@ -35,12 +36,15 @@ class Engine(val clock: Clock) {
                 Bouncer(this)
             }
 
-            val x: Float = MathUtils.cosDeg(angle) * radius
-            val z: Float = (-MathUtils.sinDeg(angle) + 1) * 0.3f
+            val cos = Math.cos(Math.toRadians(angle)).toFloat()
+            val sin = Math.sin(Math.toRadians(angle)).toFloat()
 
-            bouncer.posY = ((-MathUtils.sinDeg(angle) + 1) / 2f * 440f) + 200
+            val x: Float =  cos * radius // MathUtils.cosDeg(angle - 0.5f) * radius
+            val z: Float = (-sin + 1) * 0.3f
 
-            bouncer.posX = x
+            bouncer.posY = Interpolation.sineIn.apply(640f, 150f, i / 14f)
+
+            bouncer.posX = radius * if (i <= 8) Interpolation.sineOut.apply(i / 8f) else Interpolation.sineOut.apply(1f - ((i - 8) / 6f))
             bouncer.posZ = z
 
             entities += bouncer

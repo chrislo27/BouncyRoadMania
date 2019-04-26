@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
@@ -44,6 +45,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     }
 
     private val fontFileHandle: FileHandle by lazy { Gdx.files.internal("fonts/rodin_merged.ttf") }
+    private val cometFontFileHandle: FileHandle by lazy { Gdx.files.internal("fonts/cometstd.otf") }
     private val fontAfterLoadFunction: FreeTypeFont.() -> Unit = {
         this.font!!.apply {
             setFixedWidthGlyphs("1234567890")
@@ -56,23 +58,32 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
     val uiPalette: UIPalette by lazy {
         UIPalette(defaultFontFTF, defaultFontLargeFTF, 1f,
-                  Color(1f, 1f, 1f, 1f),
-                  Color(0f, 0f, 0f, 0.75f),
-                  Color(0.25f, 0.25f, 0.25f, 0.75f),
-                  Color(0f, 0.5f, 0.5f, 0.75f))
+                Color(1f, 1f, 1f, 1f),
+                Color(0f, 0f, 0f, 0.75f),
+                Color(0.25f, 0.25f, 0.25f, 0.75f),
+                Color(0f, 0.5f, 0.5f, 0.75f))
     }
+
+    // Fonts
 
     val defaultFontLargeKey = "default_font_large"
     val defaultBorderedFontLargeKey = "default_bordered_font_large"
+    val cometFontKey = "comet_font"
+    val cometBorderedFontKey = "comet_bordered_font"
 
-    val defaultFontFTF: FreeTypeFont
-        get() = fonts[defaultFontKey]
-    val defaultBorderedFontFTF: FreeTypeFont
-        get() = fonts[defaultBorderedFontKey]
-    val defaultFontLargeFTF: FreeTypeFont
-        get() = fonts[defaultFontLargeKey]
-    val defaultBorderedFontLargeFTF: FreeTypeFont
-        get() = fonts[defaultBorderedFontLargeKey]
+    val defaultFontFTF: FreeTypeFont get() = fonts[defaultFontKey]
+    val defaultBorderedFontFTF: FreeTypeFont get() = fonts[defaultBorderedFontKey]
+    val defaultFontLargeFTF: FreeTypeFont get() = fonts[defaultFontLargeKey]
+    val defaultBorderedFontLargeFTF: FreeTypeFont get() = fonts[defaultBorderedFontLargeKey]
+    val cometFontFTF: FreeTypeFont get() = fonts[cometFontKey]
+    val cometBorderedFontFTF: FreeTypeFont get() = fonts[cometBorderedFontKey]
+
+    val defaultFontLarge: BitmapFont get() = defaultFontLargeFTF.font!!
+    val defaultBorderedFontLarge: BitmapFont get() = defaultBorderedFontLargeFTF.font!!
+    val cometFont: BitmapFont get() = cometFontFTF.font!!
+    val cometBorderedFont: BitmapFont get() = cometBorderedFontFTF.font!!
+
+    // End of Fonts
 
     lateinit var preferences: Preferences
         private set
@@ -104,6 +115,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         run {
             fonts[defaultFontLargeKey] = createDefaultLargeFont()
             fonts[defaultBorderedFontLargeKey] = createDefaultLargeBorderedFont()
+            fonts[cometFontKey] = createCometFont()
+            fonts[cometBorderedFontKey] = createCometBorderedFont()
             fonts.loadUnloaded(defaultCamera.viewportWidth, defaultCamera.viewportHeight)
         }
 
@@ -178,8 +191,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         return FreeTypeFont(fontFileHandle, emulatedSize, createDefaultTTFParameter()
                 .apply {
                     borderWidth = 1.5f
-                })
-                .setAfterLoad(fontAfterLoadFunction)
+                }).setAfterLoad(fontAfterLoadFunction)
     }
 
     private fun createDefaultLargeFont(): FreeTypeFont {
@@ -187,8 +199,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
                 .apply {
                     size *= 4
                     borderWidth *= 4
-                })
-                .setAfterLoad(fontAfterLoadFunction)
+                }).setAfterLoad(fontAfterLoadFunction)
     }
 
     private fun createDefaultLargeBorderedFont(): FreeTypeFont {
@@ -198,7 +209,22 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
                     size *= 4
                     borderWidth *= 4
-                })
-                .setAfterLoad(fontAfterLoadFunction)
+                }).setAfterLoad(fontAfterLoadFunction)
+    }
+
+    private fun createCometFont(): FreeTypeFont {
+        return FreeTypeFont(cometFontFileHandle, emulatedSize, createDefaultTTFParameter().apply {
+            size *= 4
+        }).setAfterLoad(fontAfterLoadFunction)
+    }
+
+    private fun createCometBorderedFont(): FreeTypeFont {
+        return FreeTypeFont(cometFontFileHandle, emulatedSize, createDefaultTTFParameter()
+                .apply {
+                    borderWidth = 1.5f
+
+                    size *= 4
+                    borderWidth *= 4
+                }).setAfterLoad(fontAfterLoadFunction)
     }
 }

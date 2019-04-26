@@ -39,7 +39,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
                     bouncer.bounce()
                     if (bouncer.isPlayer) {
                         // FIXME
-                        fellOff = true
+//                        fellOff = true
                     }
                 }
             }
