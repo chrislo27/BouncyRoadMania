@@ -25,7 +25,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
         val beat = engine.clock.beat
         bouncerIndex = ((beat - sentOutAt) / beatsPerBounce).toInt()
         if (bouncerIndex >= engine.bouncers.size - 1) {
-            // FIXME
             kill = true
             bouncerIndex = engine.bouncers.size - 2
             val toBouncer = engine.bouncers[bouncerIndex + 1]

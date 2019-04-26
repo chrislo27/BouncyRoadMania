@@ -32,7 +32,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 
         val radius = 1200f
         val bouncers = mutableListOf<Bouncer>()
-        for (i in 0 until 15) {
+        for (i in -1 until 15 + 1) {
             val angle = (180 * (i / 14f)) - 90
             val bouncer: Bouncer = if (i == 13) {
                 RedBouncer(engine)
