@@ -36,10 +36,7 @@ class Engine(val clock: Clock) {
                 Bouncer(this)
             }
 
-            val cos = Math.cos(Math.toRadians(angle)).toFloat()
             val sin = Math.sin(Math.toRadians(angle)).toFloat()
-
-            val x: Float =  cos * radius // MathUtils.cosDeg(angle - 0.5f) * radius
             val z: Float = (-sin + 1) * 0.3f
 
             bouncer.posY = Interpolation.sineIn.apply(640f, 150f, i / 14f)
