@@ -3,7 +3,6 @@ package io.github.chrislo27.bouncyroadmania.screen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Bouncer
@@ -52,17 +51,24 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         val ballCycle = 1f
         if (clock.beat > ballCycle * sendBallCycle) {
             sendBallCycle++
-            engine.entities += Ball(engine, if (MathUtils.randomBoolean(0.25f)) 2f else 0.5f).apply {
-                val first = engine.entities.first()
-                posX = first.posX
-                posY = first.posY
-            }
+//            engine.entities += Ball(engine, if (MathUtils.randomBoolean(0.25f)) 2f else 0.5f).apply {
+//                val first = engine.entities.first()
+//                posX = first.posX
+//                posY = first.posY
+//            }
         }
 
         engine.renderUpdate(delta)
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             reload()
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            engine.entities += Ball(engine, 0.5f).apply {
+                val first = engine.entities.first()
+                posX = first.posX
+                posY = first.posY
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             engine.entities.filterIsInstance<Bouncer>().forEach { it.bounce() }

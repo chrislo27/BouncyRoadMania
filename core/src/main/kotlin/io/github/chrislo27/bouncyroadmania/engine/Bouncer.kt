@@ -12,6 +12,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
 
     var bounceAmt: Float = 0f
         protected set
+    open val isPlayer: Boolean = false
     protected open val texture: Texture
         get() = AssetRegistry["tex_bouncer_blue"]
     protected open val topPart: Int = 40
@@ -68,6 +69,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
 class RedBouncer(engine: Engine) : Bouncer(engine) {
     override val texture: Texture
         get() = AssetRegistry["tex_bouncer_red"]
+    override val isPlayer: Boolean = true
 
     init {
         origin.x = 24f
@@ -77,6 +79,7 @@ class RedBouncer(engine: Engine) : Bouncer(engine) {
 class YellowBouncer(engine: Engine) : Bouncer(engine) {
     override val texture: Texture
         get() = AssetRegistry["tex_bouncer_yellow"]
+    override val isPlayer: Boolean = true
 
     init {
         origin.x = 11f

@@ -12,7 +12,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
 
     val sentOutAt: Float = engine.clock.beat
     var bouncerIndex: Int = 0
-    private var lastBouncerIndex: Int = -1
+    var fellOff: Boolean = false
 
     override fun render(batch: SpriteBatch, scale: Float) {
         val tex: Texture = AssetRegistry["tex_ball"]
@@ -23,12 +23,26 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
     override fun renderUpdate(delta: Float) {
         super.renderUpdate(delta)
         val beat = engine.clock.beat
-        bouncerIndex = ((beat - sentOutAt) / beatsPerBounce).toInt()
-        if (bouncerIndex >= engine.bouncers.size - 1) {
+        val estimatedBouncerIndex = ((beat - sentOutAt) / beatsPerBounce).toInt()
+        if (!kill && estimatedBouncerIndex >= engine.bouncers.size - 1) {
             kill = true
             bouncerIndex = engine.bouncers.size - 2
             val toBouncer = engine.bouncers[bouncerIndex + 1]
             toBouncer.bounce()
+        } else if (estimatedBouncerIndex < engine.bouncers.size - 1) {
+            if (bouncerIndex != estimatedBouncerIndex) {
+                bouncerIndex = estimatedBouncerIndex
+                val bouncer = engine.bouncers[bouncerIndex]
+                if (fellOff) {
+                    kill = true
+                } else {
+                    bouncer.bounce()
+                    if (bouncer.isPlayer) {
+                        // FIXME
+                        fellOff = true
+                    }
+                }
+            }
         }
 
         // Set position
@@ -37,13 +51,10 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
         val fromBouncer = engine.bouncers[bouncerIndex]
         val toBouncer = engine.bouncers[bouncerIndex + 1]
 
-        if (bouncerIndex != lastBouncerIndex) {
-            lastBouncerIndex = bouncerIndex
-            fromBouncer.bounce()
-        }
+        val targetY = if (fellOff) -64f else toBouncer.posY
 
         posX = MathUtils.lerp(fromBouncer.posX, toBouncer.posX, a)
-        posY = MathUtils.lerp(fromBouncer.posY, toBouncer.posY, a) + arcHeight * WaveUtils.getBounceWave(a)
+        posY = MathUtils.lerp(fromBouncer.posY, targetY, a) + arcHeight * WaveUtils.getBounceWave(a)
         posZ = MathUtils.lerp(fromBouncer.posZ, toBouncer.posZ, a)
     }
 }
