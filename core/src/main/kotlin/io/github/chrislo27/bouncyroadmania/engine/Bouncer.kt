@@ -54,7 +54,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
     override fun renderUpdate(delta: Float) {
         super.renderUpdate(delta)
         if (bounceAmt > 0f){
-            bounceAmt -= delta * 10f
+            bounceAmt -= delta * 8f
             if (bounceAmt < 0f)
                 bounceAmt = 0f
         }
