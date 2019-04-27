@@ -1,16 +1,20 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Matrix4
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
 class Engine(val clock: Clock) {
+
+    companion object {
+        private val TMP_MATRIX = Matrix4()
+    }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
@@ -36,6 +40,12 @@ class Engine(val clock: Clock) {
                 Bouncer(this)
             }
 
+            if (i == -1 || i == 15) {
+                bouncer.isSilent = true
+            } else if (i == 14) {
+                bouncer.soundHandle = "sfx_cymbal"
+            }
+
             val sin = Math.sin(Math.toRadians(angle)).toFloat()
             val z: Float = (-sin + 1) * 0.3f
 
@@ -59,11 +69,13 @@ class Engine(val clock: Clock) {
 
     fun render(batch: SpriteBatch) {
         camera.update()
+        TMP_MATRIX.set(batch.projectionMatrix)
         batch.projectionMatrix = camera.combined
         batch.begin()
-        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, camera.viewportWidth, camera.viewportHeight)
         projector.render(batch, entities)
         batch.end()
+        batch.projectionMatrix = TMP_MATRIX
     }
 
 }

@@ -16,7 +16,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tex_bouncer_yellow", "images/game/yellow.png")
 
         AssetRegistry.loadAsset<Sound>("sfx_tink", "sounds/tink.ogg")
-        AssetRegistry.loadAsset<Sound>("sfx_cymbal", "sounds/cymbal.wav")
+        AssetRegistry.loadAsset<Sound>("sfx_cymbal", "sounds/cymbal.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_dud_left", "sounds/dudL.wav")
         AssetRegistry.loadAsset<Sound>("sfx_dud_right", "sounds/dudR.wav")
         AssetRegistry.loadAsset<Sound>("sfx_splash", "sounds/splash.wav")

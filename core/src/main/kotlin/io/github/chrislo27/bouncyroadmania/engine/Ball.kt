@@ -28,7 +28,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
             kill = true
             bouncerIndex = engine.bouncers.size - 2
             val toBouncer = engine.bouncers[bouncerIndex + 1]
-            toBouncer.bounce()
+            toBouncer.bounce(false)
         } else if (estimatedBouncerIndex < engine.bouncers.size - 1) {
             if (bouncerIndex != estimatedBouncerIndex) {
                 bouncerIndex = estimatedBouncerIndex
@@ -36,7 +36,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
                 if (fellOff) {
                     kill = true
                 } else {
-                    bouncer.bounce()
+                    bouncer.bounce(true)
                     if (bouncer.isPlayer) {
                         // FIXME
 //                        fellOff = true

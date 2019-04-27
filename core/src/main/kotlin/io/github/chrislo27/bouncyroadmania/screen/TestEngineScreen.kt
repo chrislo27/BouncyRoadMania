@@ -45,7 +45,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         batch.begin()
         val comet = main.cometBorderedFont
         comet.scaleMul(0.5f)
-//        comet.drawCompressed(batch, "Bouncy Road Mania", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
+//        comet.drawCompressed(batch, "Bouncy Road Mania", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight * 1.75f, 600f, Align.right)
 //        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
         comet.scaleMul(1f / 0.5f)
         batch.end()
@@ -80,7 +80,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            engine.entities.filterIsInstance<Bouncer>().forEach { it.bounce() }
+            engine.entities.filterIsInstance<Bouncer>().forEach { it.bounce(false) }
         }
     }
 
