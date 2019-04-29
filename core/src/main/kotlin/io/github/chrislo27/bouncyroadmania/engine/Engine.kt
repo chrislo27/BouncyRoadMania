@@ -17,7 +17,7 @@ class Engine(val clock: Clock) {
     companion object {
         private val TMP_MATRIX = Matrix4()
 
-        val MAX_OFFSET_SEC: Float = 5f / 60
+        val MAX_OFFSET_SEC: Float = 4.5f / 60
         val ACE_OFFSET: Float = 1f / 60
         val GOOD_OFFSET: Float = 3f / 60
         val BARELY_OFFSET: Float = 4f / 60
@@ -63,7 +63,6 @@ class Engine(val clock: Clock) {
 
             val sin = Math.sin(Math.toRadians(angle)).toFloat()
             val z: Float = (-sin + 1) * 0.3f
-            println("z for $i: $z")
 
             bouncer.posY = Interpolation.sineIn.apply(640f, 150f, i / 14f)
 
