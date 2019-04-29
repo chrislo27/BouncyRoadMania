@@ -41,14 +41,15 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
         batch.setColor(1f, 1f, 1f, 1f)
     }
 
-    fun bounce(from: Bouncer, next: Bouncer, startFromCurrentPos: Boolean) {
+    fun bounce(from: Bouncer, next: Bouncer, startFromCurrentPos: Boolean,
+               startBeat: Float = if (startFromCurrentPos) engine.clock.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce),
+               endBeat: Float = if (fellOff) (startBeat + beatsPerBounce) else (sentOutAt + (bouncesSoFar + 1) * beatsPerBounce)) {
         val fromPos: Entity = if (startFromCurrentPos) this else from
         val fellOff = this.fellOff
         val nextX = if (fellOff) MathUtils.lerp(fromPos.posX, next.posX, 0.5f) else next.posX
-        this.bounce = Bounce(fromPos.posX, fromPos.posY, fromPos.posZ, nextX, if (fellOff) -64f else next.posY, next.posZ,
+        this.bounce = Bounce(fromPos.posX, fromPos.posY, fromPos.posZ, nextX, if (fellOff) -32f else next.posY, next.posZ,
                 Interpolation.linear.apply(8f, 96f, beatsPerBounce),
-                if (startFromCurrentPos) engine.clock.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce), sentOutAt + (bouncesSoFar + 1) * beatsPerBounce,
-                from, next)
+                startBeat, endBeat, from, next)
     }
 
     override fun renderUpdate(delta: Float) {
@@ -63,6 +64,11 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
             posX = MathUtils.lerp(bounce.fromX, bounce.toX, alphaClamped)
             posY = MathUtils.lerp(bounce.fromY, bounce.toY, alphaClamped) + bounce.arcHeight * WaveUtils.getBounceWave(alphaClamped)
             posZ = MathUtils.lerp(bounce.fromZ, bounce.toZ, alphaClamped)
+            posY = if (alphaClamped <= 0.5f) {
+                MathUtils.lerp(bounce.fromY, bounce.fromY + bounce.arcHeight, WaveUtils.getBounceWave(alphaClamped))
+            } else {
+                MathUtils.lerp(bounce.fromY + bounce.arcHeight, bounce.toY, (1f - WaveUtils.getBounceWave(alphaClamped)))
+            }
 
             if (alpha >= 1f) {
                 val newFrom = bounce.toBouncer
@@ -120,13 +126,13 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
         val fo = this.fallOff
         if (fo != null && fo.bouncer is PlayerBouncer) {
             // Pending input
-            if (fo.bouncer.inputType == inputType) {
+            if (fo.bouncer.inputType == inputType && engine.clock.seconds in fo.minSeconds..fo.maxSeconds) {
                 // TODO tell engine an input was received at a certain time for recording
                 bouncesSoFar++
                 fo.bouncer.playSound()
                 this.fallOff = null
                 prepareFallOff()
-                bounce(fo.bouncer, engine.bouncers[fo.bouncer.index + 1], true)
+                bounce(fo.bouncer, engine.bouncers[fo.bouncer.index + 1], false)
                 return true
             }
         }
