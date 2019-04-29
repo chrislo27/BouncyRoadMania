@@ -66,9 +66,12 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         }
     }
 
-    fun bounce(playSound: Boolean) {
+    fun bounce() {
         bounceAmt = 1f
-        if (playSound && !isSilent) {
+    }
+
+    fun playSound(semitone: Int = this.semitone) {
+        if (!isSilent) {
             val width = engine.camera.viewportWidth
             AssetRegistry.get<Sound>(soundHandle).play(1f, Semitones.getALPitch(semitone), ((posX - (width / 2f)) / (width * 1.25f)).coerceIn(-1f, 1f))
         }

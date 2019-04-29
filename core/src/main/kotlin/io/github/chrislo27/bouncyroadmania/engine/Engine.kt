@@ -1,11 +1,13 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
+import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
@@ -14,6 +16,11 @@ class Engine(val clock: Clock) {
 
     companion object {
         private val TMP_MATRIX = Matrix4()
+
+        val MAX_OFFSET_SEC: Float = 9f / 60
+        val ACE_OFFSET: Float = 1f / 60
+        val GOOD_OFFSET: Float = 5f / 60
+        val BARELY_OFFSET: Float = 7.5f / 60
     }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
@@ -22,6 +29,10 @@ class Engine(val clock: Clock) {
     val entities: MutableList<Entity> = mutableListOf()
     val projector = PaperProjection(2f)
     var bouncers: List<Bouncer> = listOf()
+    lateinit var rightBouncer: YellowBouncer
+        private set
+    lateinit var leftBouncer: RedBouncer
+        private set
 
     fun addBouncers() {
         entities.removeAll(bouncers)
@@ -33,9 +44,13 @@ class Engine(val clock: Clock) {
         for (i in -1..15) {
             val angle = (180.0 * (i / 14.0)) - 90
             val bouncer: Bouncer = if (i == 13) {
-                RedBouncer(this)
+                RedBouncer(this).apply {
+                    leftBouncer = this
+                }
             } else if (i == 12) {
-                YellowBouncer(this)
+                YellowBouncer(this).apply {
+                    rightBouncer = this
+                }
             } else {
                 Bouncer(this)
             }
@@ -76,6 +91,32 @@ class Engine(val clock: Clock) {
         projector.render(batch, entities)
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
+    }
+
+    fun getBouncerForInput(inputType: InputType): Bouncer {
+        return when (inputType) {
+            InputType.A -> rightBouncer
+            InputType.DPAD -> leftBouncer
+        }
+    }
+
+    fun getInputTypeForBouncer(bouncer: Bouncer): InputType? {
+        return if (bouncer === rightBouncer) InputType.A else if (bouncer === leftBouncer) InputType.DPAD else null
+    }
+
+    fun fireInput(inputType: InputType) {
+        // TODO add delay between inputs
+        val bouncer = getBouncerForInput(inputType)
+        val any = entities.filterIsInstance<Ball>().fold(false) { acc, it ->
+            it.onInput(inputType) || acc
+        }
+        bouncer.bounce()
+        if (any) {
+
+        } else {
+            // play dud sound
+            AssetRegistry.get<Sound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play()
+        }
     }
 
 }

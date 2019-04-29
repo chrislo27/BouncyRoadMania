@@ -10,6 +10,7 @@ import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
 import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
+import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
@@ -80,7 +81,14 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            engine.entities.filterIsInstance<Bouncer>().forEach { it.bounce(false) }
+            engine.entities.filterIsInstance<Bouncer>().forEach { it.bounce() }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            engine.fireInput(InputType.DPAD)
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+            engine.fireInput(InputType.A)
         }
     }
 
