@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
-import io.github.chrislo27.bouncyroadmania.engine.Bouncer
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
@@ -78,10 +77,8 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
                 val first = engine.bouncers.first()
                 posX = first.posX
                 posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
             }
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            engine.entities.filterIsInstance<Bouncer>().forEach { it.bounce() }
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {

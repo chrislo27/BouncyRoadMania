@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.util.Semitones
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
@@ -18,6 +19,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
     open val semitone: Int = 0
     var isSilent: Boolean = false
     var soundHandle: String = "sfx_tink"
+    val index: Int get() = engine.bouncers.indexOf(this)
 
     protected open val texture: Texture
         get() = AssetRegistry["tex_bouncer_blue"]
@@ -66,7 +68,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         }
     }
 
-    fun bounce() {
+    fun bounceAnimation() {
         bounceAmt = 1f
     }
 
@@ -79,10 +81,13 @@ open class Bouncer(engine: Engine) : Entity(engine) {
 
 }
 
-class RedBouncer(engine: Engine) : Bouncer(engine) {
+abstract class PlayerBouncer(engine: Engine, val inputType: InputType) : Bouncer(engine) {
+    override val isPlayer: Boolean = true
+}
+
+class RedBouncer(engine: Engine) : PlayerBouncer(engine, InputType.DPAD) {
     override val texture: Texture
         get() = AssetRegistry["tex_bouncer_red"]
-    override val isPlayer: Boolean = true
     override val semitone: Int = 3
 
     init {
@@ -90,10 +95,9 @@ class RedBouncer(engine: Engine) : Bouncer(engine) {
     }
 }
 
-class YellowBouncer(engine: Engine) : Bouncer(engine) {
+class YellowBouncer(engine: Engine) : PlayerBouncer(engine, InputType.A) {
     override val texture: Texture
         get() = AssetRegistry["tex_bouncer_yellow"]
-    override val isPlayer: Boolean = true
     override val semitone: Int = -4
 
     init {

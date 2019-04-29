@@ -8,114 +8,147 @@ import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import kotlin.math.absoluteValue
 
 
 class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
 
-    data class NextInput(val inputType: InputType, val seconds: Float, var succeeded: Int = -1)
+    data class Bounce(val fromX: Float, val fromY: Float, val fromZ: Float, val toX: Float, val toY: Float, val toZ: Float, val arcHeight: Float,
+                      val startBeat: Float, val endBeat: Float, val fromBouncer: Bouncer, val toBouncer: Bouncer?)
+
+    private data class FallOff(val minSeconds: Float, val maxSeconds: Float, val bouncer: Bouncer)
 
     val sentOutAt: Float = engine.clock.beat
-    var bouncerIndex: Int = 0
+    var bouncesSoFar: Int = 0
+    var bounce: Bounce? = null
     var fellOff: Boolean = false
+        private set
 
-    // The next bouncer input that should be fired at the seconds
-    private var nextBouncerInput: NextInput? = null
+    // The ball will "fall off" after this seconds so long if bounce's toBouncer is a player
+    private var fallOff: FallOff? = null
 
     override fun render(batch: SpriteBatch, scale: Float) {
         val tex: Texture = AssetRegistry["tex_ball"]
+        val fallOff = fallOff
+        if (fallOff != null) {
+            if (fallOff.bouncer === engine.redBouncer) {
+                batch.setColor(1f, 0f, 0f, 1f)
+            } else {
+                batch.setColor(1f, 0.9f, 0f, 1f)
+            }
+        }
         batch.draw(tex, posX - tex.width / 2f, posY, tex.width * 0.5f, tex.height * 0.5f, tex.width * 1f, tex.height * 1f, scale, scale,
                 0f, 0, 0, tex.width, tex.height, false, false)
+        batch.setColor(1f, 1f, 1f, 1f)
+    }
+
+    fun bounce(from: Bouncer, next: Bouncer, startFromCurrentPos: Boolean) {
+        val fromPos: Entity = if (startFromCurrentPos) this else from
+        val fellOff = this.fellOff
+        val nextX = if (fellOff) MathUtils.lerp(fromPos.posX, next.posX, 0.5f) else next.posX
+        this.bounce = Bounce(fromPos.posX, fromPos.posY, fromPos.posZ, nextX, if (fellOff) -64f else next.posY, next.posZ,
+                Interpolation.linear.apply(8f, 96f, beatsPerBounce),
+                if (startFromCurrentPos) engine.clock.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce), sentOutAt + (bouncesSoFar + 1) * beatsPerBounce,
+                from, next)
     }
 
     override fun renderUpdate(delta: Float) {
         super.renderUpdate(delta)
         val beat = engine.clock.beat
-        val estimatedBouncerIndex = ((beat - sentOutAt) / beatsPerBounce).toInt()
-        val next = nextBouncerInput
-        if (!kill && estimatedBouncerIndex >= engine.bouncers.size - 1) {
-            kill = true
-            bouncerIndex = engine.bouncers.size - 2
-            val toBouncer = engine.bouncers[bouncerIndex + 1]
-            if (!toBouncer.isPlayer) {
-                toBouncer.bounce()
-            }
-        } else if (estimatedBouncerIndex < engine.bouncers.size - 1) {
-            if (bouncerIndex < estimatedBouncerIndex) {
-                if (!fellOff && (next == null || next.succeeded > -1)) {
-                    bouncerIndex = estimatedBouncerIndex
-                    val bouncer = engine.bouncers[bouncerIndex]
+
+        val bounce = bounce
+        if (bounce != null) {
+            val alpha = (beat - bounce.startBeat) / (bounce.endBeat - bounce.startBeat)
+            val alphaClamped = alpha.coerceIn(0f, 1f)
+
+            posX = MathUtils.lerp(bounce.fromX, bounce.toX, alphaClamped)
+            posY = MathUtils.lerp(bounce.fromY, bounce.toY, alphaClamped) + bounce.arcHeight * WaveUtils.getBounceWave(alphaClamped)
+            posZ = MathUtils.lerp(bounce.fromZ, bounce.toZ, alphaClamped)
+
+            if (alpha >= 1f) {
+                val newFrom = bounce.toBouncer
+                val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + 1)
+                if (next == null || fellOff) {
+                    this.bounce = null
+                    this.kill = true
                     if (fellOff) {
-                        kill = true
+                        AssetRegistry.get<Sound>("sfx_splash").play()
+                    }
+                } else if (newFrom != null) {
+                    if (!newFrom.isPlayer) {
+                        bouncesSoFar++
+                        if (fallOff == null) {
+                            prepareFallOff()
+                        }
+                        bounce(newFrom, next, false)
+                        newFrom.playSound()
+                        newFrom.bounceAnimation()
                     } else {
-                        if (!bouncer.isPlayer) {
-                            bouncer.bounce()
-                            bouncer.playSound()
-                        } else {
-                            val input = engine.getInputTypeForBouncer(bouncer)
-                            if (input != null) {
-                                nextBouncerInput = NextInput(input, engine.clock.tempos.beatsToSeconds(sentOutAt + (bouncerIndex * beatsPerBounce)))
+                        val fo = fallOff
+                        if (fo != null) {
+                            // Check the fall off time, if it has expired, do a proper fall bounce
+                            val currentSeconds = engine.clock.seconds
+                            if (currentSeconds > fo.maxSeconds) {
+                                // Fall off
+                                fellOff = true
+                                this.fallOff = null
+                                bouncesSoFar++
+                                newFrom.playSound(semitone = 0)
+                                bounce(newFrom, next, true)
                             }
                         }
                     }
-                    // Handle player errors
-                    if (next != null) {
-                        if (next.succeeded == 1) {
-                            this.nextBouncerInput = null
-                        } else {
-                            // failed
-                            println("fell off")
-                            fellOff = true
-                            engine.getBouncerForInput(next.inputType).playSound(semitone = 0)
-                            this.nextBouncerInput = null
-
-                            AssetRegistry.get<Sound>("sfx_splash").play()
-                        }
-                    }
-                } else if (next != null && next.succeeded == -1) {
-                    val currentSeconds = engine.clock.seconds
-                    val diff = currentSeconds - next.seconds
-                    val absDiff = diff.absoluteValue
-                    if (absDiff > Engine.BARELY_OFFSET) {
-                        next.succeeded = 0
-                    }
                 }
             }
         }
+    }
 
-        // Set position
-        val a = if (next != null && next.succeeded == -1) 0f else (((beat - sentOutAt) - (bouncerIndex * beatsPerBounce)) / beatsPerBounce).coerceIn(0f, 1f)
-        val arcHeight = Interpolation.linear.apply(8f, 96f, beatsPerBounce)
-        val fromBouncer = engine.bouncers[bouncerIndex]
-        val toBouncer = engine.bouncers[bouncerIndex + 1]
-
-        val targetY = if (fellOff) -64f else toBouncer.posY
-
-        posX = MathUtils.lerp(fromBouncer.posX, toBouncer.posX, a)
-        posY = MathUtils.lerp(fromBouncer.posY, targetY, a) + arcHeight * WaveUtils.getBounceWave(a)
-        posZ = MathUtils.lerp(fromBouncer.posZ, toBouncer.posZ, a)
+    private fun prepareFallOff() {
+        val bounce = this.bounce
+        if (bounce != null) {
+            val newFrom = bounce.toBouncer
+            val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + 1)
+            if (next != null && next.isPlayer && this.fallOff == null) {
+                // Set the fall off time
+                val expectedBeat = sentOutAt + (bouncesSoFar + 1) * beatsPerBounce
+                val expectedSeconds = engine.clock.tempos.beatsToSeconds(expectedBeat)
+                this.fallOff = FallOff(expectedSeconds - Engine.MAX_OFFSET_SEC, expectedSeconds + Engine.MAX_OFFSET_SEC, next)
+            }
+        }
     }
 
     fun onInput(inputType: InputType): Boolean {
-        val next = nextBouncerInput
-        if (next != null && next.inputType == inputType) {
-            val bouncer = engine.getBouncerForInput(inputType)
-            val currentSeconds = engine.clock.seconds
-            val diff = currentSeconds - next.seconds
-            val absDiff = diff.absoluteValue
-            if (absDiff <= Engine.MAX_OFFSET_SEC) {
-                if (absDiff > Engine.BARELY_OFFSET) {
-                    // Miss
-                    next.succeeded = 0
-                } else {
-                    bouncer.playSound()
-                    next.succeeded = 1
-                    // FIXME
-                    println("Bouncer for $inputType - $diff sec")
-                    return true
-                }
+        val fo = this.fallOff
+        if (fo != null && fo.bouncer is PlayerBouncer) {
+            // Pending input
+            if (fo.bouncer.inputType == inputType) {
+                // TODO tell engine an input was received at a certain time for recording
+                bouncesSoFar++
+                fo.bouncer.playSound()
+                this.fallOff = null
+                prepareFallOff()
+                bounce(fo.bouncer, engine.bouncers[fo.bouncer.index + 1], true)
+                return true
             }
         }
+//        val next = nextBouncerInput
+//        if (next != null && next.inputType == inputType) {
+//            val bouncer = engine.getBouncerForInput(inputType)
+//            val currentSeconds = engine.clock.seconds
+//            val diff = currentSeconds - next.seconds
+//            val absDiff = diff.absoluteValue
+//            if (absDiff <= Engine.MAX_OFFSET_SEC) {
+//                if (absDiff > Engine.BARELY_OFFSET) {
+//                    // Miss
+//                    next.succeeded = 0
+//                } else {
+//                    bouncer.playSound()
+//                    next.succeeded = 1
+//                    // FIXME
+//                    println("Bouncer for $inputType - $diff sec")
+//                    return true
+//                }
+//            }
+//        }
         return false // TODO
     }
 }

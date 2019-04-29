@@ -17,10 +17,10 @@ class Engine(val clock: Clock) {
     companion object {
         private val TMP_MATRIX = Matrix4()
 
-        val MAX_OFFSET_SEC: Float = 7f / 60
+        val MAX_OFFSET_SEC: Float = 8f / 60
         val ACE_OFFSET: Float = 1f / 60
-        val GOOD_OFFSET: Float = 4f / 60
-        val BARELY_OFFSET: Float = 6f / 60
+        val GOOD_OFFSET: Float = 5f / 60
+        val BARELY_OFFSET: Float = 7f / 60
     }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
@@ -29,9 +29,9 @@ class Engine(val clock: Clock) {
     val entities: MutableList<Entity> = mutableListOf()
     val projector = PaperProjection(2f)
     var bouncers: List<Bouncer> = listOf()
-    lateinit var rightBouncer: YellowBouncer
+    lateinit var yellowBouncer: YellowBouncer
         private set
-    lateinit var leftBouncer: RedBouncer
+    lateinit var redBouncer: RedBouncer
         private set
 
     fun addBouncers() {
@@ -45,11 +45,11 @@ class Engine(val clock: Clock) {
             val angle = (180.0 * (i / 14.0)) - 90
             val bouncer: Bouncer = if (i == 13) {
                 RedBouncer(this).apply {
-                    leftBouncer = this
+                    redBouncer = this
                 }
             } else if (i == 12) {
                 YellowBouncer(this).apply {
-                    rightBouncer = this
+                    yellowBouncer = this
                 }
             } else {
                 Bouncer(this)
@@ -95,25 +95,22 @@ class Engine(val clock: Clock) {
 
     fun getBouncerForInput(inputType: InputType): Bouncer {
         return when (inputType) {
-            InputType.A -> rightBouncer
-            InputType.DPAD -> leftBouncer
+            InputType.A -> yellowBouncer
+            InputType.DPAD -> redBouncer
         }
     }
 
     fun getInputTypeForBouncer(bouncer: Bouncer): InputType? {
-        return if (bouncer === rightBouncer) InputType.A else if (bouncer === leftBouncer) InputType.DPAD else null
+        return if (bouncer === yellowBouncer) InputType.A else if (bouncer === redBouncer) InputType.DPAD else null
     }
 
     fun fireInput(inputType: InputType) {
-        // TODO add delay between inputs
         val bouncer = getBouncerForInput(inputType)
         val any = entities.filterIsInstance<Ball>().fold(false) { acc, it ->
             it.onInput(inputType) || acc
         }
-        bouncer.bounce()
-        if (any) {
-
-        } else {
+        bouncer.bounceAnimation()
+        if (!any) {
             // play dud sound
             AssetRegistry.get<Sound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play()
         }
