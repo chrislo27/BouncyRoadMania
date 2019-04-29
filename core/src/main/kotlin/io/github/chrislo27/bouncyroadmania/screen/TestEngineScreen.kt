@@ -2,6 +2,7 @@ package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.GL20
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
@@ -11,6 +12,7 @@ import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
 import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.toolboks.ToolboksScreen
+import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
 
@@ -33,6 +35,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         sendBallCycle = 0
 
         engine.addBouncers()
+        AssetRegistry.get<Music>("music_br").stop()
     }
 
     override fun render(delta: Float) {
@@ -73,7 +76,109 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             reload()
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            engine.entities += Ball(engine, 0.5f).apply {
+            engine.entities += Ball(engine, 0.5f, engine.clock.beat).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            reload()
+            engine.clock.seconds = -0.87f
+            AssetRegistry.get<Music>("music_br").play()
+
+            engine.entities += Ball(engine, 0.5f, 4f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 12f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 20f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 28f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.66666f, 38f, true).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.66666f, 54f, true).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 1f, 68f - 1f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 70f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 83f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 84f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 91f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 92f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 98f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 99f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 100f - 0.5f).apply {
+                val first = engine.bouncers.first()
+                posX = first.posX
+                posY = first.posY
+                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+            engine.entities += Ball(engine, 0.5f, 108f - 0.5f).apply {
                 val first = engine.bouncers.first()
                 posX = first.posX
                 posY = first.posY

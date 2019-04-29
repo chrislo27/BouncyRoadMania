@@ -10,14 +10,14 @@ import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
+class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firstHasSound: Boolean = false) : Entity(engine) {
 
     data class Bounce(val fromX: Float, val fromY: Float, val fromZ: Float, val toX: Float, val toY: Float, val toZ: Float, val arcHeight: Float,
                       val startBeat: Float, val endBeat: Float, val fromBouncer: Bouncer, val toBouncer: Bouncer?)
 
     private data class FallOff(val minSeconds: Float, val maxSeconds: Float, val bouncer: Bouncer)
 
-    val sentOutAt: Float = engine.clock.beat
+    val sentOutAt: Float = sendOutAt
     var bouncesSoFar: Int = 0
     var bounce: Bounce? = null
     var fellOff: Boolean = false
@@ -25,6 +25,8 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
 
     // The ball will "fall off" after this seconds so long if bounce's toBouncer is a player
     private var fallOff: FallOff? = null
+
+    private var started: Boolean = false
 
     override fun render(batch: SpriteBatch, scale: Float) {
         val tex: Texture = AssetRegistry["tex_ball"]
@@ -55,6 +57,14 @@ class Ball(engine: Engine, val beatsPerBounce: Float) : Entity(engine) {
     override fun renderUpdate(delta: Float) {
         super.renderUpdate(delta)
         val beat = engine.clock.beat
+        if (beat < sentOutAt) return
+
+        if (!started) {
+            started = true
+            if (firstHasSound) {
+                bounce?.fromBouncer?.playSound(forcePlay = true)
+            }
+        }
 
         val bounce = bounce
         if (bounce != null) {
