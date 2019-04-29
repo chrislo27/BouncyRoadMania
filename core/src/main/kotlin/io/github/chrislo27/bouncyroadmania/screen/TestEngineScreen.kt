@@ -13,6 +13,7 @@ import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
 import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
 
@@ -76,7 +77,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             reload()
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            engine.entities += Ball(engine, 0.5f, engine.clock.beat).apply {
+            engine.entities += Ball(engine, if (Gdx.input.isShiftDown()) 1f else 0.5f, engine.clock.beat).apply {
                 val first = engine.bouncers.first()
                 posX = first.posX
                 posY = first.posY

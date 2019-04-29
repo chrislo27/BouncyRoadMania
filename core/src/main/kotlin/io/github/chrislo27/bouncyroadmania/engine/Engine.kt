@@ -55,7 +55,7 @@ class Engine(val clock: Clock) {
                 Bouncer(this)
             }
 
-            if (i == -1 || i == 15) {
+            if (i !in 0 until 15) {
                 bouncer.isSilent = true
             } else if (i == 14) {
                 bouncer.soundHandle = "sfx_cymbal"
@@ -69,10 +69,52 @@ class Engine(val clock: Clock) {
             bouncer.posX = radius * if (i <= 8) Interpolation.sineOut.apply(i / 8f) else Interpolation.sineOut.apply(1f - ((i - 8) / 6f))
             bouncer.posZ = z
 
-            entities += bouncer
             bouncers += bouncer
         }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = -50f
+//            posY = 150f
+//            posZ = 0f
+//        }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = -50f
+//            posY = 150f
+//            posZ = 0.25f
+//        }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = 100f
+//            posY = 120f
+//            posZ = 0.5f
+//        }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = 240f
+//            posY = 110f
+//            posZ = 0.65f
+//        }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = 400f
+//            posY = 100f
+//            posZ = 0.75f
+//        }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = 520f
+//            posY = 75f
+//            posZ = 0.85f
+//        }
+//        bouncers += Bouncer(this).apply {
+//            isSilent = true
+//            posX = 400f
+//            posY = -25f
+//            posZ = 0.8f
+//        }
         this.bouncers = bouncers
+        entities.addAll(bouncers)
     }
 
     fun renderUpdate(delta: Float) {
