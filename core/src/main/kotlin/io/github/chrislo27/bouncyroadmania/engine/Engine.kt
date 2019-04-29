@@ -17,10 +17,10 @@ class Engine(val clock: Clock) {
     companion object {
         private val TMP_MATRIX = Matrix4()
 
-        val MAX_OFFSET_SEC: Float = 9f / 60
+        val MAX_OFFSET_SEC: Float = 7f / 60
         val ACE_OFFSET: Float = 1f / 60
-        val GOOD_OFFSET: Float = 5f / 60
-        val BARELY_OFFSET: Float = 7.5f / 60
+        val GOOD_OFFSET: Float = 4f / 60
+        val BARELY_OFFSET: Float = 6f / 60
     }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
