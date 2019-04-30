@@ -4,5 +4,5 @@ macOS: Run the run_macOS.sh file
 Linux: Run the run_linux.sh file
 
 From terminal/command line:
-macOS: java -jar -XstartOnFirstThread BouncyRoadMania.jar
-Other OSs: java -jar BouncyRoadMania.jar
+macOS: java -jar -XstartOnFirstThread bin/BouncyRoadMania.jar
+Other OSs: java -jar bin/BouncyRoadMania.jar

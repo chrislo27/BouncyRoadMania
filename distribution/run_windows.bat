@@ -1,3 +1,3 @@
 java -version
-java -jar BouncyRoadMania.jar
+java -jar -Xms1024M bin/BouncyRoadMania.jar
 pause
