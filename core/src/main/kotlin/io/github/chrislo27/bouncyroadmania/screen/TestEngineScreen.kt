@@ -64,11 +64,6 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         val ballCycle = 1f
         if (clock.beat > ballCycle * sendBallCycle) {
             sendBallCycle++
-//            engine.entities += Ball(engine, if (MathUtils.randomBoolean(0.25f)) 2f else 0.5f).apply {
-//                val first = engine.bouncers.first()
-//                posX = first.posX
-//                posY = first.posY
-//            }
         }
 
         engine.renderUpdate(delta)
@@ -87,7 +82,13 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             reload()
             engine.clock.seconds = -0.87f
+            engine.clock.paused = true
             AssetRegistry.get<Music>("music_br").play()
+            Gdx.app.postRunnable {
+                Gdx.app.postRunnable {
+                    engine.clock.paused = false
+                }
+            }
 
             engine.entities += Ball(engine, 0.5f, 4f - 0.5f).apply {
                 val first = engine.bouncers.first()

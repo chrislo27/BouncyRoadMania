@@ -14,8 +14,11 @@ class Clock {
         }
     var beat: Float = 0f
         private set
+    var paused: Boolean = false
 
     fun update(delta: Float) {
+        if (paused) return
+
         seconds += delta
     }
 
