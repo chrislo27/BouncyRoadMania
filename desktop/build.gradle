@@ -6,7 +6,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/main/kotlin/" ]
 
-project.ext.mainClassName = "io.github.chrislo27.crossing.DesktopLauncher"
+project.ext.mainClassName = "io.github.chrislo27.bouncyroadmania.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets");
 
 task run(dependsOn: classes, type: JavaExec) {
@@ -52,7 +52,7 @@ repositories {
 }
 
 shadowJar {
-    baseName = "crossing"
+    baseName = "BouncyRoadMania"
     classifier = null
     version = null
 }
