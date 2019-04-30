@@ -44,7 +44,7 @@ object DesktopLauncher {
                     this.setResizable(true)
                     this.useVsync(idleFps <= 60)
                     this.setInitialBackgroundColor(Color(0f, 0f, 0f, 1f))
-                    this.setAudioConfig(250, 1024, 9)
+                    this.setAudioConfig(100, 2048, 32)
                     this.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Logical)
 
                     LazySound.loadLazilyWithAssetManager = "--force-lazy-sound-load" !in args
