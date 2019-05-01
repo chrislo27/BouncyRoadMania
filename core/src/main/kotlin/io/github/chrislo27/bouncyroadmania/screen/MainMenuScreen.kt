@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
@@ -34,22 +35,23 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     open inner class Event(val beat: Float, val duration: Float) {
         open fun action() {
-
         }
         open fun onDelete() {
-
         }
     }
+
     inner class BounceEvent(beat: Float, val pair: Int) : Event(beat, 0f) {
         override fun action() {
             bounce(pair)
         }
     }
+
     inner class SingleBounceEvent(beat: Float, val index: Int) : Event(beat, 0f) {
         override fun action() {
             engine.bouncers.getOrNull(index)?.bounceAnimation()
         }
     }
+
     inner class FlipXEvent(beat: Float, duration: Float) : Event(beat, duration) {
         private var started: Boolean = false
         private lateinit var positions: List<Pair<Float, Float>>
@@ -61,9 +63,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             }
             val progress = if (duration == 0f) 1f else ((clock.beat - beat) / duration).coerceIn(0f, 1f)
             engine.bouncers.forEachIndexed { i, bouncer ->
-                bouncer.posX = MathUtils.lerp(positions[i].first, positions[i].second, progress)
+                bouncer.posX = Interpolation.circle.apply(positions[i].first, positions[i].second, progress)
             }
         }
+
         override fun onDelete() {
             engine.bouncers.forEachIndexed { i, bouncer ->
                 bouncer.posX = positions[i].second
@@ -101,15 +104,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         engine.entities.clear()
         clock.seconds = 0f
         clock.tempos.clear()
-        clock.tempos.add(TempoChange(clock.tempos, 0f, 105f, Swing.STRAIGHT, 0f))
+        clock.tempos.add(TempoChange(clock.tempos, 0f, MUSIC_BPM, Swing.STRAIGHT, 0f))
 
         engine.addBouncers()
         music.play()
     }
 
     fun doCycle() {
+        events.forEach {
+            it.action()
+            it.onDelete()
+        }
         events.clear()
-        fun oneUnit(offset: Float, doGliss: Boolean) {
+        fun oneUnit(offset: Float) {
             fun oneMeasureUpToCentre(m: Float) {
                 events += BounceEvent(0f + offset + m * 4f, 1)
                 events += BounceEvent(0.5f + offset + m * 4f, 2)
@@ -120,6 +127,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 events += BounceEvent(2.5f + offset + m * 4f, 7)
                 events += BounceEvent(2.75f + offset + m * 4f, 8)
             }
+
             fun oneMeasureDownToCentre(m: Float) {
                 events += BounceEvent(0f + offset + m * 4f, 8)
                 events += BounceEvent(0.5f + offset + m * 4f, 7)
@@ -130,16 +138,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 events += BounceEvent(2.5f + offset + m * 4f, 2)
                 events += BounceEvent(2.75f + offset + m * 4f, 1)
             }
+
             fun glissUp(m: Float) {
                 for (i in 0..14) {
                     events += SingleBounceEvent((i * 0.25f) + offset + m * 4f, 14 - i + 1)
                 }
             }
+
             fun glissDown(m: Float) {
                 for (i in 0..14) {
                     events += SingleBounceEvent((i * 0.25f) + offset + m * 4f, i + 1)
                 }
             }
+
             fun endingMeasure(m: Float) {
                 events += BounceEvent(0f + offset + m * 4f, 8)
                 events += BounceEvent(0.5f + offset + m * 4f, 7)
@@ -163,11 +174,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             glissUp(6f)
             endingMeasure(7f)
 
-            events += FlipXEvent(8f * 4f + offset - 0.125f, 0.25f)
+            events += FlipXEvent(8f * 4f + offset - 0.25f, 0.25f)
         }
 
-        for (i in 0 until 10 step 2) {
-            oneUnit(i * 16f, i != 8)
+        for (i in 0 until 5) {
+            oneUnit(i * 32f)
         }
     }
 
@@ -233,6 +244,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         events.removeIf { clock.beat >= it.beat + it.duration }
         if (clock.seconds > MUSIC_DURATION) {
             clock.seconds %= MUSIC_DURATION
+            if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
+                clock.seconds = music.position
+            }
             doCycle()
         }
     }
