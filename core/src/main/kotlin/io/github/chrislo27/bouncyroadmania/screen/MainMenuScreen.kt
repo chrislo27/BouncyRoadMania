@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
@@ -30,8 +32,44 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val MUSIC_DURATION: Float = 91.428f
     }
 
-    open inner class Event(val beat: Float, val duration: Float, val action: () -> Unit)
-    inner class BounceEvent(beat: Float, val index: Int) : Event(beat, 0f, { bounce(index) })
+    open inner class Event(val beat: Float, val duration: Float) {
+        open fun action() {
+
+        }
+        open fun onDelete() {
+
+        }
+    }
+    inner class BounceEvent(beat: Float, val pair: Int) : Event(beat, 0f) {
+        override fun action() {
+            bounce(pair)
+        }
+    }
+    inner class SingleBounceEvent(beat: Float, val index: Int) : Event(beat, 0f) {
+        override fun action() {
+            engine.bouncers.getOrNull(index)?.bounceAnimation()
+        }
+    }
+    inner class FlipXEvent(beat: Float, duration: Float) : Event(beat, duration) {
+        private var started: Boolean = false
+        private lateinit var positions: List<Pair<Float, Float>>
+        override fun action() {
+            if (!started) {
+                // Record positions
+                positions = engine.bouncers.map { it.posX to (engine.camera.viewportWidth - it.posX) }
+                started = true
+            }
+            val progress = if (duration == 0f) 1f else ((clock.beat - beat) / duration).coerceIn(0f, 1f)
+            engine.bouncers.forEachIndexed { i, bouncer ->
+                bouncer.posX = MathUtils.lerp(positions[i].first, positions[i].second, progress)
+            }
+        }
+        override fun onDelete() {
+            engine.bouncers.forEachIndexed { i, bouncer ->
+                bouncer.posX = positions[i].second
+            }
+        }
+    }
 
     val clock: Clock = Clock()
     val engine = Engine(clock)
@@ -71,31 +109,37 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     fun doCycle() {
         events.clear()
-        fun oneUnit(offset: Float) {
-            fun oneMeasureUp(m: Float) {
+        fun oneUnit(offset: Float, doGliss: Boolean) {
+            fun oneMeasureUpToCentre(m: Float) {
                 events += BounceEvent(0f + offset + m * 4f, 1)
                 events += BounceEvent(0.5f + offset + m * 4f, 2)
                 events += BounceEvent(1f + offset + m * 4f, 3)
                 events += BounceEvent(1.5f + offset + m * 4f, 4)
                 events += BounceEvent(2f + offset + m * 4f, 5)
-                events += BounceEvent(2.5f + offset + m * 4f, 6)
-                events += BounceEvent(3f + offset + m * 4f, 7)
-                events += BounceEvent(3.5f + offset + m * 4f, 8)
+                events += BounceEvent(2.25f + offset + m * 4f, 6)
+                events += BounceEvent(2.5f + offset + m * 4f, 7)
+                events += BounceEvent(2.75f + offset + m * 4f, 8)
             }
-
-            fun oneMeasureDown(m: Float) {
+            fun oneMeasureDownToCentre(m: Float) {
                 events += BounceEvent(0f + offset + m * 4f, 8)
                 events += BounceEvent(0.5f + offset + m * 4f, 7)
                 events += BounceEvent(1f + offset + m * 4f, 6)
                 events += BounceEvent(1.5f + offset + m * 4f, 5)
                 events += BounceEvent(2f + offset + m * 4f, 4)
-                events += BounceEvent(2.5f + offset + m * 4f, 3)
-                events += BounceEvent(3f + offset + m * 4f, 2)
-                events += BounceEvent(3.5f + offset + m * 4f, 1)
+                events += BounceEvent(2.25f + offset + m * 4f, 3)
+                events += BounceEvent(2.5f + offset + m * 4f, 2)
+                events += BounceEvent(2.75f + offset + m * 4f, 1)
             }
-            oneMeasureUp(0f)
-            oneMeasureDown(1f)
-            oneMeasureUp(2f)
+            fun glissUp(m: Float) {
+                for (i in 0..14) {
+                    events += SingleBounceEvent((i * 0.25f) + offset + m * 4f, 14 - i + 1)
+                }
+            }
+            fun glissDown(m: Float) {
+                for (i in 0..14) {
+                    events += SingleBounceEvent((i * 0.25f) + offset + m * 4f, i + 1)
+                }
+            }
             fun endingMeasure(m: Float) {
                 events += BounceEvent(0f + offset + m * 4f, 8)
                 events += BounceEvent(0.5f + offset + m * 4f, 7)
@@ -106,11 +150,24 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 events += BounceEvent(3f + offset + m * 4f, 2)
                 events += BounceEvent(3.3333f + offset + m * 4f, 1)
             }
+
+            // Pairs
+            oneMeasureUpToCentre(0f)
+            oneMeasureDownToCentre(1f)
+            oneMeasureUpToCentre(2f)
             endingMeasure(3f)
+
+            // Gliss
+            glissUp(4f)
+            glissDown(5f)
+            glissUp(6f)
+            endingMeasure(7f)
+
+            events += FlipXEvent(8f * 4f + offset - 0.125f, 0.25f)
         }
 
-        for (i in 0 until 10) {
-            oneUnit(i * 16f)
+        for (i in 0 until 10 step 2) {
+            oneUnit(i * 16f, i != 8)
         }
     }
 
@@ -141,15 +198,21 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         batch.projectionMatrix = camera.combined
         batch.begin()
 
-        val font = main.defaultBorderedFont
-        font.scaleFont(camera)
-
-        font.scaleMul(0.5f)
+        val borderedFont = main.defaultBorderedFont
+        borderedFont.scaleFont(camera)
+        borderedFont.scaleMul(0.5f)
         val creditWidth = 512f
         val creditPadding = 4f
-        font.drawCompressed(batch, MUSIC_CREDIT, camera.viewportWidth - creditPadding - creditWidth, font.lineHeight * 3f, creditWidth, Align.right)
+        val creditHeight = borderedFont.lineHeight * 3f
+        borderedFont.drawCompressed(batch, MUSIC_CREDIT, camera.viewportWidth - creditPadding - creditWidth, creditHeight, creditWidth, Align.right)
+        borderedFont.unscaleFont()
 
-        font.unscaleFont()
+        val titleFont = main.cometBorderedFont
+        titleFont.scaleFont(camera)
+        titleFont.scaleMul(0.5f)
+        titleFont.drawCompressed(batch, BRMania.TITLE, camera.viewportWidth - creditPadding - creditWidth, creditHeight + titleFont.capHeight * 1.75f, creditWidth, Align.right)
+        titleFont.unscaleFont()
+
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
     }
@@ -162,6 +225,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         events.forEach {
             if (clock.beat >= it.beat) {
                 it.action()
+            }
+            if (clock.beat >= it.beat + it.duration) {
+                it.onDelete()
             }
         }
         events.removeIf { clock.beat >= it.beat + it.duration }

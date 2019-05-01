@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
@@ -15,7 +14,6 @@ import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.util.gdxutils.drawCompressed
 import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
 import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
@@ -57,8 +55,8 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         batch.begin()
         val comet = main.cometBorderedFont
         comet.scaleMul(0.5f)
-        comet.drawCompressed(batch, "Bouncy Road Mania", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight * 1.75f, 600f, Align.right)
-        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
+//        comet.drawCompressed(batch, "Bouncy Road Mania", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight * 1.75f, 600f, Align.right)
+//        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
         comet.scaleMul(1f / 0.5f)
         batch.end()
     }
