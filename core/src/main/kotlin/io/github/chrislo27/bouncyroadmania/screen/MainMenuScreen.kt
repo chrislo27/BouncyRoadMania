@@ -5,7 +5,6 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
@@ -30,7 +29,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val TMP_MATRIX = Matrix4()
         private val MUSIC_CREDIT: String by lazy { MusicCredit.credit("Balloon Game") }
         private val MUSIC_BPM = 105f
-        private val MUSIC_DURATION: Float = 91.428f
+        private val MUSIC_DURATION: Float = 91.4285f
     }
 
     open inner class Event(val beat: Float, val duration: Float) {
@@ -74,12 +73,31 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
 
+    inner class ChangeGradientEvent(beat: Float, duration: Float, val nextColor: Color) : Event(beat, duration) {
+        private var started: Boolean = false
+        private lateinit var oldColor: Color
+        override fun action() {
+            if (!started) {
+                oldColor = gradientTop.cpy()
+                started = true
+            }
+            gradientTop.set(oldColor)
+            val progress = if (duration == 0f) 1f else ((clock.beat - beat) / duration).coerceIn(0f, 1f)
+            gradientTop.lerp(nextColor, progress)
+        }
+
+        override fun onDelete() {
+            gradientTop.set(nextColor)
+        }
+    }
+
     val clock: Clock = Clock()
     val engine = Engine(clock)
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    val gradientTop = Color(0f, 0.58f, 1f, 1f)
+    val gradientStart = Color(0f, 0.58f, 1f, 1f)
+    val gradientTop: Color = gradientStart.cpy()
     val gradientBottom = Color(0f, 0f, 0f, 1f)
     val music: Music by lazy {
         AssetRegistry.get<Music>("music_main_menu").apply {
@@ -177,8 +195,15 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             events += FlipXEvent(8f * 4f + offset - 0.25f, 0.25f)
         }
 
+        val hsv = FloatArray(3)
         for (i in 0 until 5) {
             oneUnit(i * 32f)
+        }
+        for (i in 1..10) {
+            // Gradient
+            gradientStart.toHsv(hsv)
+            val nextColor = Color(1f, 1f, 1f, 1f).fromHsv((hsv[0] + i * 360f / 10) % 360f, hsv[1], hsv[2])
+            events += ChangeGradientEvent(i * 16f - 0.25f, 0.25f, nextColor)
         }
     }
 
@@ -244,9 +269,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         events.removeIf { clock.beat >= it.beat + it.duration }
         if (clock.seconds > MUSIC_DURATION) {
             clock.seconds %= MUSIC_DURATION
-            if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
-                clock.seconds = music.position
-            }
+//            if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
+//                clock.seconds = music.position
+//            }
             doCycle()
         }
     }
