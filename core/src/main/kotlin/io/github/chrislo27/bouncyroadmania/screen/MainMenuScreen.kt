@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
@@ -269,9 +270,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         events.removeIf { clock.beat >= it.beat + it.duration }
         if (clock.seconds > MUSIC_DURATION) {
             clock.seconds %= MUSIC_DURATION
-//            if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
-//                clock.seconds = music.position
-//            }
+            if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
+                clock.seconds = music.position
+            }
             doCycle()
         }
     }
