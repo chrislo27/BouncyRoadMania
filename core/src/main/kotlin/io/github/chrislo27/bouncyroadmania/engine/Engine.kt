@@ -2,7 +2,6 @@ package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
@@ -129,7 +128,6 @@ class Engine(val clock: Clock) {
         TMP_MATRIX.set(batch.projectionMatrix)
         batch.projectionMatrix = camera.combined
         batch.begin()
-        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, camera.viewportWidth, camera.viewportHeight)
         projector.render(batch, entities)
         batch.end()
         batch.projectionMatrix = TMP_MATRIX

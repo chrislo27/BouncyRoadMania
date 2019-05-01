@@ -22,6 +22,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Sound>("sfx_dud_right", "sounds/dudR.wav")
         AssetRegistry.loadAsset<Sound>("sfx_splash", "sounds/splash.wav")
         AssetRegistry.loadAsset<Music>("music_br", "sounds/Bouncy Road.mp3")
+
+        AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
