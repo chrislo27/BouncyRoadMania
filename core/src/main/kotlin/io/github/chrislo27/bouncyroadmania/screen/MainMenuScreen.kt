@@ -19,6 +19,7 @@ import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.unscaleFont
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.drawCompressed
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
@@ -30,7 +31,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val TMP_MATRIX = Matrix4()
         private val MUSIC_CREDIT: String by lazy { MusicCredit.credit("Balloon Game") }
         private val MUSIC_BPM = 105f
-        private val MUSIC_DURATION: Float = 91.4285f
+        private val MUSIC_DURATION: Float = 91.428f
     }
 
     open inner class Event(val beat: Float, val duration: Float) {
@@ -258,7 +259,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         val menuFont = main.kurokaneBorderedFont
         menuFont.scaleFont(camera)
         menuFont.scaleMul(0.35f)
-        menuFont.drawCompressed(batch, "> ", 0f, menuTop + menuFont.capHeight * 0.15f, menuPadding, Align.right)
+        menuFont.drawCompressed(batch, "> ", 0f + MathHelper.getSineWave(60f / MUSIC_BPM) * 10f, menuTop + menuFont.capHeight * 0.15f, menuPadding, Align.right)
         menuFont.drawCompressed(batch, "Play", menuPadding, menuTop, menuWidth, Align.left)
         menuFont.drawCompressed(batch, "Editor", menuPadding, menuTop - menuFont.lineHeight, menuWidth, Align.left)
         menuFont.drawCompressed(batch, "Exit", menuPadding, menuTop - menuFont.lineHeight * 2f, menuWidth, Align.left)
