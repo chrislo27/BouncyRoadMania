@@ -286,10 +286,14 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         if (clock.seconds > MUSIC_DURATION) {
             clock.seconds %= MUSIC_DURATION
             doCycle()
-        } else {
-            if (!MathUtils.isEqual(clock.seconds, music.position, 0.25f)) {
-                clock.seconds = music.position
-            }
+        }
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+
+        if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
+            clock.seconds = music.position
         }
     }
 
