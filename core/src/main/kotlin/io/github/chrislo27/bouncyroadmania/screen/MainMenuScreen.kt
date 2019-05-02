@@ -1,15 +1,19 @@
 package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
@@ -18,11 +22,15 @@ import io.github.chrislo27.bouncyroadmania.util.MusicCredit
 import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.unscaleFont
 import io.github.chrislo27.toolboks.ToolboksScreen
+import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.ui.Button
+import io.github.chrislo27.toolboks.ui.ImageLabel
+import io.github.chrislo27.toolboks.ui.Stage
 import io.github.chrislo27.toolboks.util.MathHelper
-import io.github.chrislo27.toolboks.util.gdxutils.drawCompressed
-import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
-import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
+import io.github.chrislo27.toolboks.util.gdxutils.*
+import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 
 
 class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScreen>(main) {
@@ -93,6 +101,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
 
+    open inner class MenuItem(val textKey: String, val isLocalizationKey: Boolean = true, val action: () -> Unit) {
+        open val text: String get() = if (isLocalizationKey) Localization[textKey] else textKey
+    }
+
     val clock: Clock = Clock()
     val engine = Engine(clock)
     val camera = OrthographicCamera().apply {
@@ -107,12 +119,62 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
     private val events: MutableList<Event> = mutableListOf()
+    override val stage: Stage<MainMenuScreen> = Stage(null, camera, camera.viewportWidth, camera.viewportHeight)
+
+    val menuPadding = 64f
+    val menuTop = 420f
+    val menuWidth = camera.viewportWidth / 2f - menuPadding
+    val menus: MutableMap<String, List<MenuItem>> = mutableMapOf()
+    var currentMenuKey: String = "main"
+    val currentMenu: List<MenuItem> get() = menus[currentMenuKey] ?: emptyList()
+    private var clickedOnMenu: MenuItem? = null
+
+    init {
+        stage.elements += object : Button<MainMenuScreen>(main.uiPalette, stage, stage) {
+            val unmuted = TextureRegion(AssetRegistry.get<Texture>("ui_music"))
+            val muted = TextureRegion(AssetRegistry.get<Texture>("ui_music_muted"))
+            val label = ImageLabel(palette, this, this.stage).apply {
+                this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+            }
+            init {
+                addLabel(label)
+            }
+        }.apply {
+            this.location.set(screenWidth = 0f, screenHeight = 0f,
+                    pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f, pixelY = camera.viewportHeight - 32f)
+            music.volume = if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) 0f else 1f
+            label.image = if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) muted else unmuted
+            this.leftClickAction = { _, _ ->
+                val old = main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)
+                main.preferences.putBoolean(PreferenceKeys.MUTE_MUSIC, !old).flush()
+                music.volume = if (!old) 0f else 1f
+                label.image = if (!old) muted else unmuted
+            }
+        }
+    }
+
+    init {
+        menus["main"] = listOf(
+                MenuItem("mainMenu.play") {
+
+                },
+                MenuItem("mainMenu.edit") {
+
+                },
+                MenuItem("mainMenu.quit") {
+                    Gdx.app.exit()
+                    thread(isDaemon = true) {
+                        Thread.sleep(500L)
+                        exitProcess(0)
+                    }
+                }
+        )
+    }
 
     init {
         clock.paused = true
         reload()
         doCycle()
-
         Gdx.app.postRunnable {
             Gdx.app.postRunnable {
                 clock.paused = false
@@ -214,8 +276,13 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         engine.bouncers.getOrNull(14 - (index - 2))?.bounceAnimation()
     }
 
+    fun getMenuIndex(): Int {
+        return if (camera.getInputX() > menuWidth) -1 else {
+            Math.floor((camera.getInputY() - (menuTop + 10f)) / -60.5).toInt().coerceAtLeast(-1)
+        }
+    }
+
     override fun render(delta: Float) {
-        super.render(delta)
         val batch = main.batch
 
         // Background
@@ -246,27 +313,40 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         borderedFont.drawCompressed(batch, BRMania.VERSION.toString(), creditPadding, borderedFont.lineHeight, creditWidth, Align.left)
         borderedFont.unscaleFont()
 
-        val menuPadding = 64f
-        val menuTop = 420f
-        val menuWidth = camera.viewportWidth - menuPadding * 2
-
         val titleFont = main.cometBorderedFont
         titleFont.scaleFont(camera)
         titleFont.scaleMul(0.6f)
-        titleFont.drawCompressed(batch, BRMania.TITLE, menuPadding / 2, menuTop + titleFont.lineHeight, menuWidth, Align.left)
+        titleFont.drawCompressed(batch, BRMania.TITLE, menuPadding / 2, menuTop + titleFont.lineHeight, camera.viewportWidth - menuPadding * 2, Align.left)
         titleFont.unscaleFont()
 
+        val menuIndex = getMenuIndex()
+        val currentMenu = currentMenu
         val menuFont = main.kurokaneBorderedFont
         menuFont.scaleFont(camera)
         menuFont.scaleMul(0.35f)
-        menuFont.drawCompressed(batch, "> ", 0f + MathHelper.getSineWave(60f / MUSIC_BPM) * 10f, menuTop + menuFont.capHeight * 0.15f, menuPadding, Align.right)
-        menuFont.drawCompressed(batch, "Play", menuPadding, menuTop, menuWidth, Align.left)
-        menuFont.drawCompressed(batch, "Editor", menuPadding, menuTop - menuFont.lineHeight, menuWidth, Align.left)
-        menuFont.drawCompressed(batch, "Exit", menuPadding, menuTop - menuFont.lineHeight * 2f, menuWidth, Align.left)
+        currentMenu.forEachIndexed { index, menuItem ->
+            menuFont.setColor(1f, 1f, 1f, 1f)
+            if (menuItem === clickedOnMenu) {
+                menuFont.setColor(0.5f, 1f, 1f, 1f)
+            }
+            menuFont.drawCompressed(batch, menuItem.text, menuPadding, menuTop - menuFont.lineHeight * index, menuWidth, Align.left)
+            menuFont.setColor(1f, 1f, 1f, 1f)
+        }
+
+        val c = clickedOnMenu
+        if (menuIndex in 0 until currentMenu.size && (c == null || c === currentMenu[menuIndex])) {
+            if (c != null && c === currentMenu[menuIndex]) {
+                menuFont.setColor(0.5f, 1f, 1f, 1f)
+            }
+            menuFont.drawCompressed(batch, "> ", 0f + MathHelper.getSineWave(60f / MUSIC_BPM) * 10f, menuTop + menuFont.capHeight * 0.15f - menuFont.lineHeight * menuIndex, menuPadding, Align.right)
+            menuFont.setColor(1f, 1f, 1f, 1f)
+        }
         menuFont.unscaleFont()
 
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
+
+        super.render(delta)
     }
 
     override fun renderUpdate() {
@@ -286,6 +366,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         if (clock.seconds > MUSIC_DURATION) {
             clock.seconds %= MUSIC_DURATION
             doCycle()
+        }
+
+        val menuIndex = getMenuIndex()
+        val currentMenu = currentMenu
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            clickedOnMenu = currentMenu.getOrNull(menuIndex)
+        }
+        if (Gdx.input.isButtonJustReleased(Input.Buttons.LEFT)) {
+            val c = clickedOnMenu
+            if (c != null && currentMenu.getOrNull(menuIndex) === c) {
+                c.action.invoke()
+            }
+            clickedOnMenu = null
         }
     }
 
