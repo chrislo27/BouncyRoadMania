@@ -287,7 +287,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             clock.seconds %= MUSIC_DURATION
             doCycle()
         } else {
-            if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
+            if (!MathUtils.isEqual(clock.seconds, music.position, 0.25f)) {
                 clock.seconds = music.position
             }
         }
