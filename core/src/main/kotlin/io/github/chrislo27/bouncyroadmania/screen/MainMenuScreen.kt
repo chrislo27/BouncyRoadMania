@@ -193,7 +193,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             glissUp(6f)
             endingMeasure(7f)
 
-            events += FlipXEvent(8f * 4f + offset - 0.25f, 0.25f)
+//            events += FlipXEvent(8f * 4f + offset - 0.25f, 0.25f)
         }
 
         val hsv = FloatArray(3)
@@ -238,17 +238,31 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         val borderedFont = main.defaultBorderedFont
         borderedFont.scaleFont(camera)
         borderedFont.scaleMul(0.5f)
-        val creditWidth = 512f
         val creditPadding = 4f
+        val creditWidth = camera.viewportWidth - creditPadding * 4f
         val creditHeight = borderedFont.lineHeight * 3f
         borderedFont.drawCompressed(batch, MUSIC_CREDIT, camera.viewportWidth - creditPadding - creditWidth, creditHeight, creditWidth, Align.right)
+        borderedFont.drawCompressed(batch, BRMania.VERSION.toString(), creditPadding, borderedFont.lineHeight, creditWidth, Align.left)
         borderedFont.unscaleFont()
+
+        val menuPadding = 64f
+        val menuTop = 420f
+        val menuWidth = camera.viewportWidth - menuPadding * 2
 
         val titleFont = main.cometBorderedFont
         titleFont.scaleFont(camera)
-        titleFont.scaleMul(0.5f)
-        titleFont.drawCompressed(batch, BRMania.TITLE, camera.viewportWidth - creditPadding - creditWidth, creditHeight + titleFont.capHeight * 1.75f, creditWidth, Align.right)
+        titleFont.scaleMul(0.6f)
+        titleFont.drawCompressed(batch, BRMania.TITLE, menuPadding / 2, menuTop + titleFont.lineHeight, menuWidth, Align.left)
         titleFont.unscaleFont()
+
+        val menuFont = main.kurokaneBorderedFont
+        menuFont.scaleFont(camera)
+        menuFont.scaleMul(0.35f)
+        menuFont.drawCompressed(batch, "> ", 0f, menuTop + menuFont.capHeight * 0.15f, menuPadding, Align.right)
+        menuFont.drawCompressed(batch, "Play", menuPadding, menuTop, menuWidth, Align.left)
+        menuFont.drawCompressed(batch, "Editor", menuPadding, menuTop - menuFont.lineHeight, menuWidth, Align.left)
+        menuFont.drawCompressed(batch, "Exit", menuPadding, menuTop - menuFont.lineHeight * 2f, menuWidth, Align.left)
+        menuFont.unscaleFont()
 
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
@@ -270,10 +284,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         events.removeIf { clock.beat >= it.beat + it.duration }
         if (clock.seconds > MUSIC_DURATION) {
             clock.seconds %= MUSIC_DURATION
+            doCycle()
+        } else {
             if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
                 clock.seconds = music.position
             }
-            doCycle()
         }
     }
 
