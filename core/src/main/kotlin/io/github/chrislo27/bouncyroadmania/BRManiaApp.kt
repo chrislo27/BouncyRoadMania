@@ -221,7 +221,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     private fun createCometBorderedFont(): FreeTypeFont {
         return FreeTypeFont(cometFontFileHandle, emulatedSize, createDefaultTTFParameter()
                 .apply {
-                    borderWidth = 1.5f
+                    borderWidth = 2f
 
                     size *= 4
                     borderWidth *= 4
@@ -231,7 +231,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     private fun createKurokaneBorderedFont(): FreeTypeFont {
         return FreeTypeFont(kurokaneFontFileHandle, emulatedSize, createDefaultTTFParameter()
                 .apply {
-                    borderWidth = 1.5f
+                    borderWidth = 3f
 
                     size *= 4
                     borderWidth *= 4
