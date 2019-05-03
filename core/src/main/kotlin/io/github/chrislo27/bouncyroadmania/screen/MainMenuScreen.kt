@@ -6,6 +6,8 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -46,6 +48,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     open inner class Event(val beat: Float, val duration: Float) {
         open fun action() {
         }
+
         open fun onDelete() {
         }
     }
@@ -113,6 +116,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         var enabled: Boolean = true
     }
 
+    data class MenuAnimation(val key: String, val speed: Float = 0.5f, var progress: Float = 0f)
+
     val clock: Clock = Clock()
     val engine = Engine(clock)
     val camera = OrthographicCamera().apply {
@@ -135,7 +140,15 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     val menuTop = 420f
     val menuWidth = camera.viewportWidth / 2f - menuPadding
     val menus: MutableMap<String, List<MenuItem>> = mutableMapOf()
+    val menuAnimations: MutableList<MenuAnimation> = mutableListOf()
     var currentMenuKey: String = "main"
+        set(value) {
+            val last = field
+            if (last != value) {
+                field = value
+            }
+            menuAnimations += MenuAnimation(last)
+        }
     val currentMenu: List<MenuItem> get() = menus[currentMenuKey] ?: emptyList()
     private var clickedOnMenu: MenuItem? = null
 
@@ -146,6 +159,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             val label = ImageLabel(palette, this, this.stage).apply {
                 this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
             }
+
             init {
                 addLabel(label)
             }
@@ -191,7 +205,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
                 },
                 MenuItem("mainMenu.edit") {
-
+                    currentMenuKey = "main"
                 },
                 MenuItem("mainMenu.settings") {
 
@@ -370,15 +384,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         val menuFont = main.kurokaneBorderedFont
         menuFont.scaleFont(camera)
         menuFont.scaleMul(0.35f)
-        currentMenu.forEachIndexed { index, menuItem ->
-            menuFont.setColor(1f, 1f, 1f, 1f)
-            if (!menuItem.enabled) {
-                menuFont.setColor(0.5f, 0.5f, 0.5f, 1f)
-            } else if (menuItem === clickedOnMenu) {
-                menuFont.setColor(0.5f, 1f, 1f, 1f)
-            }
-            menuFont.drawCompressed(batch, menuItem.text, menuPadding, menuTop - menuFont.lineHeight * index, menuWidth, Align.left)
-            menuFont.setColor(1f, 1f, 1f, 1f)
+        renderMenu(batch, currentMenu, menuFont, 0f, 0f, 1f)
+        menuAnimations.forEach { animation ->
+            renderMenu(batch, currentMenu, menuFont, Interpolation.smooth.apply(0f, -menuWidth / 2f, animation.progress), 0f, Interpolation.exp5Out.apply(1f, 0f, animation.progress))
         }
 
         val c = clickedOnMenu
@@ -397,6 +405,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         batch.projectionMatrix = TMP_MATRIX
 
         super.render(delta)
+    }
+
+    fun renderMenu(batch: SpriteBatch, menu: List<MenuItem>, menuFont: BitmapFont, xOffset: Float, yOffset: Float, alpha: Float) {
+        menu.forEachIndexed { index, menuItem ->
+            menuFont.setColor(1f, 1f, 1f, alpha)
+            if (!menuItem.enabled) {
+                menuFont.setColor(0.5f, 0.5f, 0.5f, alpha)
+            } else if (menuItem === clickedOnMenu) {
+                menuFont.setColor(0.5f, 1f, 1f, alpha)
+            }
+            menuFont.drawCompressed(batch, menuItem.text, menuPadding + xOffset, menuTop - menuFont.lineHeight * index + yOffset, menuWidth, Align.left)
+            menuFont.setColor(1f, 1f, 1f, 1f)
+        }
     }
 
     override fun renderUpdate() {
@@ -428,6 +449,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 }
             }
         }
+        menuAnimations.forEach { it.progress += Gdx.graphics.deltaTime / it.speed }
+        menuAnimations.removeIf { it.progress >= 1f }
 
         val menuIndex = getMenuIndex()
         val currentMenu = currentMenu
