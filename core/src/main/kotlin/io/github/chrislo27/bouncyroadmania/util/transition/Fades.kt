@@ -1,4 +1,4 @@
-package io.github.chrislo27.bouncyroadmania.util
+package io.github.chrislo27.bouncyroadmania.util.transition
 
 
 import com.badlogic.gdx.graphics.Color
