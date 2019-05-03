@@ -116,7 +116,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         var enabled: Boolean = true
     }
 
-    data class MenuAnimation(val key: String, val speed: Float = 0.5f, var progress: Float = 0f)
+    data class MenuAnimation(val key: String, val speed: Float = 0.35f, var progress: Float = 0f, var reversed: Boolean = false)
 
     val clock: Clock = Clock()
     val engine = Engine(clock)
@@ -146,8 +146,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             val last = field
             if (last != value) {
                 field = value
+                menuAnimations += MenuAnimation(last)
+                menuAnimations += MenuAnimation(value, reversed = true)
             }
-            menuAnimations += MenuAnimation(last)
         }
     val currentMenu: List<MenuItem> get() = menus[currentMenuKey] ?: emptyList()
     private var clickedOnMenu: MenuItem? = null
@@ -205,12 +206,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
                 },
                 MenuItem("mainMenu.edit") {
-                    currentMenuKey = "main"
+
                 },
                 MenuItem("mainMenu.settings") {
-
-                }.apply {
-                    this.enabled = false
+                    currentMenuKey = "settings"
                 },
                 MenuItem("mainMenu.quit") {
                     Gdx.app.exit()
@@ -218,6 +217,23 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                         Thread.sleep(500L)
                         exitProcess(0)
                     }
+                }
+        )
+        menus["settings"] = listOf(
+                MenuItem("mainMenu.settings.video") {
+                }.apply {
+                    this.enabled = false
+                },
+                MenuItem("mainMenu.settings.audio") {
+                }.apply {
+                    this.enabled = false
+                },
+                MenuItem("mainMenu.settings.controls") {
+                }.apply {
+                    this.enabled = false
+                },
+                MenuItem("mainMenu.back") {
+                    currentMenuKey = "main"
                 }
         )
     }
@@ -384,9 +400,13 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         val menuFont = main.kurokaneBorderedFont
         menuFont.scaleFont(camera)
         menuFont.scaleMul(0.35f)
-        renderMenu(batch, currentMenu, menuFont, 0f, 0f, 1f)
         menuAnimations.forEach { animation ->
-            renderMenu(batch, currentMenu, menuFont, Interpolation.smooth.apply(0f, -menuWidth / 2f, animation.progress), 0f, Interpolation.exp5Out.apply(1f, 0f, animation.progress))
+            renderMenu(batch, menus.getValue(animation.key), menuFont,
+                    Interpolation.smooth.apply(0f, -menuPadding, animation.progress) + (if (animation.reversed) menuPadding else 0f),
+                    0f, Interpolation.smooth.apply(1f, 0f, if (!animation.reversed) animation.progress else (1f - animation.progress)))
+        }
+        if (menuAnimations.none { it.reversed && it.key == currentMenuKey }) {
+            renderMenu(batch, currentMenu, menuFont, 0f, 0f, 1f)
         }
 
         val c = clickedOnMenu
@@ -437,6 +457,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         if (lastMusicPos > music.position) {
             clock.seconds = music.position
             doCycle()
+        } else if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f) && music.position > 0.1f) {
+            clock.seconds = music.position
         }
         lastMusicPos = music.position
 
