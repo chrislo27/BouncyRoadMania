@@ -126,6 +126,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             isLooping = true
         }
     }
+    private var lastMusicPos = 0f
     private val events: MutableList<Event> = mutableListOf()
     override val stage: Stage<MainMenuScreen> = Stage(null, camera, camera.viewportWidth, camera.viewportHeight)
 
@@ -159,6 +160,28 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 music.volume = if (!old) 0f else 1f
                 label.image = if (!old) muted else unmuted
             }
+        }
+        stage.elements += Button(main.uiPalette, stage, stage).apply {
+            this.location.set(screenWidth = 0f, screenHeight = 0f,
+                    pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 2, pixelY = camera.viewportHeight - 32f)
+            this.leftClickAction = { _, _ ->
+                Gdx.graphics.setFullscreenMode(Gdx.graphics.displayModes.maxBy { it.width * it.height * it.refreshRate }!!)
+            }
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_fullscreen"))
+            })
+        }
+        stage.elements += Button(main.uiPalette, stage, stage).apply {
+            this.location.set(screenWidth = 0f, screenHeight = 0f,
+                    pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 3, pixelY = camera.viewportHeight - 32f)
+            this.leftClickAction = { _, _ ->
+                Gdx.graphics.setWindowedMode(BRMania.WIDTH, BRMania.HEIGHT)
+            }
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_reset_window"))
+            })
         }
     }
 
@@ -390,10 +413,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             }
         }
         events.removeIf { clock.beat >= it.beat + it.duration }
-        if (clock.seconds > MUSIC_DURATION) {
-            clock.seconds %= MUSIC_DURATION
+        if (lastMusicPos > music.position) {
+            clock.seconds = music.position
             doCycle()
         }
+        lastMusicPos = music.position
 
         for (i in 0 until titleWiggle.size) {
             if (titleWiggle[i] != 0f) {
@@ -432,6 +456,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             |seconds: ${clock.seconds}
             |bpm: ${clock.tempos.tempoAt(clock.beat)}
             |events: ${events.size}
+            |music: ${music.position}
+            |  offset: ${clock.seconds - music.position}
         """.trimMargin()
     }
 
