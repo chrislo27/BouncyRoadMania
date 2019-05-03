@@ -40,6 +40,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val MUSIC_CREDIT: String by lazy { MusicCredit.credit("Balloon Game") }
         private val MUSIC_BPM = 105f
         private val MUSIC_DURATION: Float = 91.428f
+        private val TITLE = BRMania.TITLE.split(' ').map { "$it " }
     }
 
     open inner class Event(val beat: Float, val duration: Float) {
@@ -83,6 +84,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
 
+    inner class WiggleTitleEvent(beat: Float, val index: Int, val amt: Float = 1f) : Event(beat, 0f) {
+        override fun action() {
+            titleWiggle[index] = amt
+        }
+    }
+
     inner class ChangeGradientEvent(beat: Float, duration: Float, val nextColor: Color) : Event(beat, duration) {
         private var started: Boolean = false
         private lateinit var oldColor: Color
@@ -103,6 +110,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     open inner class MenuItem(val textKey: String, val isLocalizationKey: Boolean = true, val action: () -> Unit) {
         open val text: String get() = if (isLocalizationKey) Localization[textKey] else textKey
+        var enabled: Boolean = true
     }
 
     val clock: Clock = Clock()
@@ -121,6 +129,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private val events: MutableList<Event> = mutableListOf()
     override val stage: Stage<MainMenuScreen> = Stage(null, camera, camera.viewportWidth, camera.viewportHeight)
 
+    val titleWiggle: FloatArray = FloatArray(3) { 0f }
     val menuPadding = 64f
     val menuTop = 420f
     val menuWidth = camera.viewportWidth / 2f - menuPadding
@@ -160,6 +169,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 },
                 MenuItem("mainMenu.edit") {
 
+                },
+                MenuItem("mainMenu.settings") {
+
+                }.apply {
+                    this.enabled = false
                 },
                 MenuItem("mainMenu.quit") {
                     Gdx.app.exit()
@@ -233,7 +247,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 }
             }
 
-            fun endingMeasure(m: Float) {
+            fun endingMeasure(m: Float, wiggle: Boolean) {
                 events += BounceEvent(0f + offset + m * 4f, 8)
                 events += BounceEvent(0.5f + offset + m * 4f, 7)
                 events += BounceEvent(1f + offset + m * 4f, 6)
@@ -242,19 +256,24 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 events += BounceEvent(2.6667f + offset + m * 4f, 3)
                 events += BounceEvent(3f + offset + m * 4f, 2)
                 events += BounceEvent(3.3333f + offset + m * 4f, 1)
+                if (wiggle) {
+                    events += WiggleTitleEvent(2.6667f + offset + m * 4f, 2)
+                    events += WiggleTitleEvent(3f + offset + m * 4f, 1)
+                    events += WiggleTitleEvent(3.3333f + offset + m * 4f, 0)
+                }
             }
 
             // Pairs
             oneMeasureUpToCentre(0f)
             oneMeasureDownToCentre(1f)
             oneMeasureUpToCentre(2f)
-            endingMeasure(3f)
+            endingMeasure(3f, false)
 
             // Gliss
             glissUp(4f)
             glissDown(5f)
             glissUp(6f)
-            endingMeasure(7f)
+            endingMeasure(7f, true)
 
 //            events += FlipXEvent(8f * 4f + offset - 0.25f, 0.25f)
         }
@@ -316,7 +335,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         val titleFont = main.cometBorderedFont
         titleFont.scaleFont(camera)
         titleFont.scaleMul(0.6f)
-        titleFont.drawCompressed(batch, BRMania.TITLE, menuPadding / 2, menuTop + titleFont.lineHeight, camera.viewportWidth - menuPadding * 2, Align.left)
+        var titleX = menuPadding / 2f
+        TITLE.forEachIndexed { i, s ->
+            titleX += titleFont.draw(batch, s, titleX, menuTop + titleFont.lineHeight + titleFont.capHeight * titleWiggle[i]).width
+        }
+//        titleFont.drawCompressed(batch, BRMania.TITLE, menuPadding / 2, menuTop + titleFont.lineHeight, camera.viewportWidth - menuPadding * 2, Align.left)
         titleFont.unscaleFont()
 
         val menuIndex = getMenuIndex()
@@ -326,7 +349,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         menuFont.scaleMul(0.35f)
         currentMenu.forEachIndexed { index, menuItem ->
             menuFont.setColor(1f, 1f, 1f, 1f)
-            if (menuItem === clickedOnMenu) {
+            if (!menuItem.enabled) {
+                menuFont.setColor(0.5f, 0.5f, 0.5f, 1f)
+            } else if (menuItem === clickedOnMenu) {
                 menuFont.setColor(0.5f, 1f, 1f, 1f)
             }
             menuFont.drawCompressed(batch, menuItem.text, menuPadding, menuTop - menuFont.lineHeight * index, menuWidth, Align.left)
@@ -335,7 +360,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
         val c = clickedOnMenu
         if (menuIndex in 0 until currentMenu.size && (c == null || c === currentMenu[menuIndex])) {
-            if (c != null && c === currentMenu[menuIndex]) {
+            if (!currentMenu[menuIndex].enabled) {
+                menuFont.setColor(0.5f, 0.5f, 0.5f, 0f)
+            } else if (c != null && c === currentMenu[menuIndex]) {
                 menuFont.setColor(0.5f, 1f, 1f, 1f)
             }
             menuFont.drawCompressed(batch, "> ", 0f + MathHelper.getSineWave(60f / MUSIC_BPM) * 10f, menuTop + menuFont.capHeight * 0.15f - menuFont.lineHeight * menuIndex, menuPadding, Align.right)
@@ -368,6 +395,16 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             doCycle()
         }
 
+        for (i in 0 until titleWiggle.size) {
+            if (titleWiggle[i] != 0f) {
+                val sign = Math.signum(titleWiggle[i])
+                titleWiggle[i] -= sign * Gdx.graphics.deltaTime * 8f
+                if (Math.signum(titleWiggle[i]) != sign && titleWiggle[i] != 0f) {
+                    titleWiggle[i] = 0f
+                }
+            }
+        }
+
         val menuIndex = getMenuIndex()
         val currentMenu = currentMenu
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
@@ -375,7 +412,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
         if (Gdx.input.isButtonJustReleased(Input.Buttons.LEFT)) {
             val c = clickedOnMenu
-            if (c != null && currentMenu.getOrNull(menuIndex) === c) {
+            if (c != null && currentMenu.getOrNull(menuIndex) === c && c.enabled) {
                 c.action.invoke()
             }
             clickedOnMenu = null
