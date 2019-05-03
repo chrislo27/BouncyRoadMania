@@ -9,9 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.toolboks.Toolboks.StageOutlineMode.ALL
-import io.github.chrislo27.toolboks.Toolboks.StageOutlineMode.NONE
-import io.github.chrislo27.toolboks.Toolboks.StageOutlineMode.ONLY_VISIBLE
+import io.github.chrislo27.toolboks.Toolboks.StageOutlineMode.*
 import io.github.chrislo27.toolboks.font.FontHandler
 import io.github.chrislo27.toolboks.font.FreeTypeFont
 import io.github.chrislo27.toolboks.i18n.Localization
@@ -218,7 +216,7 @@ ${getDebugString()}
 ${(screen as? ToolboksScreen<*, *>)?.getDebugString() ?: ""}"""
 
                     font.setColor(1f, 1f, 1f, 1f)
-                    font.drawCompressed(batch, string, 8f, Gdx.graphics.height - 8f, Gdx.graphics.width - 16f,
+                    font.drawCompressed(batch, string, 8f, defaultCamera.viewportHeight - 8f, defaultCamera.viewportWidth - 16f,
                                         Align.left)
 
                     font.data.setScale(1f)
