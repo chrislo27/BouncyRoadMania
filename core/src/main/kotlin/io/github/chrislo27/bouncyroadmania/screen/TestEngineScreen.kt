@@ -9,9 +9,9 @@ import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
-import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
-import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
+import io.github.chrislo27.bouncyroadmania.util.Swing
+import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown

@@ -1,7 +1,5 @@
 package io.github.chrislo27.bouncyroadmania.util
 
-import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
-
 
 object TempoUtils {
     fun beatsToSeconds(beat: Float, bpm: Float): Float =

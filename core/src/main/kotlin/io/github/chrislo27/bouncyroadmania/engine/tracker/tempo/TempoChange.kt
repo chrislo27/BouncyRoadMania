@@ -2,6 +2,7 @@ package io.github.chrislo27.bouncyroadmania.engine.tracker.tempo
 
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
+import io.github.chrislo27.bouncyroadmania.util.Swing
 import io.github.chrislo27.bouncyroadmania.util.SwingUtils
 import io.github.chrislo27.bouncyroadmania.util.TempoUtils
 import java.text.DecimalFormat

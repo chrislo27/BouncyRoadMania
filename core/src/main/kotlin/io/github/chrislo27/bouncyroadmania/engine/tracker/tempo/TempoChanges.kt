@@ -3,8 +3,8 @@ package io.github.chrislo27.bouncyroadmania.engine.tracker.tempo
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
-import io.github.chrislo27.rhre3.util.Swing
-import io.github.chrislo27.rhre3.util.TempoUtils
+import io.github.chrislo27.bouncyroadmania.util.Swing
+import io.github.chrislo27.bouncyroadmania.util.TempoUtils
 import java.util.*
 
 
@@ -37,10 +37,10 @@ class TempoChanges(val defaultTempo: Float = 120f, val defaultSwing: Swing = Swi
             val swingDivision: Float = it["swingDivision"]?.asDouble(0.0)?.toFloat() ?: 0f
             val swing: Swing = if (swingRatio !in Swing.ABS_MIN_SWING..Swing.MAX_SWING || swingDivision <= 0f) defaultSwing else Swing(swingRatio, swingDivision)
             add(TempoChange(this,
-                            it["beat"].asDouble().toFloat(),
-                            it["bpm"].asDouble(defaultTempo.toDouble()).toFloat(),
-                            swing, it["width"]?.floatValue()?.coerceAtLeast(0f) ?: 0f),
-                shouldUpdate = false)
+                    it["beat"].asDouble().toFloat(),
+                    it["bpm"].asDouble(defaultTempo.toDouble()).toFloat(),
+                    swing, it["width"]?.floatValue()?.coerceAtLeast(0f) ?: 0f),
+                    shouldUpdate = false)
         }
         update()
     }
@@ -66,7 +66,8 @@ class TempoChanges(val defaultTempo: Float = 120f, val defaultSwing: Swing = Swi
     }
 
     fun secondsToBeats(seconds: Float): Float {
-        val tc: TempoChange = backingSecondsMap.lowerEntry(seconds)?.value ?: return TempoUtils.secondsToBeats(seconds, defaultTempo)
+        val tc: TempoChange = backingSecondsMap.lowerEntry(seconds)?.value
+                ?: return TempoUtils.secondsToBeats(seconds, defaultTempo)
 
         return tc.secondsToBeats(seconds)
     }
@@ -81,7 +82,8 @@ class TempoChanges(val defaultTempo: Float = 120f, val defaultSwing: Swing = Swi
      * Same as [secondsToBeats] but disregards swing
      */
     fun linearSecondsToBeats(seconds: Float): Float {
-        val tc: TempoChange = backingSecondsMap.lowerEntry(seconds)?.value ?: return TempoUtils.secondsToBeats(seconds, defaultTempo)
+        val tc: TempoChange = backingSecondsMap.lowerEntry(seconds)?.value
+                ?: return TempoUtils.secondsToBeats(seconds, defaultTempo)
 
         return tc.secondsToBeats(seconds)
     }
