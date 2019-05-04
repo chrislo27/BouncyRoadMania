@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.Texture
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
-import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
-import io.github.chrislo27.bouncyroadmania.util.Swing
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
+import io.github.chrislo27.bouncyroadmania.util.Swing
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
@@ -19,9 +19,8 @@ import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
 
 class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngineScreen>(main) {
-
-    val clock: Clock = Clock()
-    val engine = Engine(clock)
+    
+    val engine: Engine = Engine()
 
     var sendBallCycle = 0
 
@@ -31,9 +30,9 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 
     fun reload() {
         engine.entities.clear()
-        clock.seconds = 0f
-        clock.tempos.clear()
-        clock.tempos.add(TempoChange(clock.tempos, 0f, 154f, Swing.STRAIGHT, 0f))
+        engine.seconds = 0f
+        engine.tempos.clear()
+        engine.tempos.add(TempoChange(engine.tempos, 0f, 154f, Swing.STRAIGHT, 0f))
         sendBallCycle = 0
 
         engine.addBouncers()
@@ -65,20 +64,19 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         super.renderUpdate()
 
         val delta = Gdx.graphics.deltaTime
-        clock.update(delta)
 
         val ballCycle = 1f
-        if (clock.beat > ballCycle * sendBallCycle) {
+        if (engine.beat > ballCycle * sendBallCycle) {
             sendBallCycle++
         }
 
-        engine.renderUpdate(delta)
+        engine.update(delta)
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             reload()
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            engine.entities += Ball(engine, if (Gdx.input.isShiftDown()) 1f else 0.5f, engine.clock.beat).apply {
+            engine.entities += Ball(engine, if (Gdx.input.isShiftDown()) 1f else 0.5f, engine.beat).apply {
                 val first = engine.bouncers.first()
                 posX = first.posX
                 posY = first.posY
@@ -87,12 +85,12 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             reload()
-            engine.clock.seconds = -0.87f
-            engine.clock.paused = true
+            engine.seconds = -0.87f
+            engine.playState = PlayState.STOPPED
             AssetRegistry.get<Music>("music_br").play()
             Gdx.app.postRunnable {
                 Gdx.app.postRunnable {
-                    engine.clock.paused = false
+                    engine.playState = PlayState.PLAYING
                 }
             }
 
@@ -203,9 +201,9 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
     }
 
     override fun getDebugString(): String? {
-        return """beat: ${clock.beat}
-            |seconds: ${clock.seconds}
-            |bpm: ${clock.tempos.tempoAt(clock.beat)}
+        return """beat: ${engine.beat}
+            |seconds: ${engine.seconds}
+            |bpm: ${engine.tempos.tempoAt(engine.beat)}
         """.trimMargin()
     }
 

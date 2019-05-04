@@ -17,12 +17,9 @@ import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.engine.Engine
-import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
-import io.github.chrislo27.bouncyroadmania.util.MusicCredit
-import io.github.chrislo27.bouncyroadmania.util.Swing
-import io.github.chrislo27.bouncyroadmania.util.scaleFont
-import io.github.chrislo27.bouncyroadmania.util.unscaleFont
+import io.github.chrislo27.bouncyroadmania.util.*
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -74,7 +71,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 positions = engine.bouncers.map { it.posX to (engine.camera.viewportWidth - it.posX) }
                 started = true
             }
-            val progress = if (duration == 0f) 1f else ((clock.beat - beat) / duration).coerceIn(0f, 1f)
+            val progress = if (duration == 0f) 1f else ((engine.beat - beat) / duration).coerceIn(0f, 1f)
             engine.bouncers.forEachIndexed { i, bouncer ->
                 bouncer.posX = Interpolation.circle.apply(positions[i].first, positions[i].second, progress)
             }
@@ -102,7 +99,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 started = true
             }
             gradientTop.set(oldColor)
-            val progress = if (duration == 0f) 1f else ((clock.beat - beat) / duration).coerceIn(0f, 1f)
+            val progress = if (duration == 0f) 1f else ((engine.beat - beat) / duration).coerceIn(0f, 1f)
             gradientTop.lerp(nextColor, progress)
         }
 
@@ -118,8 +115,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     data class MenuAnimation(val key: String, val speed: Float = 0.35f, var progress: Float = 0f, var reversed: Boolean = false)
 
-    val clock: Clock = Clock()
-    val engine = Engine(clock)
+    val engine: Engine = Engine()
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
@@ -211,6 +207,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 MenuItem("mainMenu.settings") {
                     currentMenuKey = "settings"
                 },
+                MenuItem("Tests", isLocalizationKey = false) {
+                    currentMenuKey = "test"
+                },
                 MenuItem("mainMenu.quit") {
                     Gdx.app.exit()
                     thread(isDaemon = true) {
@@ -236,24 +235,54 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     currentMenuKey = "main"
                 }
         )
+
+        // Test menus
+        menus["test"] = listOf(
+                MenuItem("TinyFD", isLocalizationKey = false) {
+                    currentMenuKey = "test_tinyfd"
+                },
+                MenuItem("mainMenu.back") {
+                    currentMenuKey = "main"
+                }
+        )
+        menus["test_tinyfd"] = listOf(
+                MenuItem("File open", isLocalizationKey = false) {
+                    println(TinyFDWrapper.openFile("Open a file", "", false, null))
+                },
+                MenuItem("File save", isLocalizationKey = false) {
+                    println(TinyFDWrapper.saveFile("Save to a file", "", null))
+                },
+                MenuItem("File save (images)", isLocalizationKey = false) {
+                    println(TinyFDWrapper.saveFile("Save to an image file", "", TinyFDWrapper.Filter(listOf("*.jpg", "*.png"), "Image files (*.jpg, *.png)")))
+                },
+                MenuItem("Folder select", isLocalizationKey = false) {
+                    println(TinyFDWrapper.selectFolder("Select a folder", ""))
+                },
+                MenuItem("Colour select", isLocalizationKey = false) {
+                    println(TinyFDWrapper.selectColor("Select a colour", Color.PINK))
+                },
+                MenuItem("mainMenu.back") {
+                    currentMenuKey = "test"
+                }
+        )
     }
 
     init {
-        clock.paused = true
+        engine.playState = PlayState.STOPPED
         reload()
         doCycle()
         Gdx.app.postRunnable {
             Gdx.app.postRunnable {
-                clock.paused = false
+                engine.playState = PlayState.PLAYING
             }
         }
     }
 
     fun reload() {
         engine.entities.clear()
-        clock.seconds = 0f
-        clock.tempos.clear()
-        clock.tempos.add(TempoChange(clock.tempos, 0f, MUSIC_BPM, Swing.STRAIGHT, 0f))
+        engine.seconds = 0f
+        engine.tempos.clear()
+        engine.tempos.add(TempoChange(engine.tempos, 0f, MUSIC_BPM, Swing.STRAIGHT, 0f))
 
         engine.addBouncers()
         music.play()
@@ -442,23 +471,22 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     override fun renderUpdate() {
         super.renderUpdate()
-        clock.update(Gdx.graphics.deltaTime)
-        engine.renderUpdate(Gdx.graphics.deltaTime)
+        engine.update(Gdx.graphics.deltaTime)
 
         events.forEach {
-            if (clock.beat >= it.beat) {
+            if (engine.beat >= it.beat) {
                 it.action()
             }
-            if (clock.beat >= it.beat + it.duration) {
+            if (engine.beat >= it.beat + it.duration) {
                 it.onDelete()
             }
         }
-        events.removeIf { clock.beat >= it.beat + it.duration }
+        events.removeIf { engine.beat >= it.beat + it.duration }
         if (lastMusicPos > music.position) {
-            clock.seconds = music.position
+            engine.seconds = music.position
             doCycle()
-        } else if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f) && music.position > 0.1f) {
-            clock.seconds = music.position
+        } else if (!MathUtils.isEqual(engine.seconds, music.position, 0.1f) && music.position > 0.1f) {
+            engine.seconds = music.position
         }
         lastMusicPos = music.position
 
@@ -491,18 +519,18 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
 
-        if (!MathUtils.isEqual(clock.seconds, music.position, 0.1f)) {
-            clock.seconds = music.position
+        if (!MathUtils.isEqual(engine.seconds, music.position, 0.1f)) {
+            engine.seconds = music.position
         }
     }
 
     override fun getDebugString(): String? {
-        return """beat: ${clock.beat}
-            |seconds: ${clock.seconds}
-            |bpm: ${clock.tempos.tempoAt(clock.beat)}
+        return """beat: ${engine.beat}
+            |seconds: ${engine.seconds}
+            |bpm: ${engine.tempos.tempoAt(engine.beat)}
             |events: ${events.size}
             |music: ${music.position}
-            |  offset: ${clock.seconds - music.position}
+            |  offset: ${engine.seconds - music.position}
         """.trimMargin()
     }
 

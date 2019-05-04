@@ -5,17 +5,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
-import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
-import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChanges
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class Engine(val clock: Clock) {
+class Engine : Clock() {
 
     companion object {
         private val TMP_MATRIX = Matrix4()
@@ -32,9 +30,9 @@ class Engine(val clock: Clock) {
     val projector = PaperProjection(2f)
 
     val timeSignatures: TimeSignatures = TimeSignatures()
-    val tempos: TempoChanges get() = clock.tempos
     val musicVolumes: MusicVolumes = MusicVolumes()
     val trackers: List<TrackerContainer<*>> = listOf(tempos, musicVolumes)
+
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
     lateinit var yellowBouncer: YellowBouncer
@@ -83,7 +81,15 @@ class Engine(val clock: Clock) {
         entities.addAll(bouncers)
     }
 
-    fun renderUpdate(delta: Float) {
+    override fun update(delta: Float) {
+        // No super update
+        if (playState != PlayState.PLAYING)
+            return
+
+        // Timing
+        seconds += delta
+
+        // Updating
         entities.forEach {
             it.renderUpdate(delta)
         }

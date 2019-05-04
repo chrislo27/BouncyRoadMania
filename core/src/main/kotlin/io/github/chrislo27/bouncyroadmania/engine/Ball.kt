@@ -44,7 +44,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
     }
 
     fun bounce(from: Bouncer, next: Bouncer, startFromCurrentPos: Boolean,
-               startBeat: Float = if (startFromCurrentPos) engine.clock.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce),
+               startBeat: Float = if (startFromCurrentPos) engine.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce),
                endBeat: Float = if (fellOff) (startBeat + beatsPerBounce) else (sentOutAt + (bouncesSoFar + 1) * beatsPerBounce)) {
         val fromPos: Entity = if (startFromCurrentPos) this else from
         val fellOff = this.fellOff
@@ -56,7 +56,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
     override fun renderUpdate(delta: Float) {
         super.renderUpdate(delta)
-        val beat = engine.clock.beat
+        val beat = engine.beat
         if (beat < sentOutAt) return
 
         if (!started) {
@@ -102,7 +102,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                         val fo = fallOff
                         if (fo != null) {
                             // Check the fall off time, if it has expired, do a proper fall bounce
-                            val currentSeconds = engine.clock.seconds
+                            val currentSeconds = engine.seconds
                             if (currentSeconds > fo.maxSeconds) {
                                 // Fall off
                                 fellOff = true
@@ -126,7 +126,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
             if (next != null && next.isPlayer && this.fallOff == null) {
                 // Set the fall off time
                 val expectedBeat = sentOutAt + (bouncesSoFar + 1) * beatsPerBounce
-                val expectedSeconds = engine.clock.tempos.beatsToSeconds(expectedBeat)
+                val expectedSeconds = engine.tempos.beatsToSeconds(expectedBeat)
                 this.fallOff = FallOff(expectedSeconds - Engine.MAX_OFFSET_SEC, expectedSeconds + Engine.MAX_OFFSET_SEC, next)
             }
         }
@@ -136,7 +136,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         val fo = this.fallOff
         if (fo != null && fo.bouncer is PlayerBouncer) {
             // Pending input
-            if (fo.bouncer.inputType == inputType && engine.clock.seconds in fo.minSeconds..fo.maxSeconds) {
+            if (fo.bouncer.inputType == inputType && engine.seconds in fo.minSeconds..fo.maxSeconds) {
                 // TODO tell engine an input was received at a certain time for recording
                 bouncesSoFar++
                 fo.bouncer.playSound()

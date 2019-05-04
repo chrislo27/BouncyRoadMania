@@ -1,9 +1,9 @@
-package io.github.chrislo27.bouncyroadmania.engine.clock
+package io.github.chrislo27.bouncyroadmania.engine
 
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChanges
 
 
-class Clock {
+open class Clock {
 
     val tempos: TempoChanges = TempoChanges(120f)
 
@@ -14,10 +14,10 @@ class Clock {
         }
     var beat: Float = 0f
         private set
-    var paused: Boolean = false
+    var playState: PlayState = PlayState.STOPPED
 
-    fun update(delta: Float) {
-        if (paused) return
+    open fun update(delta: Float) {
+        if (playState != PlayState.PLAYING) return
 
         seconds += delta
     }
