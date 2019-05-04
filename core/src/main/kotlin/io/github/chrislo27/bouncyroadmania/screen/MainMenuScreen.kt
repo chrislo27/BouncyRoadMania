@@ -45,7 +45,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val TITLE = BRMania.TITLE.split(' ').map { "$it " }
     }
 
-    open inner class Event(val beat: Float, val duration: Float) {
+    private open inner class Event(val beat: Float, val duration: Float) {
         open fun action() {
         }
 
@@ -53,19 +53,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
 
-    inner class BounceEvent(beat: Float, val pair: Int) : Event(beat, 0f) {
+    private inner class BounceEvent(beat: Float, val pair: Int) : Event(beat, 0f) {
         override fun action() {
             bounce(pair)
         }
     }
 
-    inner class SingleBounceEvent(beat: Float, val index: Int) : Event(beat, 0f) {
+    private inner class SingleBounceEvent(beat: Float, val index: Int) : Event(beat, 0f) {
         override fun action() {
             engine.bouncers.getOrNull(index)?.bounceAnimation()
         }
     }
 
-    inner class FlipXEvent(beat: Float, duration: Float) : Event(beat, duration) {
+    private inner class FlipXEvent(beat: Float, duration: Float) : Event(beat, duration) {
         private var started: Boolean = false
         private lateinit var positions: List<Pair<Float, Float>>
         override fun action() {
@@ -87,13 +87,13 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
 
-    inner class WiggleTitleEvent(beat: Float, val index: Int, val amt: Float = 1f) : Event(beat, 0f) {
+    private inner class WiggleTitleEvent(beat: Float, val index: Int, val amt: Float = 1f) : Event(beat, 0f) {
         override fun action() {
             titleWiggle[index] = amt
         }
     }
 
-    inner class ChangeGradientEvent(beat: Float, duration: Float, val nextColor: Color) : Event(beat, duration) {
+    private inner class ChangeGradientEvent(beat: Float, duration: Float, val nextColor: Color) : Event(beat, duration) {
         private var started: Boolean = false
         private lateinit var oldColor: Color
         override fun action() {
