@@ -1,6 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.engine.clock
 
-import io.github.chrislo27.rhre3.track.tracker.tempo.TempoChanges
+import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChanges
 
 
 class Clock {

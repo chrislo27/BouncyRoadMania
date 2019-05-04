@@ -18,8 +18,8 @@ import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
-import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
-import io.github.chrislo27.bouncyroadmania.engine.clock.tempo.TempoChange
+import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.Swing
+import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.MusicCredit
 import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.unscaleFont

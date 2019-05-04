@@ -1,8 +1,8 @@
-package io.github.chrislo27.bouncyroadmania.engine.clock
+package io.github.chrislo27.bouncyroadmania.engine.tracker
 
 
 abstract class Tracker<SELF : Tracker<SELF>>(val container: TrackerContainer<SELF>,
-                                                                                              var beat: Float, width: Float) {
+                                             var beat: Float, width: Float) {
 
     open val allowsResize: Boolean = true
     var width: Float = width

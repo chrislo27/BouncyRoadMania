@@ -1,11 +1,9 @@
-package io.github.chrislo27.bouncyroadmania.engine.clock.tempo
+package io.github.chrislo27.bouncyroadmania.engine.tracker.tempo
 
 import com.badlogic.gdx.math.MathUtils
-import io.github.chrislo27.bouncyroadmania.engine.clock.Swing
+import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 import io.github.chrislo27.bouncyroadmania.util.SwingUtils
 import io.github.chrislo27.bouncyroadmania.util.TempoUtils
-import io.github.chrislo27.bouncyroadmania.engine.clock.Tracker
-import io.github.chrislo27.rhre3.track.tracker.tempo.TempoChanges
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*

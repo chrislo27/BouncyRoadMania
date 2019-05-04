@@ -1,4 +1,4 @@
-package io.github.chrislo27.bouncyroadmania.engine.clock
+package io.github.chrislo27.bouncyroadmania.engine.tracker.tempo
 
 import kotlin.math.roundToInt
 

@@ -7,6 +7,10 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import io.github.chrislo27.bouncyroadmania.engine.clock.Clock
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
+import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
+import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
+import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
+import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChanges
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
@@ -25,8 +29,13 @@ class Engine(val clock: Clock) {
     val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    val entities: MutableList<Entity> = mutableListOf()
     val projector = PaperProjection(2f)
+
+    val timeSignatures: TimeSignatures = TimeSignatures()
+    val tempos: TempoChanges get() = clock.tempos
+    val musicVolumes: MusicVolumes = MusicVolumes()
+    val trackers: List<TrackerContainer<*>> = listOf(tempos, musicVolumes)
+    val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
     lateinit var yellowBouncer: YellowBouncer
         private set
@@ -70,48 +79,6 @@ class Engine(val clock: Clock) {
 
             bouncers += bouncer
         }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = -50f
-//            posY = 150f
-//            posZ = 0f
-//        }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = -50f
-//            posY = 150f
-//            posZ = 0.25f
-//        }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = 100f
-//            posY = 120f
-//            posZ = 0.5f
-//        }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = 240f
-//            posY = 110f
-//            posZ = 0.65f
-//        }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = 400f
-//            posY = 100f
-//            posZ = 0.75f
-//        }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = 520f
-//            posY = 75f
-//            posZ = 0.85f
-//        }
-//        bouncers += Bouncer(this).apply {
-//            isSilent = true
-//            posX = 400f
-//            posY = -25f
-//            posZ = 0.8f
-//        }
         this.bouncers = bouncers
         entities.addAll(bouncers)
     }
@@ -138,10 +105,6 @@ class Engine(val clock: Clock) {
             InputType.A -> yellowBouncer
             InputType.DPAD -> redBouncer
         }
-    }
-
-    fun getInputTypeForBouncer(bouncer: Bouncer): InputType? {
-        return if (bouncer === yellowBouncer) InputType.A else if (bouncer === redBouncer) InputType.DPAD else null
     }
 
     fun fireInput(inputType: InputType) {
