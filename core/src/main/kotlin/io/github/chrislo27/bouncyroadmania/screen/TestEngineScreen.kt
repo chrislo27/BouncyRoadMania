@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
@@ -15,6 +16,7 @@ import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.Swing
+import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
@@ -26,7 +28,11 @@ import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
 
 class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngineScreen>(main) {
-    
+
+    companion object {
+        private val TMP_MATRIX = Matrix4()
+    }
+
     val engine: Engine = Engine()
 
     var sendBallCycle = 0
@@ -66,13 +72,18 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 ////        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
 //        comet.scaleMul(1f / 0.5f)
 //        batch.end()
+        TMP_MATRIX.set(batch.projectionMatrix)
+        batch.projectionMatrix = engine.camera.combined
         batch.begin()
         val font = main.defaultBorderedFont
-        font.drawCompressed(batch, "M - Start Music\nR - Stop\nE - Deploy ball\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0", engine.camera.viewportWidth - 1280f / 2 + 32f, font.lineHeight * 6f, 600f, Align.right)
+        font.scaleFont(engine.camera)
+        font.drawCompressed(batch, "M - Start Music\nR - Stop\nE - Deploy ball (0.5 beats)\nSHIFT+E - Deploy (1 beat)\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0",
+                engine.camera.viewportWidth - 600f - 8f, font.lineHeight * 7f, 600f, Align.right)
         font.scaleMul(0.5f)
         font.drawCompressed(batch, BRMania.VERSION.toString(), 8f, 8f + font.capHeight, 400f, Align.left)
         font.scaleMul(1f / 0.5f)
         batch.end()
+        batch.projectionMatrix = TMP_MATRIX
     }
 
     override fun renderUpdate() {
