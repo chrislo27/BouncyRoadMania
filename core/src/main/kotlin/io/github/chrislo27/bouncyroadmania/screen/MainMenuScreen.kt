@@ -203,10 +203,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     init {
         menus["main"] = listOf(
                 MenuItem("mainMenu.play") {
-
+                    main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
                 MenuItem("mainMenu.edit") {
                     main.screen = TransitionScreen(main, main.screen, ScreenRegistry.getNonNull("editor"), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                }.apply {
+                    enabled = false
                 },
                 MenuItem("mainMenu.settings") {
                     currentMenuKey = "settings"
@@ -542,6 +544,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             |music: ${music.position}
             |  offset: ${engine.seconds - music.position}
         """.trimMargin()
+    }
+
+    override fun hide() {
+        super.hide()
+        music.stop()
     }
 
     override fun tickUpdate() {

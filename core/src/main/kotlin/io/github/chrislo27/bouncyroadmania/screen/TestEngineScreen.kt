@@ -3,8 +3,10 @@ package io.github.chrislo27.bouncyroadmania.screen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
@@ -12,8 +14,12 @@ import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.Swing
+import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
+import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.transition.TransitionScreen
+import io.github.chrislo27.toolboks.util.gdxutils.drawCompressed
 import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
 import io.github.chrislo27.toolboks.util.gdxutils.scaleMul
 
@@ -30,6 +36,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 
     fun reload() {
         engine.entities.clear()
+        engine.playState = PlayState.PLAYING
         engine.seconds = 0f
         engine.tempos.clear()
         engine.tempos.add(TempoChange(engine.tempos, 0f, 154f, Swing.STRAIGHT, 0f))
@@ -51,12 +58,18 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 
         engine.render(batch)
 
+//        batch.begin()
+//        val comet = main.cometBorderedFont
+//        comet.scaleMul(0.5f)
+////        comet.drawCompressed(batch, "Bouncy Road Mania", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight * 1.75f, 600f, Align.right)
+////        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
+//        comet.scaleMul(1f / 0.5f)
+//        batch.end()
         batch.begin()
-        val comet = main.cometBorderedFont
-        comet.scaleMul(0.5f)
-//        comet.drawCompressed(batch, "Bouncy Road Mania", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight * 1.75f, 600f, Align.right)
-//        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
-        comet.scaleMul(1f / 0.5f)
+        val font = main.defaultBorderedFontLarge
+        font.scaleMul(0.25f)
+        font.drawCompressed(batch, "M - Start Music\nR - Stop\nE - Deploy ball\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0", engine.camera.viewportWidth - 1280f / 2 + 32f, font.lineHeight * 6f, 600f, Align.right)
+        font.scaleMul(1f / 0.25f)
         batch.end()
     }
 
@@ -192,11 +205,20 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            engine.fireInput(InputType.DPAD)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.S) || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            if (engine.playState == PlayState.PLAYING) {
+                engine.fireInput(InputType.DPAD)
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-            engine.fireInput(InputType.A)
+            if (engine.playState == PlayState.PLAYING) {
+                engine.fireInput(InputType.A)
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            reload()
+            main.screen = TransitionScreen(main, main.screen, MainMenuScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
         }
     }
 
