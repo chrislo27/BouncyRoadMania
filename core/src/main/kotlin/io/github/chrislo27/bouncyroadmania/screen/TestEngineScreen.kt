@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
@@ -66,10 +67,11 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 //        comet.scaleMul(1f / 0.5f)
 //        batch.end()
         batch.begin()
-        val font = main.defaultBorderedFontLarge
-        font.scaleMul(0.25f)
+        val font = main.defaultBorderedFont
         font.drawCompressed(batch, "M - Start Music\nR - Stop\nE - Deploy ball\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0", engine.camera.viewportWidth - 1280f / 2 + 32f, font.lineHeight * 6f, 600f, Align.right)
-        font.scaleMul(1f / 0.25f)
+        font.scaleMul(0.5f)
+        font.drawCompressed(batch, BRMania.VERSION.toString(), 8f, 8f + font.capHeight, 400f, Align.left)
+        font.scaleMul(1f / 0.5f)
         batch.end()
     }
 

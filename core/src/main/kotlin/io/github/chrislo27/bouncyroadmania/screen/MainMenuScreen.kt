@@ -152,6 +152,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     val currentMenu: List<MenuItem> get() = menus[currentMenuKey] ?: emptyList()
     private var clickedOnMenu: MenuItem? = null
+    private var stopMusicOnHide = true
 
     init {
         stage.elements += object : Button<MainMenuScreen>(main.uiPalette, stage, stage) {
@@ -248,9 +249,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     currentMenuKey = "test_tinyfd"
                 },
                 MenuItem("Screen wipe (-)", isLocalizationKey = false) {
+                    stopMusicOnHide = false
                     main.screen = TransitionScreen(main, main.screen, main.screen, WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
                 MenuItem("Screen wipe (+)", isLocalizationKey = false) {
+                    stopMusicOnHide = false
                     main.screen = TransitionScreen(main, main.screen, main.screen, WipeTo(Color.BLACK, 0.35f, slope = 4f), WipeFrom(Color.BLACK, 0.35f, slope = 4f))
                 },
                 MenuItem("mainMenu.back") {
@@ -548,7 +551,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     override fun hide() {
         super.hide()
-        music.stop()
+        if (stopMusicOnHide) {
+            music.stop()
+        }
+        stopMusicOnHide = true
     }
 
     override fun tickUpdate() {
