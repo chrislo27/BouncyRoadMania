@@ -20,9 +20,13 @@ import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.*
+import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
+import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.registry.ScreenRegistry
+import io.github.chrislo27.toolboks.transition.TransitionScreen
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ImageLabel
 import io.github.chrislo27.toolboks.ui.Stage
@@ -202,12 +206,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
                 },
                 MenuItem("mainMenu.edit") {
-
+                    main.screen = TransitionScreen(main, main.screen, ScreenRegistry.getNonNull("editor"), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
                 MenuItem("mainMenu.settings") {
                     currentMenuKey = "settings"
                 },
-                MenuItem("Tests", isLocalizationKey = false) {
+                MenuItem("Debug", isLocalizationKey = false) {
                     currentMenuKey = "test"
                 },
                 MenuItem("mainMenu.quit") {
@@ -240,6 +244,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         menus["test"] = listOf(
                 MenuItem("TinyFD", isLocalizationKey = false) {
                     currentMenuKey = "test_tinyfd"
+                },
+                MenuItem("Screen wipe (-)", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, main.screen, WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                },
+                MenuItem("Screen wipe (+)", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, main.screen, WipeTo(Color.BLACK, 0.35f, slope = 4f), WipeFrom(Color.BLACK, 0.35f, slope = 4f))
                 },
                 MenuItem("mainMenu.back") {
                     currentMenuKey = "main"

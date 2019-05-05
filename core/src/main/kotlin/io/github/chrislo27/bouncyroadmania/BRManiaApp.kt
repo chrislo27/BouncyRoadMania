@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
+import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
@@ -19,12 +20,10 @@ import io.github.chrislo27.toolboks.font.FreeTypeFont
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.logging.Logger
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.registry.ScreenRegistry
 import io.github.chrislo27.toolboks.ui.UIPalette
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.setHSB
-import org.asynchttpclient.AsyncHttpClient
-import org.asynchttpclient.DefaultAsyncHttpClientConfig
-import org.asynchttpclient.Dsl
 import org.lwjgl.glfw.GLFW
 import java.io.File
 
@@ -36,7 +35,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         lateinit var instance: BRManiaApp
             private set
 
-        val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).setCompressionEnforced(true))
+//        val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).setCompressionEnforced(true))
 
         private const val RAINBOW_STR = "RAINBOW"
         private val rainbowColor: Color = Color()
@@ -128,9 +127,13 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
 
-        // screen
+        // screens
         run {
+            fun addOtherScreens() {
+                ScreenRegistry += "editor" to EditorScreen(this)
+            }
             this.screen = AssetRegistryLoadingScreen(this).setNextScreen {
+                addOtherScreens()
                 MainMenuScreen(this)
             }
         }
@@ -173,7 +176,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
     override fun dispose() {
         super.dispose()
-        httpClient.close()
+//        httpClient.close()
     }
 
     private fun createDefaultTTFParameter(): FreeTypeFontGenerator.FreeTypeFontParameter {
