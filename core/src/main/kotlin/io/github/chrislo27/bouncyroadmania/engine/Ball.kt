@@ -30,14 +30,14 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
     override fun render(batch: SpriteBatch, scale: Float) {
         val tex: Texture = AssetRegistry["tex_ball"]
-        val fallOff = fallOff
-        if (fallOff != null) {
-            if (fallOff.bouncer === engine.redBouncer) {
-                batch.setColor(1f, 0f, 0f, 1f)
-            } else {
-                batch.setColor(1f, 0.9f, 0f, 1f)
-            }
-        }
+//        val fallOff = fallOff
+//        if (fallOff != null) {
+//            if (fallOff.bouncer === engine.redBouncer) {
+//                batch.setColor(1f, 0f, 0f, 1f)
+//            } else {
+//                batch.setColor(1f, 0.9f, 0f, 1f)
+//            }
+//        }
         batch.draw(tex, posX - tex.width / 2f, posY, tex.width * 0.5f, tex.height * 0.5f, tex.width * 1f, tex.height * 1f, scale, scale,
                 0f, 0, 0, tex.width, tex.height, false, false)
         batch.setColor(1f, 1f, 1f, 1f)
