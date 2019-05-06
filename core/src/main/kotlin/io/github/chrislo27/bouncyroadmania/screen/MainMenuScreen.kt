@@ -25,7 +25,6 @@ import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.registry.ScreenRegistry
 import io.github.chrislo27.toolboks.transition.TransitionScreen
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ImageLabel
@@ -44,6 +43,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val MUSIC_BPM = 105f
         private val MUSIC_DURATION: Float = 91.428f
         private val TITLE = BRMania.TITLE.split(' ').map { "$it " }
+        private val CYCLE_COLOURS = listOf(Color.valueOf("0500FF"), Color.valueOf("9E00FF"), Color.valueOf("FF00C6"), Color.valueOf("FF002D"),
+                Color.valueOf("FF6A00"), Color.valueOf("FFD800"), Color.valueOf("60FF00"), Color.valueOf("23EF83"), Color.valueOf("00FFD1"), Color.valueOf("0093FF"))
     }
 
     private open inner class Event(val beat: Float, val duration: Float) {
@@ -123,7 +124,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    val gradientStart = Color(0f, 0.58f, 1f, 1f)
+    val gradientStart: Color = Color().set(CYCLE_COLOURS.last())
     val gradientTop: Color = gradientStart.cpy()
     val gradientBottom = Color(0f, 0f, 0f, 1f)
     val music: Music by lazy {
@@ -374,14 +375,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 //            events += FlipXEvent(8f * 4f + offset - 0.25f, 0.25f)
         }
 
-        val hsv = FloatArray(3)
         for (i in 0 until 5) {
             oneUnit(i * 32f)
         }
         for (i in 1..10) {
             // Gradient
-            gradientStart.toHsv(hsv)
-            val nextColor = Color(1f, 1f, 1f, 1f).fromHsv((hsv[0] + i * 360f / 10) % 360f, hsv[1], hsv[2])
+            val nextColor = CYCLE_COLOURS[i - 1].cpy()
             events += ChangeGradientEvent(i * 16f - 0.25f, 0.25f, nextColor)
         }
     }
