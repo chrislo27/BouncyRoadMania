@@ -1,6 +1,7 @@
 package io.github.chrislo27.bouncyroadmania
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.files.FileHandle
@@ -92,6 +93,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     var versionTextWidth: Float = -1f
         private set
 
+    private var lastWindowed: Pair<Int, Int> = BRMania.WIDTH to BRMania.HEIGHT
+
     override fun getTitle(): String = "${BRMania.TITLE} ${BRMania.VERSION}"
 
     override val programLaunchArguments: List<String>
@@ -172,11 +175,34 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 //        }
 
         super.postRender()
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
+            if (Gdx.graphics.isFullscreen) {
+                attemptEndFullscreen()
+            } else {
+                attemptFullscreen()
+            }
+        }
     }
 
     override fun dispose() {
         super.dispose()
 //        httpClient.close()
+    }
+
+    fun attemptFullscreen() {
+        lastWindowed = Gdx.graphics.width to Gdx.graphics.height
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.displayModes.maxBy { it.width * it.height * it.refreshRate }!!)
+    }
+
+    fun attemptEndFullscreen() {
+        val last = lastWindowed
+        Gdx.graphics.setWindowedMode(last.first, last.second)
+    }
+
+    fun attemptResetWindow() {
+
+        Gdx.graphics.setWindowedMode(BRMania.WIDTH, BRMania.HEIGHT)
     }
 
     private fun createDefaultTTFParameter(): FreeTypeFontGenerator.FreeTypeFontParameter {

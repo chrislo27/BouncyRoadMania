@@ -29,6 +29,7 @@ import io.github.chrislo27.toolboks.transition.TransitionScreen
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ImageLabel
 import io.github.chrislo27.toolboks.ui.Stage
+import io.github.chrislo27.toolboks.ui.TextLabel
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
 import kotlin.concurrent.thread
@@ -169,6 +170,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var stopMusicOnHide = true
 
     init {
+        stage.tooltipElement = TextLabel(main.uiPalette, stage, stage).apply {
+            this.textAlign = Align.center
+            this.fontScaleMultiplier = 0.75f
+            this.background = true
+        }
         stage.elements += object : Button<MainMenuScreen>(main.uiPalette, stage, stage) {
             val unmuted = TextureRegion(AssetRegistry.get<Texture>("ui_music"))
             val muted = TextureRegion(AssetRegistry.get<Texture>("ui_music_muted"))
@@ -182,36 +188,44 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }.apply {
             this.location.set(screenWidth = 0f, screenHeight = 0f,
                     pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f, pixelY = camera.viewportHeight - 32f)
-            music.volume = if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) 0f else 1f
-            label.image = if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) muted else unmuted
+            val muted = main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)
+            music.volume = if (muted) 0f else 1f
+            label.image = if (muted) this.muted else unmuted
             this.leftClickAction = { _, _ ->
                 val old = main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)
                 main.preferences.putBoolean(PreferenceKeys.MUTE_MUSIC, !old).flush()
                 music.volume = if (!old) 0f else 1f
-                label.image = if (!old) muted else unmuted
+                label.image = if (!old) this@apply.muted else unmuted
+                this.tooltipText = "mainMenu.tooltip.${if (!old) "mute" else "unmute"}Music"
             }
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "mainMenu.tooltip.${if (muted) "mute" else "unmute"}Music"
         }
         stage.elements += Button(main.uiPalette, stage, stage).apply {
             this.location.set(screenWidth = 0f, screenHeight = 0f,
                     pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 2, pixelY = camera.viewportHeight - 32f)
             this.leftClickAction = { _, _ ->
-                Gdx.graphics.setFullscreenMode(Gdx.graphics.displayModes.maxBy { it.width * it.height * it.refreshRate }!!)
+                main.attemptFullscreen()
             }
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_fullscreen"))
             })
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "mainMenu.tooltip.fullscreen"
         }
         stage.elements += Button(main.uiPalette, stage, stage).apply {
             this.location.set(screenWidth = 0f, screenHeight = 0f,
                     pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 3, pixelY = camera.viewportHeight - 32f)
             this.leftClickAction = { _, _ ->
-                Gdx.graphics.setWindowedMode(BRMania.WIDTH, BRMania.HEIGHT)
+                main.attemptResetWindow()
             }
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_reset_window"))
             })
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "mainMenu.tooltip.resetWindow"
         }
     }
 
