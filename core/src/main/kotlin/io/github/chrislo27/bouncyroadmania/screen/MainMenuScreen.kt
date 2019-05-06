@@ -43,8 +43,21 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val MUSIC_BPM = 105f
         private val MUSIC_DURATION: Float = 91.428f
         private val TITLE = BRMania.TITLE.split(' ').map { "$it " }
-        private val CYCLE_COLOURS = listOf(Color.valueOf("0500FF"), Color.valueOf("9E00FF"), Color.valueOf("FF00C6"), Color.valueOf("FF002D"),
-                Color.valueOf("FF6A00"), Color.valueOf("FFD800"), Color.valueOf("60FF00"), Color.valueOf("23EF83"), Color.valueOf("00FFD1"), Color.valueOf("0093FF"))
+        private val CYCLE_COLOURS: List<Color> by lazy {
+            val tex = AssetRegistry.get<Texture>("tex_main_menu_gradient")
+            val td = tex.textureData
+            td.prepare()
+            val shouldDispose = td.disposePixmap()
+            val pixmap = td.consumePixmap()
+            val ret = mutableListOf<Color>()
+            for (i in 0 until 10) {
+                ret += Color(pixmap.getPixel(i.coerceIn(0, pixmap.width - 1), 0))
+            }
+            if (shouldDispose) {
+                pixmap.dispose()
+            }
+            ret
+        }
     }
 
     private open inner class Event(val beat: Float, val duration: Float) {

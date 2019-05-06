@@ -15,6 +15,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tex_bouncer_blue", "images/game/blue.png")
         AssetRegistry.loadAsset<Texture>("tex_bouncer_red", "images/game/red.png")
         AssetRegistry.loadAsset<Texture>("tex_bouncer_yellow", "images/game/yellow.png")
+        AssetRegistry.loadAsset<Texture>("tex_main_menu_gradient", "images/main_menu_gradient.png")
 
         AssetRegistry.loadAsset<Texture>("ui_music", "images/ui/icon/music_button.png")
         AssetRegistry.loadAsset<Texture>("ui_music_muted", "images/ui/icon/music_button_muted.png")
