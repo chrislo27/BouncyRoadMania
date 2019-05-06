@@ -208,8 +208,6 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 },
                 MenuItem("mainMenu.edit") {
                     main.screen = TransitionScreen(main, main.screen, ScreenRegistry.getNonNull("editor"), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
-                }.apply {
-                    enabled = false
                 },
                 MenuItem("mainMenu.settings") {
                     currentMenuKey = "settings"
