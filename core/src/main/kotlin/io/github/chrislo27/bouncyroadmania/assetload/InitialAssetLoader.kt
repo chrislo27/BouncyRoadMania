@@ -20,6 +20,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_music", "images/ui/icon/music_button.png")
         AssetRegistry.loadAsset<Texture>("ui_music_muted", "images/ui/icon/music_button_muted.png")
         AssetRegistry.loadAsset<Texture>("ui_fullscreen", "images/ui/icon/fullscreen.png")
+        AssetRegistry.loadAsset<Texture>("ui_unfullscreen", "images/ui/icon/unfullscreen.png")
         AssetRegistry.loadAsset<Texture>("ui_reset_window", "images/ui/icon/reset_window.png")
         AssetRegistry.loadAsset<Texture>("ui_save_button", "images/ui/icon/save_button.png")
         AssetRegistry.loadAsset<Texture>("ui_new_button", "images/ui/icon/new_button.png")

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
@@ -148,7 +149,45 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     }
     private var lastMusicPos = 0f
     private val events: MutableList<Event> = mutableListOf()
+
     override val stage: Stage<MainMenuScreen> = Stage(null, camera, camera.viewportWidth, camera.viewportHeight)
+    private val fullscreenButton: Button<MainMenuScreen> = object : Button<MainMenuScreen>(main.uiPalette, stage, stage){
+        var fullscreenState = Gdx.graphics.isFullscreen
+
+        override fun render(screen: MainMenuScreen, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
+            super.render(screen, batch, shapeRenderer)
+            if (Gdx.graphics.isFullscreen != fullscreenState) {
+                fullscreenState = Gdx.graphics.isFullscreen
+                if (!fullscreenState) {
+                    this.tooltipText = "mainMenu.tooltip.fullscreen"
+                    (labels.first() as ImageLabel).image = TextureRegion(AssetRegistry.get<Texture>("ui_fullscreen"))
+                } else {
+                    this.tooltipText = "mainMenu.tooltip.unfullscreen"
+                    (labels.first() as ImageLabel).image = TextureRegion(AssetRegistry.get<Texture>("ui_unfullscreen"))
+                }
+            }
+        }
+    }.apply {
+        this.location.set(screenWidth = 0f, screenHeight = 0f,
+                pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 2, pixelY = camera.viewportHeight - 32f)
+        this.addLabel(ImageLabel(palette, this, this.stage).apply {
+            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+            this.image = if (Gdx.graphics.isFullscreen) TextureRegion(AssetRegistry.get<Texture>("ui_unfullscreen")) else TextureRegion(AssetRegistry.get<Texture>("ui_fullscreen"))
+        })
+        this.leftClickAction = { _, _ ->
+            if (Gdx.graphics.isFullscreen) {
+                main.attemptEndFullscreen()
+            } else {
+                main.attemptFullscreen()
+            }
+        }
+        this.tooltipTextIsLocalizationKey = true
+        if (Gdx.graphics.isFullscreen) {
+            this.tooltipText = "mainMenu.tooltip.unfullscreen"
+        } else {
+            this.tooltipText = "mainMenu.tooltip.fullscreen"
+        }
+    }
 
     val titleWiggle: FloatArray = FloatArray(3) { 0f }
     val menuPadding = 64f
@@ -170,9 +209,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var stopMusicOnHide = true
 
     init {
-        stage.tooltipElement = TextLabel(main.uiPalette, stage, stage).apply {
+        stage.tooltipElement = TextLabel(main.uiPalette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), stage, stage).apply {
             this.textAlign = Align.center
-            this.fontScaleMultiplier = 0.75f
             this.background = true
         }
         stage.elements += object : Button<MainMenuScreen>(main.uiPalette, stage, stage) {
@@ -201,19 +239,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "mainMenu.tooltip.${if (muted) "mute" else "unmute"}Music"
         }
-        stage.elements += Button(main.uiPalette, stage, stage).apply {
-            this.location.set(screenWidth = 0f, screenHeight = 0f,
-                    pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 2, pixelY = camera.viewportHeight - 32f)
-            this.leftClickAction = { _, _ ->
-                main.attemptFullscreen()
-            }
-            this.addLabel(ImageLabel(palette, this, this.stage).apply {
-                this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
-                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_fullscreen"))
-            })
-            this.tooltipTextIsLocalizationKey = true
-            this.tooltipText = "mainMenu.tooltip.fullscreen"
-        }
+        stage.elements += fullscreenButton
         stage.elements += Button(main.uiPalette, stage, stage).apply {
             this.location.set(screenWidth = 0f, screenHeight = 0f,
                     pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 3, pixelY = camera.viewportHeight - 32f)

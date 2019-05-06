@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.editor.stage
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -25,11 +26,10 @@ class EditorStage(val editor: Editor)
             }
         }
         elements += toolbarStage
-        this.tooltipElement = TextLabel(palette.copy(backColor = palette.backColor.cpy().also { it.a = (it.a * 1.5f).coerceIn(0f, 1f) }), this, this).apply {
+        this.tooltipElement = TextLabel(palette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), this, this).apply {
             this.isLocalizationKey = false
             this.background = true
             this.textAlign = Align.center
-            this.fontScaleMultiplier = 0.75f
         }
 
         val buttonSize = 32f
