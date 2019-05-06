@@ -207,7 +207,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
                 MenuItem("mainMenu.edit") {
-                    main.screen = TransitionScreen(main, main.screen, ScreenRegistry.getNonNull("editor"), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                    val editor = EditorScreen(main) // ScreenRegistry.getNonNull("editor")
+                    main.screen = TransitionScreen(main, main.screen, editor, WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
                 MenuItem("mainMenu.settings") {
                     currentMenuKey = "settings"

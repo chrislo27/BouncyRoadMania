@@ -1,6 +1,7 @@
 package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
@@ -18,6 +19,14 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
         Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         super.render(delta)
+    }
+
+    override fun renderUpdate() {
+        super.renderUpdate()
+        // FIXME
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            main.screen = MainMenuScreen(main)
+        }
     }
 
     override fun tickUpdate() {
