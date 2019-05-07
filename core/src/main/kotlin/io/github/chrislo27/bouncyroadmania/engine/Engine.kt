@@ -36,6 +36,7 @@ class Engine : Clock() {
     override var playState: PlayState by Delegates.observable(super.playState) { _, old, value ->
         if (old != value) {
             entities.forEach { it.onPlayStateChanged(old, value) }
+            lastBounceTinkSound.clear()
         }
     }
 
@@ -45,7 +46,7 @@ class Engine : Clock() {
         private set
     lateinit var redBouncer: RedBouncer
         private set
-    var lastBounceTinkSound: Float = Float.NEGATIVE_INFINITY
+    val lastBounceTinkSound: MutableMap<String, Float> = mutableMapOf()
 
     fun addBouncers() {
         entities.removeAll(bouncers)

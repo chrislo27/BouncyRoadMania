@@ -95,14 +95,20 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                             prepareFallOff()
                         }
                         bounce(newFrom, next, false)
-                        if (newFrom.soundHandle == "sfx_tink") {
-                            if (!MathUtils.isEqual(engine.lastBounceTinkSound, engine.seconds, 0.05f)) {
-                                engine.lastBounceTinkSound = engine.seconds
-                                newFrom.playSound()
+                        if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle] ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
+                            if (!newFrom.isSilent) {
+                                engine.lastBounceTinkSound[newFrom.soundHandle] = engine.seconds
                             }
-                        } else {
                             newFrom.playSound()
                         }
+//                        if (newFrom.soundHandle == "sfx_tink") {
+//                            if (!MathUtils.isEqual(engine.lastBounceTinkSound, engine.seconds, 0.05f)) {
+//                                engine.lastBounceTinkSound = engine.seconds
+//                                newFrom.playSound()
+//                            }
+//                        } else {
+//                            newFrom.playSound()
+//                        }
                         newFrom.bounceAnimation()
                     } else {
                         val fo = fallOff
