@@ -450,6 +450,40 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     }
 
     override fun render(delta: Float) {
+        // Engine and events updates
+        if (music.isPlaying) {
+            engine.update(Gdx.graphics.deltaTime)
+
+            events.forEach {
+                if (engine.beat >= it.beat) {
+                    it.action()
+                }
+                if (engine.beat >= it.beat + it.duration) {
+                    it.onDelete()
+                }
+            }
+            events.removeIf { engine.beat >= it.beat + it.duration }
+            if (lastMusicPos > music.position) {
+                engine.seconds = music.position
+                doCycle()
+            } else if (!MathUtils.isEqual(engine.seconds, music.position, 0.1f) && music.position > 0.1f) {
+                engine.seconds = music.position
+            }
+            lastMusicPos = music.position
+        }
+
+        for (i in 0 until titleWiggle.size) {
+            if (titleWiggle[i] != 0f) {
+                val sign = Math.signum(titleWiggle[i])
+                titleWiggle[i] -= sign * Gdx.graphics.deltaTime * 8f
+                if (Math.signum(titleWiggle[i]) != sign && titleWiggle[i] != 0f) {
+                    titleWiggle[i] = 0f
+                }
+            }
+        }
+        menuAnimations.forEach { it.progress += Gdx.graphics.deltaTime / it.speed }
+        menuAnimations.removeIf { it.progress >= 1f }
+
         val batch = main.batch
 
         // Background
@@ -537,37 +571,6 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     override fun renderUpdate() {
         super.renderUpdate()
-        engine.update(Gdx.graphics.deltaTime)
-
-        events.forEach {
-            if (engine.beat >= it.beat) {
-                it.action()
-            }
-            if (engine.beat >= it.beat + it.duration) {
-                it.onDelete()
-            }
-        }
-        events.removeIf { engine.beat >= it.beat + it.duration }
-        if (lastMusicPos > music.position) {
-            engine.seconds = music.position
-            doCycle()
-        } else if (!MathUtils.isEqual(engine.seconds, music.position, 0.1f) && music.position > 0.1f) {
-            engine.seconds = music.position
-        }
-        lastMusicPos = music.position
-
-        for (i in 0 until titleWiggle.size) {
-            if (titleWiggle[i] != 0f) {
-                val sign = Math.signum(titleWiggle[i])
-                titleWiggle[i] -= sign * Gdx.graphics.deltaTime * 8f
-                if (Math.signum(titleWiggle[i]) != sign && titleWiggle[i] != 0f) {
-                    titleWiggle[i] = 0f
-                }
-            }
-        }
-        menuAnimations.forEach { it.progress += Gdx.graphics.deltaTime / it.speed }
-        menuAnimations.removeIf { it.progress >= 1f }
-
         val menuIndex = getMenuIndex()
         val currentMenu = currentMenu
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
