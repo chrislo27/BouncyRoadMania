@@ -46,7 +46,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         engine.playState = PlayState.PLAYING
         engine.seconds = 0f
         engine.tempos.clear()
-        engine.tempos.add(TempoChange(engine.tempos, 0f, 154f, Swing.STRAIGHT, 0f))
+        engine.tempos.add(TempoChange(engine.tempos, -5f, 154f, Swing.STRAIGHT, 0f))
         sendBallCycle = 0
 
         engine.addBouncers()
@@ -77,8 +77,10 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         batch.begin()
         val font = main.defaultBorderedFont
         font.scaleFont(engine.camera)
-        font.drawCompressed(batch, "M - Start Music\nR - Stop\nE - Deploy ball (0.5 beats)\nSHIFT+E - Deploy (1 beat)\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0",
-                engine.camera.viewportWidth - 600f - 8f, font.lineHeight * 7f, 600f, Align.right)
+        font.scaleMul(0.75f)
+        font.drawCompressed(batch, "M - Bouncy Road 1\nSHIFT+M - Bouncy Road 2\nR - Stop\nE - Deploy ball (0.5 ♩)\nSHIFT+E - Deploy (1 ♩)\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0",
+                engine.camera.viewportWidth - 600f - 8f, font.lineHeight * 8f, 600f, Align.right)
+        font.scaleMul(1f / 0.75f)
         font.scaleMul(0.5f)
         font.drawCompressed(batch, BRMania.VERSION.toString(), 8f, 8f + font.capHeight, 400f, Align.left)
         font.scaleMul(1f / 0.5f)
@@ -111,7 +113,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             reload()
-            engine.seconds = -0.87f
+            engine.seconds = -1.94805f - 0.552f
             engine.playState = PlayState.STOPPED
             AssetRegistry.get<Music>("music_br").play()
             Gdx.app.postRunnable {
@@ -156,11 +158,13 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
                 posY = first.posY
                 bounce(engine.bouncers[0], engine.bouncers[1], false)
             }
-            engine.entities += Ball(engine, 1f, 68f - 1f).apply {
-                val first = engine.bouncers.first()
-                posX = first.posX
-                posY = first.posY
-                bounce(engine.bouncers[0], engine.bouncers[1], false)
+            if (!Gdx.input.isShiftDown()) {
+                engine.entities += Ball(engine, 1f, 68f - 1f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
             }
             engine.entities += Ball(engine, 0.5f, 70f - 0.5f).apply {
                 val first = engine.bouncers.first()
@@ -215,6 +219,49 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
                 posX = first.posX
                 posY = first.posY
                 bounce(engine.bouncers[0], engine.bouncers[1], false)
+            }
+
+            if (Gdx.input.isShiftDown()) {
+                // Bouncy Road 2
+                engine.entities += Ball(engine, 1f, -4f - 1f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
+                engine.entities += Ball(engine, 1f, 4f - 1f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
+                engine.entities += Ball(engine, 1f, 20f - 1f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
+
+
+                engine.entities += Ball(engine, 2f, 36f - 2f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
+
+                engine.entities += Ball(engine, 1f, 68.5f - 1f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
+                engine.entities += Ball(engine, 2f, 84f - 2f).apply {
+                    val first = engine.bouncers.first()
+                    posX = first.posX
+                    posY = first.posY
+                    bounce(engine.bouncers[0], engine.bouncers[1], false)
+                }
             }
         }
 
