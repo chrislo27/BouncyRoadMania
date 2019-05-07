@@ -14,7 +14,7 @@ open class Clock {
         }
     var beat: Float = 0f
         private set
-    var playState: PlayState = PlayState.STOPPED
+    open var playState: PlayState = PlayState.STOPPED
 
     open fun update(delta: Float) {
         if (playState != PlayState.PLAYING) return

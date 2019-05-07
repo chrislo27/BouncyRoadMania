@@ -11,6 +11,7 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import kotlin.properties.Delegates
 
 
 class Engine : Clock() {
@@ -32,6 +33,11 @@ class Engine : Clock() {
     val timeSignatures: TimeSignatures = TimeSignatures()
     val musicVolumes: MusicVolumes = MusicVolumes()
     val trackers: List<TrackerContainer<*>> = listOf(tempos, musicVolumes)
+    override var playState: PlayState by Delegates.observable(super.playState) { _, old, value ->
+        if (old != value) {
+            entities.forEach { it.onPlayStateChanged(old, value) }
+        }
+    }
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
@@ -39,6 +45,7 @@ class Engine : Clock() {
         private set
     lateinit var redBouncer: RedBouncer
         private set
+    var lastBounceTinkSound: Float = Float.NEGATIVE_INFINITY
 
     fun addBouncers() {
         entities.removeAll(bouncers)

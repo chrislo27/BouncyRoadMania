@@ -17,4 +17,6 @@ abstract class Entity(val engine: Engine) : PaperRenderable {
 
     }
 
+    open fun onPlayStateChanged(oldValue: PlayState, newValue: PlayState) {}
+
 }
