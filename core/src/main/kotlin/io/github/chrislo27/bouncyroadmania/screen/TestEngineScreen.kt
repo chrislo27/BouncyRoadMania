@@ -36,6 +36,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
     val engine: Engine = Engine()
 
     var sendBallCycle = 0
+    var hideUI = false
 
     init {
         reload()
@@ -60,7 +61,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         val batch = main.batch
 
         batch.begin()
-        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, Gdx.graphics.width * 1f, Gdx.graphics.height * 1f)
+        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, main.defaultCamera.viewportWidth, main.defaultCamera.viewportHeight)
         batch.end()
 
         engine.render(batch)
@@ -72,20 +73,23 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
 ////        comet.drawCompressed(batch, "ホッピングロードマニア", engine.camera.viewportWidth - 1280f / 2, comet.lineHeight, 600f, Align.right)
 //        comet.scaleMul(1f / 0.5f)
 //        batch.end()
-        TMP_MATRIX.set(batch.projectionMatrix)
-        batch.projectionMatrix = engine.camera.combined
-        batch.begin()
-        val font = main.defaultBorderedFont
-        font.scaleFont(engine.camera)
-        font.scaleMul(0.75f)
-        font.drawCompressed(batch, "M - Bouncy Road 1\nSHIFT+M - Bouncy Road 2\nR - Stop\nE - Deploy ball (0.5 ♩)\nSHIFT+E - Deploy (1 ♩)\nESC - Main Menu\nW/A/S/D - \uE110\nJ - \uE0E0",
-                engine.camera.viewportWidth - 600f - 8f, font.lineHeight * 8f, 600f, Align.right)
-        font.scaleMul(1f / 0.75f)
-        font.scaleMul(0.5f)
-        font.drawCompressed(batch, BRMania.VERSION.toString(), 8f, 8f + font.capHeight, 400f, Align.left)
-        font.scaleMul(1f / 0.5f)
-        batch.end()
-        batch.projectionMatrix = TMP_MATRIX
+        if (!hideUI) {
+            TMP_MATRIX.set(batch.projectionMatrix)
+            batch.projectionMatrix = engine.camera.combined
+            batch.begin()
+            val font = main.defaultBorderedFont
+            font.scaleFont(engine.camera)
+            font.scaleMul(0.75f)
+            font.drawCompressed(batch, "W/A/S/D - \uE110\n" +
+                    "J - \uE0E0\nE - Deploy ball (0.5 ♩)\nSHIFT+E - Deploy (1 ♩)\nESC - Main Menu\nR - Stop\nM - Bouncy Road 1\nSHIFT+M - Bouncy Road 2\nF1 - Toggle UI",
+                    engine.camera.viewportWidth - 600f - 8f, font.lineHeight * 9f, 600f, Align.right)
+            font.scaleMul(1f / 0.75f)
+            font.scaleMul(0.5f)
+            font.drawCompressed(batch, BRMania.VERSION.toString(), 8f, 8f + font.capHeight, 400f, Align.left)
+            font.scaleMul(1f / 0.5f)
+            batch.end()
+            batch.projectionMatrix = TMP_MATRIX
+        }
     }
 
     override fun renderUpdate() {
@@ -110,6 +114,9 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
                 posY = first.posY
                 bounce(engine.bouncers[0], engine.bouncers[1], false)
             }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+            hideUI = !hideUI
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             reload()
