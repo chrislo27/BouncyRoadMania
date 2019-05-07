@@ -9,7 +9,7 @@ import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 import kotlin.math.absoluteValue
 
 
-class WipeTo(val color: Color, duration: Float, val slope: Float = -4f, val interpolation: Interpolation = Interpolation.linear)
+class WipeTo(val color: Color, duration: Float, val slope: Float = 4f, val interpolation: Interpolation = Interpolation.linear)
     : Transition(duration) {
     override fun render(transitionScreen: TransitionScreen<*>, screenRender: () -> Unit) {
         screenRender()
@@ -40,7 +40,7 @@ class WipeTo(val color: Color, duration: Float, val slope: Float = -4f, val inte
     }
 }
 
-class WipeFrom(val color: Color, duration: Float, val slope: Float = -4f, val interpolation: Interpolation = Interpolation.linear)
+class WipeFrom(val color: Color, duration: Float, val slope: Float = 4f, val interpolation: Interpolation = Interpolation.linear)
     : Transition(duration) {
     override fun render(transitionScreen: TransitionScreen<*>, screenRender: () -> Unit) {
         screenRender()
