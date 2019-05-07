@@ -3,7 +3,6 @@ package io.github.chrislo27.bouncyroadmania.engine
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
@@ -50,7 +49,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         val fellOff = this.fellOff
         val nextX = if (fellOff) MathUtils.lerp(fromPos.posX, next.posX, 0.5f) else next.posX
         this.bounce = Bounce(fromPos.posX, fromPos.posY, fromPos.posZ, nextX, if (fellOff) -32f else next.posY, next.posZ,
-                Interpolation.linear.apply(8f, 96f, beatsPerBounce),
+                100f * beatsPerBounce + 8f,
                 startBeat, endBeat, from, next)
     }
 
