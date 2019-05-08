@@ -1,8 +1,8 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
 
-enum class PlayState {
+enum class PlayState(val localizationKey: String) {
 
-    STOPPED, PLAYING, PAUSED
+    STOPPED("editor.playState.stop"), PLAYING("editor.playState.play"), PAUSED("editor.playState.pause")
 
 }

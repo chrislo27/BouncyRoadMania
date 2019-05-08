@@ -133,7 +133,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         // screens
         run {
             fun addOtherScreens() {
-                ScreenRegistry += "editor" to EditorScreen(this)
+
             }
             this.screen = AssetRegistryLoadingScreen(this).setNextScreen {
                 addOtherScreens()
