@@ -23,6 +23,7 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.*
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
+import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -258,6 +259,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     }
 
     init {
+        val mainDebugItem = MenuItem("Debug", isLocalizationKey = false) {
+                    currentMenuKey = "test"
+                }
         menus["main"] = listOf(
                 MenuItem("mainMenu.play") {
                     main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
@@ -268,10 +272,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 },
                 MenuItem("mainMenu.settings") {
                     currentMenuKey = "settings"
+                }.apply {
+                    this.enabled = false
                 },
-                MenuItem("Debug", isLocalizationKey = false) {
-                    currentMenuKey = "test"
-                },
+                mainDebugItem,
                 MenuItem("mainMenu.quit") {
                     Gdx.app.exit()
                     thread(isDaemon = true) {
@@ -279,7 +283,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                         exitProcess(0)
                     }
                 }
-        )
+        ) - (if (!Toolboks.debugMode) listOf(mainDebugItem) else listOf())
         menus["settings"] = listOf(
                 MenuItem("mainMenu.settings.video") {
                 }.apply {
