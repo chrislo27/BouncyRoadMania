@@ -253,6 +253,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "mainMenu.tooltip.resetWindow"
         }
+
+        stage.updatePositions()
     }
 
     init {
