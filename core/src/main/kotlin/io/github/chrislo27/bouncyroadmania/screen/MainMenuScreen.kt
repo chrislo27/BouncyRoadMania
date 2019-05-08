@@ -140,9 +140,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    val gradientStart: Color = Color().set(CYCLE_COLOURS.last())
-    val gradientTop: Color = gradientStart.cpy()
-    val gradientBottom = Color(0f, 0f, 0f, 1f)
+    val gradientStart: Color = Color().set(CYCLE_COLOURS.last()).apply {
+        engine.gradientLast.set(this)
+    }
+    val gradientTop: Color get() = engine.gradientLast
     val music: Music by lazy {
         AssetRegistry.get<Music>("music_main_menu").apply {
             isLooping = true
@@ -491,15 +492,6 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         menuAnimations.removeIf { it.progress >= 1f }
 
         val batch = main.batch
-
-        // Background
-        TMP_MATRIX.set(batch.projectionMatrix)
-        camera.update()
-        batch.projectionMatrix = camera.combined
-        batch.begin()
-        batch.drawQuad(0f, 0f, gradientBottom, camera.viewportWidth, 0f, gradientBottom, camera.viewportWidth, camera.viewportHeight, gradientTop, 0f, camera.viewportHeight, gradientTop)
-        batch.end()
-        batch.projectionMatrix = TMP_MATRIX
 
         // Engine rendering
         engine.render(batch)

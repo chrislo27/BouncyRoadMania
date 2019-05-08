@@ -11,13 +11,18 @@ import org.lwjgl.opengl.GL20
 
 class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(main) {
 
-    val editor: Editor = Editor()
+    val editor: Editor = Editor(main)
     override val stage: EditorStage
         get() = editor.stage
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        val batch = main.batch
+
+        editor.renderer.render(batch)
+
         super.render(delta)
     }
 

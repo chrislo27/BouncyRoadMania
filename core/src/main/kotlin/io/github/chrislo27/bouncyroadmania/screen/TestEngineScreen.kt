@@ -5,13 +5,13 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
@@ -48,6 +48,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         engine.seconds = 0f
         engine.tempos.clear()
         engine.tempos.add(TempoChange(engine.tempos, -5f, 154f, Swing.STRAIGHT, 0f))
+        engine.gradientDirection = GradientDirection.VERTICAL
         sendBallCycle = 0
 
         engine.addBouncers()
@@ -59,10 +60,6 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         val batch = main.batch
-
-        batch.begin()
-        batch.draw(AssetRegistry.get<Texture>("tex_gradient"), 0f, 0f, main.defaultCamera.viewportWidth, main.defaultCamera.viewportHeight)
-        batch.end()
 
         engine.render(batch)
 

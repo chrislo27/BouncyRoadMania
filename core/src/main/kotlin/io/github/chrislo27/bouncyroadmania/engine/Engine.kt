@@ -1,6 +1,7 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
@@ -11,6 +12,7 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import kotlin.properties.Delegates
 
 
@@ -47,6 +49,11 @@ class Engine : Clock() {
     lateinit var redBouncer: RedBouncer
         private set
     val lastBounceTinkSound: MutableMap<String, Float> = mutableMapOf()
+
+    // Visuals
+    val gradientLast: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
+    val gradientFirst: Color = Color(0f, 0f, 0f, 1f)
+    var gradientDirection: GradientDirection = GradientDirection.VERTICAL
 
     fun addBouncers() {
         entities.removeAll(bouncers)
@@ -89,6 +96,10 @@ class Engine : Clock() {
         entities.addAll(bouncers)
     }
 
+    init {
+        addBouncers()
+    }
+
     override fun update(delta: Float) {
         // No super update
         if (playState != PlayState.PLAYING)
@@ -109,6 +120,12 @@ class Engine : Clock() {
         TMP_MATRIX.set(batch.projectionMatrix)
         batch.projectionMatrix = camera.combined
         batch.begin()
+        // gradient
+        if (gradientDirection == GradientDirection.VERTICAL) {
+            batch.drawQuad(0f, 0f, gradientFirst, camera.viewportWidth, 0f, gradientFirst, camera.viewportWidth, camera.viewportHeight, gradientLast, 0f, camera.viewportHeight, gradientLast)
+        } else {
+            batch.drawQuad(0f, 0f, gradientFirst, camera.viewportWidth, 0f, gradientLast, camera.viewportWidth, camera.viewportHeight, gradientLast, 0f, camera.viewportHeight, gradientFirst)
+        }
         projector.render(batch, entities)
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
