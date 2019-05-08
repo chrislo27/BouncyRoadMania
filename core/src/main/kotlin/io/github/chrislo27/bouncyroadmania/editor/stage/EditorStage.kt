@@ -37,7 +37,7 @@ class EditorStage(val editor: Editor)
         messageLabel = TextLabel(palette, messageBarStage, messageBarStage).apply {
             this.fontScaleMultiplier = 0.5f
             this.textWrapping = false
-            this.text = "MESSAGE LABEL MESSAGE LABEL MESSAGE LABEL"
+            this.text = ""
             this.isLocalizationKey = false
             this.textAlign = Align.left
             this.location.set(screenHeight = 0.5f)
@@ -46,7 +46,7 @@ class EditorStage(val editor: Editor)
         controlsLabel = TextLabel(palette, messageBarStage, messageBarStage).apply {
             this.fontScaleMultiplier = 0.5f
             this.textWrapping = false
-            this.text = "CONTROLS LABEL CONTROLS LABEL CONTROLS LABEL"
+            this.text = ""
             this.isLocalizationKey = false
             this.textAlign = Align.left
             this.location.set(screenHeight = 0.5f, screenY = 0.5f)
