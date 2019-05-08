@@ -12,6 +12,6 @@ class Editor {
 
     }
     val engine: Engine = Engine()
-
+    var currentTool: Tool = Tool.SELECTION
 
 }
