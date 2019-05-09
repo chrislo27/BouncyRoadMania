@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
+import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
-import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
@@ -21,7 +21,6 @@ import io.github.chrislo27.toolboks.font.FreeTypeFont
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.logging.Logger
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.registry.ScreenRegistry
 import io.github.chrislo27.toolboks.ui.UIPalette
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.setHSB
@@ -92,6 +91,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         private set
     var versionTextWidth: Float = -1f
         private set
+    var editorTheme: EditorTheme = EditorTheme.DEFAULT_THEMES.getValue("light")
 
     private var lastWindowed: Pair<Int, Int> = BRMania.WIDTH to BRMania.HEIGHT
 
@@ -142,7 +142,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         }
 
         // preferences
-        preferences = Gdx.app.getPreferences("Crossing")
+        preferences = Gdx.app.getPreferences("BouncyRoadMania")
+        editorTheme = EditorTheme.DEFAULT_THEMES[preferences.getString("editorTheme", "")] ?: editorTheme
     }
 
     override fun preRender() {
