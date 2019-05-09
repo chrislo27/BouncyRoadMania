@@ -21,13 +21,16 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
 
         val buttonSize = 32f
         val buttonPadding = 6f
+
+        // I/O buttons
         this.elements += Button(palette, this, this).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_new_button"))
             })
-            this.tooltipText = "New"
+            this.tooltipText = "editor.new"
+            this.tooltipTextIsLocalizationKey = true
         }
         this.elements += Button(palette, this, this).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 2 + buttonSize,
@@ -35,7 +38,8 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_load_button"))
             })
-            this.tooltipText = "Open"
+            this.tooltipText = "editor.load"
+            this.tooltipTextIsLocalizationKey = true
         }
         this.elements += Button(palette, this, this).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 3 + buttonSize * 2,
@@ -43,7 +47,8 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_save_button"))
             })
-            this.tooltipText = "Save"
+            this.tooltipText = "editor.save"
+            this.tooltipTextIsLocalizationKey = true
         }
 
         // Separator
@@ -109,6 +114,12 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_edit_mode_params"))
             })
+        }
+
+        // Bottom separator
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(1f, 1f, 1f, 0.5f)
+            this.location.set(0f, 0f, 1f, 0f, pixelHeight = 1f)
         }
     }
 
