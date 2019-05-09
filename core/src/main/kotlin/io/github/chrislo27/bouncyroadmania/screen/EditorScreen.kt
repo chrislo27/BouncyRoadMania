@@ -2,6 +2,7 @@ package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputMultiplexer
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
@@ -32,6 +33,16 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             main.screen = MainMenuScreen(main)
         }
+    }
+
+    override fun show() {
+        super.show()
+        (Gdx.input.inputProcessor as? InputMultiplexer)?.addProcessor(editor)
+    }
+
+    override fun hide() {
+        super.hide()
+        (Gdx.input.inputProcessor as? InputMultiplexer)?.removeProcessor(editor)
     }
 
     override fun tickUpdate() {
