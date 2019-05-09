@@ -15,6 +15,7 @@ class EditorStage(val editor: Editor)
     : Stage<EditorScreen>(null, OrthographicCamera().apply { setToOrtho(false, 1280f, 720f) }, 1280f, 720f) {
 
     val toolbarStage: ToolbarStage
+    val timelineStage: TimelineStage
     val messageBarStage: Stage<EditorScreen>
     
     val messageLabel: TextLabel<EditorScreen>
@@ -26,6 +27,11 @@ class EditorStage(val editor: Editor)
             this.location.set(screenHeight = 0f, screenY = 1f, pixelY = -40f, pixelHeight = 40f)
         }
         elements += toolbarStage
+
+        timelineStage = TimelineStage(this, palette).apply {
+            this.location.set(screenHeight = 0f, screenY = 1f, pixelY = -40f * 2f, pixelHeight = 40f)
+        }
+        elements += timelineStage
 
         messageBarStage = Stage(this, this.camera, this.pixelsWidth, this.pixelsHeight).apply {
             this.location.set(screenHeight = 0f, screenY = 0f, pixelY = 0f, pixelHeight = 32f)
