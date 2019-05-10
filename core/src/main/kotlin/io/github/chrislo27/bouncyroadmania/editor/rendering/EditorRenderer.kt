@@ -58,4 +58,8 @@ class EditorRenderer(val editor: Editor) {
 
     }
 
+    fun getDebugString(): String {
+        return ""
+    }
+
 }

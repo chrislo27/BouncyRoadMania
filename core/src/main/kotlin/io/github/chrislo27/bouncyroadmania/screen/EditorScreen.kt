@@ -45,6 +45,10 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
         (Gdx.input.inputProcessor as? InputMultiplexer)?.removeProcessor(editor)
     }
 
+    override fun getDebugString(): String? {
+        return editor.getDebugString()
+    }
+
     override fun tickUpdate() {
     }
 

@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.editor
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
@@ -20,6 +21,7 @@ class Editor(val main: BRManiaApp) : InputProcessor {
     var currentTool: Tool by Delegates.observable(Tool.SELECTION) { _, _, _ -> updateMessageBar() }
 
     val renderer: EditorRenderer = EditorRenderer(this)
+    private var frameLastCallUpdateMessageBar: Long = -1
 
     init {
         Localization.addListener {
@@ -28,6 +30,7 @@ class Editor(val main: BRManiaApp) : InputProcessor {
     }
 
     fun updateMessageBar() {
+        frameLastCallUpdateMessageBar = Gdx.graphics.frameId
         val message = StringBuilder()
         val controls = StringBuilder()
 
@@ -70,5 +73,9 @@ class Editor(val main: BRManiaApp) : InputProcessor {
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         return false
+    }
+
+    fun getDebugString(): String {
+        return "updateMessageBar: ${Gdx.graphics.frameId - frameLastCallUpdateMessageBar}" + "\n${renderer.getDebugString()}"
     }
 }
