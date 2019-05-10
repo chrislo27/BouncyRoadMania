@@ -21,8 +21,8 @@ class EditorRenderer(val editor: Editor) {
     private val main: BRManiaApp get() = editor.main
     private val engine: Engine get() = editor.engine
 
-    val camera: OrthographicCamera = OrthographicCamera().apply {
-        setToOrtho(false, 1280f, 720f)
+    val trackCamera: OrthographicCamera = OrthographicCamera().apply {
+        setToOrtho(false, 15f * (16f / 9f), 15f)
     }
     val staticCamera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
