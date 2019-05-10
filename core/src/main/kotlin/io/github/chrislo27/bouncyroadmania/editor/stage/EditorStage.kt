@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.toolboks.ui.ColourPane
@@ -66,6 +67,14 @@ class EditorStage(val editor: Editor)
         }
 
         stage.updatePositions()
+        decideVisibility()
+    }
+
+    /**
+     * Decides what parts of the stage are visible based on the current editor state.
+     */
+    fun decideVisibility() {
+        timelineStage.visible = editor.editMode != EditMode.PARAMETERS
     }
 
 }
