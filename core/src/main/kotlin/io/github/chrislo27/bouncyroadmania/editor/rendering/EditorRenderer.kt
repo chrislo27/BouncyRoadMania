@@ -7,6 +7,8 @@ import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
+import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 
@@ -55,7 +57,18 @@ class EditorRenderer(val editor: Editor) {
     }
 
     private fun renderParams(batch: SpriteBatch) {
-
+        TMP_MATRIX.set(batch.projectionMatrix)
+        batch.projectionMatrix = staticCamera.combined
+        batch.begin()
+        with(engine) {
+            if (gradientDirection == GradientDirection.VERTICAL) {
+                batch.drawQuad(0f, 0f, gradientFirst, staticCamera.viewportWidth, 0f, gradientFirst, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientLast, 0f, staticCamera.viewportHeight, gradientLast)
+            } else {
+                batch.drawQuad(0f, 0f, gradientFirst, staticCamera.viewportWidth, 0f, gradientLast, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientLast, 0f, staticCamera.viewportHeight, gradientFirst)
+            }
+        }
+        batch.end()
+        batch.projectionMatrix = TMP_MATRIX
     }
 
     fun getDebugString(): String {
