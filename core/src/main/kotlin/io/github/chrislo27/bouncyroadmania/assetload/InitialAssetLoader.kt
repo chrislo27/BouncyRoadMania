@@ -33,6 +33,10 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_play", "images/ui/icon/play.png")
         AssetRegistry.loadAsset<Texture>("ui_stop", "images/ui/icon/stop.png")
 
+        AssetRegistry.loadAsset<Texture>("tracker_right_tri", "images/ui/tracker_right_triangle.png")
+        AssetRegistry.loadAsset<Texture>("tracker_tri", "images/ui/tracker_triangle.png")
+        AssetRegistry.loadAsset<Texture>("tracker_right_tri_bordered", "images/ui/tracker_triangle_right_bordered.png")
+
         AssetRegistry.loadAsset<Sound>("sfx_tink", "sounds/tink.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_cymbal", "sounds/cymbal.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_dud_left", "sounds/dudL.wav")
