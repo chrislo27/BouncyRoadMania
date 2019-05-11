@@ -115,6 +115,9 @@ class EditorRenderer(val editor: Editor) {
         // beat numbers
         this.renderBeatNumbers(batch, beatRange, font)
 
+        // top trackers
+        this.renderTopTrackers(batch, beatRange, trackYOffset)
+
         // bottom trackers
         this.renderBottomTrackers(batch, beatRange)
 

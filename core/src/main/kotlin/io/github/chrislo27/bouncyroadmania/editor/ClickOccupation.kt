@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.editor
 
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 
 
@@ -12,51 +13,51 @@ sealed class ClickOccupation {
 
     object None : ClickOccupation()
 
-//    class Playback(val editor: Editor)
-//        : ClickOccupation(), ReversibleAction<Engine>, TrackerBased {
-//        val old = editor.remix.playbackStart
-//        override var finished: Boolean = false
-//        override var final: Float = Float.NaN
-//            set(value) {
-//                if (!java.lang.Float.isNaN(field)) {
-//                    error("Attempt to set value to $value when already set to $field")
-//                }
-//                field = value
-//            }
-//
-//        override fun redo(context: Engine) {
-//            if (final == Float.NaN)
-//                error("Final value was NaN which is impossible")
-//            editor.remix.playbackStart = final
-//        }
-//
-//        override fun undo(context: Engine) {
-//            editor.remix.playbackStart = old
-//        }
-//    }
-//
-//    class Music(val editor: Editor, val middleClick: Boolean)
-//        : ClickOccupation(), ReversibleAction<Engine>, TrackerBased {
-//        val old = editor.remix.musicStartSec
-//        override var finished: Boolean = false
-//        override var final: Float = Float.NaN
-//            set(value) {
-//                if (!java.lang.Float.isNaN(field)) {
-//                    error("Attempt to set value to $value when already set to $field")
-//                }
-//                field = value
-//            }
-//
-//        override fun redo(context: Engine) {
-//            if (final != final)
-//                error("Final value was NaN which is impossible")
-//            editor.remix.musicStartSec = final
-//        }
-//
-//        override fun undo(context: Engine) {
-//            editor.remix.musicStartSec = old
-//        }
-//    }
+    class Playback(val editor: Editor)
+        : ClickOccupation(), ReversibleAction<Editor>, TrackerBased {
+        val old: Float = editor.engine.playbackStart
+        override var finished: Boolean = false
+        override var final: Float = Float.NaN
+            set(value) {
+                if (!java.lang.Float.isNaN(field)) {
+                    error("Attempt to set value to $value when already set to $field")
+                }
+                field = value
+            }
+
+        override fun redo(context: Editor) {
+            if (final == Float.NaN)
+                error("Final value was NaN which is impossible")
+            context.engine.playbackStart = final
+        }
+
+        override fun undo(context: Editor) {
+            context.engine.playbackStart = old
+        }
+    }
+
+    class Music(val editor: Editor, val middleClick: Boolean)
+        : ClickOccupation(), ReversibleAction<Editor>, TrackerBased {
+        val old = editor.engine.musicStartSec
+        override var finished: Boolean = false
+        override var final: Float = Float.NaN
+            set(value) {
+                if (!java.lang.Float.isNaN(field)) {
+                    error("Attempt to set value to $value when already set to $field")
+                }
+                field = value
+            }
+
+        override fun redo(context: Editor) {
+            if (final != final)
+                error("Final value was NaN which is impossible")
+            context.engine.musicStartSec = final
+        }
+
+        override fun undo(context: Editor) {
+            context.engine.musicStartSec = old
+        }
+    }
 
 //    class CreatingSelection(val editor: Editor, val startPoint: Vector2)
 //        : ClickOccupation() {

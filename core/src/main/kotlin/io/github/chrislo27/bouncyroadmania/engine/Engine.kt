@@ -53,6 +53,9 @@ class Engine : Clock() {
     var lastPoint: Float = 0f
         private set
 
+    var playbackStart: Float = 0f
+    var musicStartSec: Float = 0f
+
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
     lateinit var yellowBouncer: YellowBouncer

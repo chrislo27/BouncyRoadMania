@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionHistory
 import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
@@ -15,10 +16,12 @@ import io.github.chrislo27.toolboks.util.gdxutils.getInputX
 import io.github.chrislo27.toolboks.util.gdxutils.getInputY
 import io.github.chrislo27.toolboks.util.gdxutils.isControlDown
 import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import kotlin.properties.Delegates
 
 
-class Editor(val main: BRManiaApp) : InputProcessor {
+class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
 
     companion object {
         const val EVENT_HEIGHT: Float = 48f
@@ -28,6 +31,11 @@ class Editor(val main: BRManiaApp) : InputProcessor {
         internal const val ZERO_BEAT_SYMBOL = "♩"
         internal const val SELECTION_RECT_ADD = "+"
         internal const val SELECTION_RECT_INVERT = "±"
+        internal val THREE_DECIMAL_PLACES_FORMATTER = DecimalFormat("0.000", DecimalFormatSymbols())
+        internal val TRACKER_TIME_FORMATTER = DecimalFormat("00.000", DecimalFormatSymbols())
+        internal val TRACKER_MINUTES_FORMATTER = DecimalFormat("00", DecimalFormatSymbols())
+        val ONE_DECIMAL_PLACE_FORMATTER = DecimalFormat("0.0", DecimalFormatSymbols())
+        val TWO_DECIMAL_PLACES_FORMATTER = DecimalFormat("0.00", DecimalFormatSymbols())
     }
 
     val theme: EditorTheme get() = main.editorTheme
@@ -44,6 +52,8 @@ class Editor(val main: BRManiaApp) : InputProcessor {
 
     val renderer: EditorRenderer = EditorRenderer(this)
     private var frameLastCallUpdateMessageBar: Long = -1
+    var cachedPlaybackStart: Pair<Float, String> = Float.POSITIVE_INFINITY to ""
+    var cachedMusicStart: Pair<Float, String> = Float.POSITIVE_INFINITY to ""
 
     init {
         Localization.addListener {
