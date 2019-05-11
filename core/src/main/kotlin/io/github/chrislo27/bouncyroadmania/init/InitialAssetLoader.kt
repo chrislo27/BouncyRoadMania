@@ -1,4 +1,4 @@
-package io.github.chrislo27.bouncyroadmania.assetload
+package io.github.chrislo27.bouncyroadmania.init
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Music
@@ -32,6 +32,12 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_pause", "images/ui/icon/pause.png")
         AssetRegistry.loadAsset<Texture>("ui_play", "images/ui/icon/play.png")
         AssetRegistry.loadAsset<Texture>("ui_stop", "images/ui/icon/stop.png")
+
+        AssetRegistry.loadAsset<Texture>("tool_selection", "images/tool/selection.png")
+        AssetRegistry.loadAsset<Texture>("tool_tempo_change", "images/tool/tempo_change.png")
+        AssetRegistry.loadAsset<Texture>("tool_time_signature", "images/tool/time_signature.png")
+        AssetRegistry.loadAsset<Texture>("tool_music_volume", "images/tool/music_volume.png")
+        AssetRegistry.loadAsset<Texture>("tool_swing", "images/tool/swing.png")
 
         AssetRegistry.loadAsset<Texture>("tracker_right_tri", "images/ui/tracker_right_triangle.png")
         AssetRegistry.loadAsset<Texture>("tracker_tri", "images/ui/tracker_triangle.png")

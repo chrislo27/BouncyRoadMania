@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import io.github.chrislo27.bouncyroadmania.assetload.InitialAssetLoader
+import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
