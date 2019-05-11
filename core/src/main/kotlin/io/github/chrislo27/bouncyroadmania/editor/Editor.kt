@@ -3,12 +3,16 @@ package io.github.chrislo27.bouncyroadmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 import io.github.chrislo27.toolboks.i18n.Localization
+import io.github.chrislo27.toolboks.util.gdxutils.getInputX
+import io.github.chrislo27.toolboks.util.gdxutils.getInputY
 import io.github.chrislo27.toolboks.util.gdxutils.isControlDown
 import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
 import kotlin.properties.Delegates
@@ -36,6 +40,7 @@ class Editor(val main: BRManiaApp) : InputProcessor {
     val engine: Engine = Engine()
     var currentTool: Tool by Delegates.observable(Tool.SELECTION) { _, _, _ -> updateMessageBar() }
     var snap: Float = 0.25f
+    var clickOccupation: ClickOccupation = ClickOccupation.None
 
     val renderer: EditorRenderer = EditorRenderer(this)
     private var frameLastCallUpdateMessageBar: Long = -1
@@ -78,6 +83,28 @@ class Editor(val main: BRManiaApp) : InputProcessor {
 
     }
 
+    fun getTrackerOnMouse(klass: Class<out Tracker<*>>?, obeyY: Boolean): Tracker<*>? {
+        if (klass == null || (obeyY && renderer.trackCamera.getInputY() > 0f))
+            return null
+        val mouseX = renderer.trackCamera.getInputX()
+        engine.trackers.forEach { container ->
+            val result = container.map.values.firstOrNull {
+                if (it::class.java != klass)
+                    false
+                else if (it.isZeroWidth)
+                    MathUtils.isEqual(mouseX, it.beat, snap * 0.5f)
+                else
+                    mouseX in it.beat..it.endBeat
+            }
+
+            if (result != null)
+                return result
+        }
+
+        return null
+    }
+
+
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         return false
     }
@@ -103,8 +130,6 @@ class Editor(val main: BRManiaApp) : InputProcessor {
     }
 
     override fun keyDown(keycode: Int): Boolean {
-
-
         return false
     }
 

@@ -115,6 +115,9 @@ class EditorRenderer(val editor: Editor) {
         // beat numbers
         this.renderBeatNumbers(batch, beatRange, font)
 
+        // bottom trackers
+        this.renderBottomTrackers(batch, beatRange)
+
         font.unscaleFont()
         batch.end()
         batch.projectionMatrix = TMP_MATRIX

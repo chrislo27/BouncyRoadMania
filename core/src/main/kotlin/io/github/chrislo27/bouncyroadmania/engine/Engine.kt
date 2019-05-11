@@ -39,6 +39,7 @@ class Engine : Clock() {
     val timeSignatures: TimeSignatures = TimeSignatures()
     val musicVolumes: MusicVolumes = MusicVolumes()
     val trackers: List<TrackerContainer<*>> = listOf(tempos, musicVolumes)
+    val trackersReverseView: List<TrackerContainer<*>> = trackers.asReversed()
     override var playState: PlayState by Delegates.observable(super.playState) { _, old, value ->
         if (old != value) {
             entities.forEach { it.onPlayStateChanged(old, value) }
