@@ -82,7 +82,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
             if (alpha >= 1f) {
                 val newFrom = bounce.toBouncer
-                val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + 1)
+                val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + alpha.toInt())
                 if (next == null || fellOff) {
                     this.bounce = null
                     this.kill = true
