@@ -7,15 +7,14 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
-import io.github.chrislo27.bouncyroadmania.editor.EditMode
-import io.github.chrislo27.bouncyroadmania.editor.Editor
-import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
-import io.github.chrislo27.bouncyroadmania.editor.SubbeatSection
+import io.github.chrislo27.bouncyroadmania.editor.*
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
+import io.github.chrislo27.bouncyroadmania.util.RectanglePool
 import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.unscaleFont
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
+import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 
@@ -108,6 +107,33 @@ class EditorRenderer(val editor: Editor) {
         font.scaleFont(trackCamera)
 
         this.renderHorizontalTrackLines(batch, beatRangeStartFloat, beatRangeEndFloat - beatRangeStartFloat, trackYOffset)
+
+        // events
+        val events = engine.events
+        events.forEach {
+            it.updateInterpolation(false)
+        }
+        if (editor.selection.isNotEmpty()) {
+            val clickOccupation = editor.clickOccupation
+            if (clickOccupation is ClickOccupation.SelectionDrag) {
+                val oldColor = batch.packedColor
+                val rect = RectanglePool.obtain()
+                rect.set(clickOccupation.lerpLeft, clickOccupation.lerpBottom, clickOccupation.lerpRight - clickOccupation.lerpLeft, clickOccupation.lerpTop - clickOccupation.lerpBottom)
+
+                batch.color = theme.selection.fill
+                batch.fillRect(rect)
+                batch.color = theme.selection.border
+                batch.drawRect(rect, toScaleX(Editor.SELECTION_BORDER), toScaleY(Editor.SELECTION_BORDER))
+
+                batch.packedColor = oldColor
+                RectanglePool.free(rect)
+            }
+        }
+        engine.events.forEach {
+            if (it.inRenderRange(beatRangeStartFloat, beatRangeEndFloat)) {
+                it.render(batch, this.editor)
+            }
+        }
 
         // beat lines
         this.renderBeatLines(batch, beatRange, trackYOffset, true)

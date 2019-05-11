@@ -26,11 +26,7 @@ abstract class Event(val engine: Engine) {
 
     open fun updateInterpolation(forceUpdate: Boolean) {
         if (forceUpdate) {
-            lerpDifference.x = 0f
-            lerpDifference.y = 0f
-            lerpDifference.width = 0f
-            lerpDifference.height = 0f
-
+            lerpDifference.set(0f, 0f, 0f, 0f)
             return
         }
 
@@ -51,6 +47,11 @@ abstract class Event(val engine: Engine) {
         lerpDifference.y = (old.y + lerpDifference.y) - bounds.y
         lerpDifference.width = (old.width + lerpDifference.width) - bounds.width
         lerpDifference.height = (old.height + lerpDifference.height) - bounds.height
+    }
+
+    open fun inRenderRange(start: Float, end: Float): Boolean {
+        return bounds.x + lerpDifference.x + bounds.width + lerpDifference.width >= start
+                && bounds.x + lerpDifference.x <= end
     }
 
     /**

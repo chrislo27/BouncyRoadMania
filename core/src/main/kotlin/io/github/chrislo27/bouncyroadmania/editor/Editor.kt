@@ -10,6 +10,7 @@ import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.util.gdxutils.getInputX
@@ -27,6 +28,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         const val EVENT_HEIGHT: Float = 48f
         const val EVENT_WIDTH: Float = EVENT_HEIGHT * 4
         const val TRACK_LINE_THICKNESS: Float = 2f
+        const val SELECTION_BORDER: Float = 2f
         internal const val NEGATIVE_SYMBOL = "-"
         internal const val ZERO_BEAT_SYMBOL = "♩"
         internal const val SELECTION_RECT_ADD = "+"
@@ -49,6 +51,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     var currentTool: Tool by Delegates.observable(Tool.SELECTION) { _, _, _ -> updateMessageBar() }
     var snap: Float = 0.25f
     var clickOccupation: ClickOccupation = ClickOccupation.None
+    var selection: List<Event> = listOf()
 
     val renderer: EditorRenderer = EditorRenderer(this)
     private var frameLastCallUpdateMessageBar: Long = -1
