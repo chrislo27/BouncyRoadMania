@@ -25,6 +25,10 @@ class Engine : Clock() {
         val ACE_OFFSET: Float = 1f / 60
         val GOOD_OFFSET: Float = 3f / 60
         val BARELY_OFFSET: Float = 4f / 60
+
+        val MIN_TRACK_COUNT: Int = 4
+        val MAX_TRACK_COUNT: Int = 4
+        val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
     }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
@@ -41,6 +45,12 @@ class Engine : Clock() {
             lastBounceTinkSound.clear()
         }
     }
+
+    var trackCount: Int = DEFAULT_TRACK_COUNT
+    var duration: Float = Float.POSITIVE_INFINITY
+        private set
+    var lastPoint: Float = 0f
+        private set
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()

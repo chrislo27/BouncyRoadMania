@@ -29,6 +29,9 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
 
     override fun renderUpdate() {
         super.renderUpdate()
+
+        editor.renderUpdate()
+
         // FIXME
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             main.screen = MainMenuScreen(main)
