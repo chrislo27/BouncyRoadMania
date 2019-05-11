@@ -62,7 +62,13 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         if (!started) {
             started = true
             if (firstHasSound) {
-                bounce?.fromBouncer?.playSound(forcePlay = true)
+                val from = bounce?.fromBouncer
+                if (from != null) {
+                    if (!MathUtils.isEqual(engine.lastBounceTinkSound[from.soundHandle] ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
+                        engine.lastBounceTinkSound[from.soundHandle] = engine.seconds
+                        from.playSound(forcePlay = true)
+                    }
+                }
             }
         }
 
@@ -96,7 +102,8 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                             prepareFallOff()
                         }
                         bounce(newFrom, next, false)
-                        if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle] ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
+                        if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
+                                        ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
                             if (!newFrom.isSilent) {
                                 engine.lastBounceTinkSound[newFrom.soundHandle] = engine.seconds
                             }
