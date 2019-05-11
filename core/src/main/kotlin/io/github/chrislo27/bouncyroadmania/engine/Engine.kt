@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import io.github.chrislo27.bouncyroadmania.engine.entity.*
+import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
+import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
@@ -14,6 +16,7 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolum
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
+import io.github.chrislo27.toolboks.util.gdxutils.maxX
 import kotlin.properties.Delegates
 
 
@@ -49,6 +52,13 @@ class Engine : Clock() {
     }
 
     var trackCount: Int = DEFAULT_TRACK_COUNT
+        set(value) {
+            field = value
+            events.filterIsInstance<EndEvent>().forEach {
+                it.bounds.y = 0f
+                it.bounds.height = value.toFloat()
+            }
+        }
     var duration: Float = Float.POSITIVE_INFINITY
         private set
     var lastPoint: Float = 0f
@@ -56,6 +66,8 @@ class Engine : Clock() {
 
     var playbackStart: Float = 0f
     var musicStartSec: Float = 0f
+
+    val events: List<Event> = mutableListOf()
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
@@ -113,6 +125,26 @@ class Engine : Clock() {
 
     init {
         addBouncers()
+    }
+
+    fun addEvent(event: Event) {
+        if (event !in events) {
+            (events as MutableList) += event
+            recomputeCachedData()
+        }
+    }
+
+    fun removeEvent(event: Event) {
+        val oldSize = events.size
+        (events as MutableList) -= event
+        if (events.size != oldSize) {
+            recomputeCachedData()
+        }
+    }
+
+    fun recomputeCachedData() {
+        lastPoint = events.firstOrNull { it is EndEvent }?.bounds?.x ?: events.maxBy { it.bounds.maxX }?.bounds?.maxX ?: 0f
+        duration = events.firstOrNull { it is EndEvent }?.bounds?.x ?: Float.POSITIVE_INFINITY
     }
 
     override fun update(delta: Float) {

@@ -18,6 +18,7 @@ class EditorTheme {
                 "dark" to EditorTheme().apply {
                     background.set(0.15f, 0.15f, 0.15f, 1f)
                     trackLine.set(0.95f, 0.95f, 0.95f, 1f)
+                    events.generic.set(0.65f, 0.65f, 0.65f, 1f)
                 }
         )
 
@@ -35,9 +36,24 @@ class EditorTheme {
         val tempoChange: Color = Color(0.4f, 0.4f, 0.9f, 1f)
     }
 
+    class EventsGroup {
+        val selectionTint: Color = Color(0f, 0.75f, 0.75f, 1f)
+        val nameText: Color = Color(0f, 0f, 0f, 1f)
+
+        val generic: Color = Color(0.85f, 0.85f, 0.85f, 1f)
+        val input: Color = Color(1f, 178f / 255f, 191f / 255f, 1f)
+    }
+
+    class SelectionGroup {
+        val fill: Color = Color(0.1f, 0.75f, 0.75f, 0.333f)
+        val border: Color = Color(0.1f, 0.85f, 0.85f, 1f)
+    }
+
     val background: Color = Color(1f, 1f, 1f, 1f)
     val trackLine: Color = Color(0f, 0f, 0f, 1f)
     val trackers: TrackersGroup = TrackersGroup()
+    val events: EventsGroup = EventsGroup()
+    val selection: SelectionGroup = SelectionGroup()
 
     fun getTrackerColour(tracker: Tracker<*>?): Color {
         return when (tracker) {
@@ -57,6 +73,18 @@ class EditorTheme {
             put("musicVolume", trackers.musicVolume.toJsonString())
             put("tempoChange", trackers.tempoChange.toJsonString())
         }
+
+        node.putObject("events").apply {
+            put("generic", events.generic.toJsonString())
+            put("input", events.input.toJsonString())
+            put("selectionTint", events.selectionTint.toJsonString())
+            put("nameText", events.nameText.toJsonString())
+        }
+
+        node.putObject("selection").apply {
+            put("fill", selection.fill.toJsonString())
+            put("border", selection.border.toJsonString())
+        }
     }
 
     fun fromTree(node: ObjectNode) {
@@ -68,6 +96,18 @@ class EditorTheme {
             trackers.musicStart.fromJsonString(n["musicStart"]?.asText(""))
             trackers.musicVolume.fromJsonString(n["musicVolume"]?.asText(""))
             trackers.tempoChange.fromJsonString(n["tempoChange"]?.asText(""))
+        }
+
+        (node["events"] as? ObjectNode)?.also { n ->
+            events.generic.fromJsonString(n["generic"]?.asText(""))
+            events.input.fromJsonString(n["input"]?.asText(""))
+            events.selectionTint.fromJsonString(n["selectionTint"]?.asText(""))
+            events.nameText.fromJsonString(n["nameText"]?.asText(""))
+        }
+
+        (node["selection"] as? ObjectNode)?.also { n ->
+            selection.fill.fromJsonString(n["fill"]?.asText(""))
+            selection.border.fromJsonString(n["border"]?.asText(""))
         }
     }
 
