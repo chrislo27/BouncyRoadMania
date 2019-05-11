@@ -7,9 +7,7 @@ import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
-import io.github.chrislo27.toolboks.ui.ColourPane
-import io.github.chrislo27.toolboks.ui.Stage
-import io.github.chrislo27.toolboks.ui.TextLabel
+import io.github.chrislo27.toolboks.ui.*
 
 
 class EditorStage(val editor: Editor)
@@ -21,6 +19,9 @@ class EditorStage(val editor: Editor)
     
     val messageLabel: TextLabel<EditorScreen>
     val controlsLabel: TextLabel<EditorScreen>
+
+    var isTyping: Boolean = false
+        private set
 
     init {
         val palette = BRManiaApp.instance.uiPalette
@@ -68,6 +69,19 @@ class EditorStage(val editor: Editor)
 
         stage.updatePositions()
         decideVisibility()
+    }
+
+    override fun frameUpdate(screen: EditorScreen) {
+        super.frameUpdate(screen)
+        isTyping = checkIsTyping(this.elements)
+    }
+
+    private fun checkIsTyping(list: List<UIElement<EditorScreen>>): Boolean {
+        return list.any {
+            if (it is Stage) {
+                checkIsTyping(it.elements)
+            } else (it as? TextField)?.hasFocus ?: false
+        }
     }
 
     /**

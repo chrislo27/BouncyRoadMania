@@ -14,6 +14,7 @@ import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
+import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSoundSystem
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
@@ -48,6 +49,48 @@ class Engine : Clock() {
         if (old != value) {
             entities.forEach { it.onPlayStateChanged(old, value) }
             lastBounceTinkSound.clear()
+
+            when (value) {
+                PlayState.STOPPED -> {
+                    AssetRegistry.stopAllSounds()
+//                    music?.music?.pause()
+                    BeadsSoundSystem.stop()
+                }
+                PlayState.PAUSED -> {
+                    AssetRegistry.pauseAllSounds()
+//                    music?.music?.pause()
+                    BeadsSoundSystem.pause()
+                }
+                PlayState.PLAYING -> {
+//                    lastMusicPosition = -1f
+//                    scheduleMusicPlaying = true
+                    AssetRegistry.resumeAllSounds()
+                    if (old == PlayState.STOPPED) {
+                        recomputeCachedData()
+                        seconds = tempos.beatsToSeconds(playbackStart)
+                        entities.forEach {
+//                            if (it.getUpperUpdateableBound() < beat) {
+//                                it.playbackCompletion = PlaybackCompletion.FINISHED
+//                            } else {
+//                                it.playbackCompletion = PlaybackCompletion.WAITING
+//                            }
+                        }
+
+//                        lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
+//                        lastMetronomeMeasurePart = -1
+                    }
+                    BeadsSoundSystem.resume()
+//                    if (music != null) {
+//                        if (seconds >= musicStartSec) {
+//                            music.music.play()
+//                            setMusicVolume()
+//                            seekMusic()
+//                        } else {
+//                            music.music.stop()
+//                        }
+//                    }
+                }
+            }
         }
     }
 

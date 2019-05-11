@@ -41,6 +41,7 @@ class EditorRenderer(val editor: Editor) {
         update()
     }
     val subbeatSection = SubbeatSection()
+    var cameraPan: CameraPan? = null
 
     /**
      * Converts pixels to correct size for track camera width
@@ -74,6 +75,14 @@ class EditorRenderer(val editor: Editor) {
             val cameraZoom = cameraZoomNormal
             trackCamera.position.y = MathUtils.lerp(trackCamera.position.y, cameraY, transitionTime)
             trackCamera.zoom = MathUtils.lerp(trackCamera.zoom, cameraZoom, transitionTime)
+
+            val cameraPan = cameraPan
+            if (cameraPan != null) {
+                cameraPan.update(Gdx.graphics.deltaTime, trackCamera)
+                if (cameraPan.done) {
+                    this.cameraPan = null
+                }
+            }
 
             trackCamera.update()
         }

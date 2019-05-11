@@ -12,11 +12,17 @@ import io.github.chrislo27.bouncyroadmania.util.RectanglePool
 
 abstract class Event(val engine: Engine) {
 
+    companion object {
+        const val STRETCH_AREA: Float = 1f / 12f
+        const val MIN_STRETCH: Float = 1f / 8f
+    }
+
     var isSelected: Boolean = false
     val bounds: Rectangle = Rectangle(0f, 0f, 0f, 1f)
     val lerpDifference: Rectangle = Rectangle()
     open val isRendered: Boolean = true
     open val canBeCopied: Boolean = true
+    open val isStretchable: Boolean = false
 
     open fun render(batch: SpriteBatch, editor: Editor) {
 
