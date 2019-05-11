@@ -17,6 +17,10 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tex_bouncer_yellow", "images/game/yellow.png")
         AssetRegistry.loadAsset<Texture>("tex_main_menu_gradient", "images/main_menu_gradient.png")
 
+        AssetRegistry.loadAsset<Texture>("ui_checkbox_x", "images/ui/checkbox/x.png")
+        AssetRegistry.loadAsset<Texture>("ui_checkbox_checked", "images/ui/checkbox/checked.png")
+        AssetRegistry.loadAsset<Texture>("ui_checkbox_unchecked", "images/ui/checkbox/unchecked.png")
+        AssetRegistry.loadAsset<Texture>("ui_back", "images/ui/icon/back.png")
         AssetRegistry.loadAsset<Texture>("ui_music", "images/ui/icon/music_button.png")
         AssetRegistry.loadAsset<Texture>("ui_music_muted", "images/ui/icon/music_button_muted.png")
         AssetRegistry.loadAsset<Texture>("ui_fullscreen", "images/ui/icon/fullscreen.png")
@@ -32,6 +36,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_pause", "images/ui/icon/pause.png")
         AssetRegistry.loadAsset<Texture>("ui_play", "images/ui/icon/play.png")
         AssetRegistry.loadAsset<Texture>("ui_stop", "images/ui/icon/stop.png")
+        AssetRegistry.loadAsset<Texture>("ui_exit", "images/ui/icon/exit.png")
 
         AssetRegistry.loadAsset<Texture>("tool_selection", "images/tool/selection.png")
         AssetRegistry.loadAsset<Texture>("tool_tempo_change", "images/tool/tempo_change.png")
