@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
-import io.github.chrislo27.bouncyroadmania.engine.Ball
+import io.github.chrislo27.bouncyroadmania.engine.entity.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
 import io.github.chrislo27.bouncyroadmania.engine.PlayState

@@ -1,5 +1,7 @@
-package io.github.chrislo27.bouncyroadmania.engine
+package io.github.chrislo27.bouncyroadmania.engine.entity
 
+import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.renderer.PaperRenderable
 import io.github.chrislo27.bouncyroadmania.util.Position
 

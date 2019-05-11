@@ -1,4 +1,4 @@
-package io.github.chrislo27.bouncyroadmania.engine
+package io.github.chrislo27.bouncyroadmania.engine.entity
 
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.util.Semitones
 import io.github.chrislo27.toolboks.registry.AssetRegistry
