@@ -2,12 +2,17 @@ package io.github.chrislo27.bouncyroadmania.engine.event
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.util.RectanglePool
+import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.util.gdxutils.drawRect
+import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 
 abstract class Event(val engine: Engine) {
@@ -15,6 +20,7 @@ abstract class Event(val engine: Engine) {
     companion object {
         const val STRETCH_AREA: Float = 1f / 12f
         const val MIN_STRETCH: Float = 1f / 8f
+        const val BORDER: Float = 4f
     }
 
     var isSelected: Boolean = false
@@ -23,9 +29,63 @@ abstract class Event(val engine: Engine) {
     open val isRendered: Boolean = true
     open val canBeCopied: Boolean = true
     open val isStretchable: Boolean = false
+    open val renderText: String = ""
+
+    open fun getRenderColor(editor:Editor, theme: EditorTheme): Color {
+        return theme.events.generic
+    }
 
     open fun render(batch: SpriteBatch, editor: Editor) {
+        val textColor = editor.theme.events.nameText
+        val text = renderText
+        val font = editor.main.defaultFont
+        val color = getRenderColor(editor, editor.theme)
+        val oldColor = batch.packedColor
+        val oldFontSizeX = font.data.scaleX
+        val oldFontSizeY = font.data.scaleY
+        val selectionTint = editor.theme.events.selectionTint
+        val showSelection = isSelected
 
+        val x = bounds.x + lerpDifference.x
+        val y = bounds.y + lerpDifference.y
+        val height = bounds.height + lerpDifference.height
+        val width = bounds.width + lerpDifference.width
+
+        // filled rect + border
+        batch.setColorWithTintIfNecessary(selectionTint, color.r, color.g, color.b, color.a, necessary = showSelection)
+        batch.fillRect(x, y,
+                width, height)
+
+        batch.setColorWithTintIfNecessary(selectionTint, (color.r - 0.25f).coerceIn(0f, 1f),
+                (color.g - 0.25f).coerceIn(0f, 1f),
+                (color.b - 0.25f).coerceIn(0f, 1f),
+                color.a, necessary = showSelection)
+
+        if (this.isStretchable) {
+            val oldColor2 = batch.packedColor
+            val arrowWidth: Float = Math.min(width / 2f, Editor.EVENT_HEIGHT / Editor.EVENT_WIDTH)
+            val y2 = y + height / 2 - 0.5f
+            val arrowTex = AssetRegistry.get<Texture>("event_stretchable_arrow")
+
+            batch.setColorWithTintIfNecessary(selectionTint, (color.r - 0.25f).coerceIn(0f, 1f),
+                    (color.g - 0.25f).coerceIn(0f, 1f),
+                    (color.b - 0.25f).coerceIn(0f, 1f),
+                    color.a * 0.5f, necessary = showSelection)
+
+            batch.draw(arrowTex, x + arrowWidth, y2, width - arrowWidth * 2, 1f,
+                    arrowTex.width / 2, 0, arrowTex.width / 2,
+                    arrowTex.height, false, false)
+            batch.draw(arrowTex, x, y2, arrowWidth, 1f,
+                    0, 0, arrowTex.width / 2, arrowTex.height, false, false)
+            batch.draw(arrowTex, x + width, y2, -arrowWidth, 1f,
+                    0, 0, arrowTex.width / 2, arrowTex.height, false, false)
+
+            batch.packedColor = oldColor2
+        }
+
+        batch.drawRect(x, y,
+                width, height,
+                editor.renderer.toScaleX(BORDER), editor.renderer.toScaleY(BORDER))
     }
 
     abstract fun copy(): Event
