@@ -461,16 +461,17 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         if (music.isPlaying) {
             engine.update(Gdx.graphics.deltaTime)
 
+            val beat = engine.beat
             events.forEach {
-                if (engine.beat >= it.beat) {
+                if (beat in it.beat..it.beat + it.duration) {
                     it.action()
                 }
-                if (engine.beat >= it.beat + it.duration) {
+                if (beat >= it.beat + it.duration) {
                     it.onDelete()
                 }
             }
-            events.removeIf { engine.beat >= it.beat + it.duration }
-            if (lastMusicPos > music.position) {
+            events.removeIf { beat >= it.beat + it.duration }
+            if (lastMusicPos > music.position + 1f) {
                 engine.seconds = music.position
                 doCycle()
             } else if (!MathUtils.isEqual(engine.seconds, music.position, 0.1f) && music.position > 0.1f) {
