@@ -463,7 +463,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
             val beat = engine.beat
             events.forEach {
-                if (beat in it.beat..it.beat + it.duration) {
+                if (beat >= it.beat) {
                     it.action()
                 }
                 if (beat >= it.beat + it.duration) {
