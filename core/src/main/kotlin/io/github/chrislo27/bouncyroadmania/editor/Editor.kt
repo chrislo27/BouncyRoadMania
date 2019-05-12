@@ -3,18 +3,24 @@ package io.github.chrislo27.bouncyroadmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionGroup
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionHistory
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.impl.*
 import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
+import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.toolboks.i18n.Localization
+import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
 import java.text.DecimalFormat
@@ -46,6 +52,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     var editMode: EditMode by Delegates.observable(EditMode.EVENTS) { _, oldVal, newVal ->
         stage.decideVisibility()
         updateMessageBar()
+        engine.requiresPlayerInput = newVal == EditMode.ENGINE
     }
     val stage: EditorStage = EditorStage(this)
     val engine: Engine = Engine()
@@ -53,9 +60,15 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     var snap: Float = 0.25f
     var clickOccupation: ClickOccupation = ClickOccupation.None
     var selection: List<Event> = listOf()
+        set(value) {
+            field.forEach { it.isSelected = false }
+            field = value
+            field.forEach { it.isSelected = true }
+        }
 
     val renderer: EditorRenderer = EditorRenderer(this)
     private var frameLastCallUpdateMessageBar: Long = -1
+    private var wasStretchCursor = false
     var cachedPlaybackStart: Pair<Float, String> = Float.POSITIVE_INFINITY to ""
     var cachedMusicStart: Pair<Float, String> = Float.POSITIVE_INFINITY to ""
 
@@ -197,11 +210,11 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                             if (selection.isNotEmpty() && !stage.isTyping) {
                                 if (Gdx.input.isKeyJustPressed(Input.Keys.FORWARD_DEL) || Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
                                     this.selection.forEach { engine.removeEvent(it) }
-//                                    remix.addActionWithoutMutating(ActionGroup(listOf(
-//                                            EntityRemoveAction(this, this.selection,
-//                                                    this.selection.map { Rectangle(it.bounds) }),
-//                                            EntitySelectionAction(this, this.selection.toList(), listOf())
-//                                    )))
+                                    this.addActionWithoutMutating(ActionGroup(listOf(
+                                            EventRemoveAction(this.selection,
+                                                    this.selection.map { Rectangle(it.bounds) }),
+                                            EventSelectionAction(this.selection.toList(), listOf())
+                                    )))
                                     this.selection = listOf()
 
                                     updateMessageBar()
@@ -231,22 +244,23 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         if (engine.playState != PlayState.STOPPED)
             return
 
-//        run stretchCursor@{
-//            val clickOccupation = clickOccupation
-//            val shouldStretch = engine.playState == PlayState.STOPPED && currentTool == Tool.SELECTION &&
-//                    ((clickOccupation is ClickOccupation.SelectionDrag && clickOccupation.isStretching) ||
-//                            (clickOccupation == ClickOccupation.None && this.selection.isNotEmpty() && this.selection.all { it is IStretchable && it.isStretchable } && remix.entities.any {
-//                                canStretchEntity(mouseVector, it)
-//                            }))
-//
-//            if (wasStretchCursor && !shouldStretch) {
-//                Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
-//                wasStretchCursor = shouldStretch
-//            } else if (!wasStretchCursor && shouldStretch) {
-//                Gdx.graphics.setCursor(AssetRegistry["cursor_horizontal_resize"])
-//                wasStretchCursor = shouldStretch
-//            }
-//        }
+        run stretchCursor@{
+            val clickOccupation = clickOccupation
+            val mouseVector = mouseVector
+            val shouldStretch = engine.playState == PlayState.STOPPED && currentTool == Tool.SELECTION &&
+                    ((clickOccupation is ClickOccupation.SelectionDrag && clickOccupation.isStretching) ||
+                            (clickOccupation == ClickOccupation.None && this.selection.isNotEmpty() && this.selection.all { it.isStretchable } && engine.events.any {
+                                canStretchEvent(mouseVector, it)
+                            }))
+
+            if (wasStretchCursor && !shouldStretch) {
+                Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
+                wasStretchCursor = shouldStretch
+            } else if (!wasStretchCursor && shouldStretch) {
+                Gdx.graphics.setCursor(AssetRegistry["cursor_horizontal_resize"])
+                wasStretchCursor = shouldStretch
+            }
+        }
 
 
         if (currentTool.showSubbeatLines) {
@@ -256,6 +270,12 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             subbeatSection.end = subbeatSection.start + 0.5f
         }
 
+    }
+
+    fun canStretchEvent(mouseVector: Vector2, it: Event): Boolean {
+        return it.isSelected &&
+                mouseVector.y in it.bounds.y..it.bounds.y + it.bounds.height &&
+                getStretchRegionForStretchable(mouseVector.x, it) != StretchRegion.NONE
     }
 
     fun getTrackerOnMouse(klass: Class<out Tracker<*>>?, obeyY: Boolean): Tracker<*>? {
@@ -278,7 +298,24 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
 
         return null
     }
+    
+    fun getStretchRegionForStretchable(beat: Float, event: Event): StretchRegion {
+        if (!event.isStretchable)
+            return StretchRegion.NONE
 
+        if (beat in event.bounds.x..Math.min(event.bounds.x + Event.STRETCH_AREA,
+                        event.bounds.x + event.bounds.width / 2f)) {
+            return StretchRegion.LEFT
+        }
+
+        val right = event.bounds.x + event.bounds.width
+
+        if (beat in Math.max(right - Event.STRETCH_AREA, right - event.bounds.width / 2f)..right) {
+            return StretchRegion.RIGHT
+        }
+
+        return StretchRegion.NONE
+    }
 
     fun getSelectionMode(): SelectionMode {
         return when {
@@ -286,6 +323,11 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             !Gdx.input.isAltDown() && Gdx.input.isControlDown() && !Gdx.input.isShiftDown() -> SelectionMode.INVERT
             else -> SelectionMode.REPLACE
         }
+    }
+
+    fun getEventOnMouse(): Event? {
+        val mouseVector = mouseVector
+        return engine.events.firstOrNull { mouseVector in it.bounds }
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -317,12 +359,59 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                 } else {
                     ClickOccupation.Playback(this)
                 }
-            } else {
-                val clickOccupation = clickOccupation
-                if (clickOccupation == ClickOccupation.None) {
-                    // begin selection rectangle
-                    val newClick = ClickOccupation.CreatingSelection(this, Vector2(mouseVector))
+            } else if (!isAnyTrackerButtonDown && isDraggingButtonDown) {
+                if (engine.events.any { mouseVector in it.bounds && it.isSelected}) {
+                    val inBounds = this.selection
+                    val newSel = if (isCopying && inBounds.all { it.canBeCopied }) {
+                        inBounds.map { it.copy() }
+                    } else {
+                        inBounds
+                    }
+                    val first = newSel.first()
+                    val oldSel = this.selection.toList()
+                    val clickedOn = getEventOnMouse().takeIf { it in oldSel } ?: first
+                    val camera = renderer.trackCamera
+                    val mouseOffset = Vector2(camera.getInputX() - first.bounds.x,
+                            camera.getInputY() - first.bounds.y)
+                    val stretchRegion = if (newSel.isNotEmpty() && newSel.all { it.isStretchable } && !isCopying)
+                        getStretchRegionForStretchable(camera.getInputX(), clickedOn) else StretchRegion.NONE
+
+                    val newClick = ClickOccupation.SelectionDrag(this, first, clickedOn, mouseOffset,
+                            false, isCopying, oldSel, stretchRegion)
+
+                    if (isCopying) {
+                        this.selection = newSel
+                        val notIn = newSel.filter { it !in engine.events }
+                        if (notIn.isNotEmpty()) engine.addAllEvents(notIn)
+                    }
+
+                    newSel.forEach {
+                        it.updateInterpolation(true)
+                    }
+
                     this.clickOccupation = newClick
+                } else if (stage.pickerStage.isMouseOver()) {
+                    val instantiator = EventRegistry.list.getOrNull(stage.pickerStage.display.index) ?: return false
+                    val created = instantiator.factory(instantiator, engine)
+                    if (created.isNotEmpty()) {
+                        val oldSelection = selection.toList()
+                        selection = created.toList()
+                        val first = selection.first()
+                        val selectionDrag = ClickOccupation.SelectionDrag(this, first, first, Vector2(0f, 0f), true, false, oldSelection, StretchRegion.NONE)
+                        selectionDrag.setPositionRelativeToMouse()
+                        this.selection.forEach {
+                            it.updateInterpolation(true)
+                            engine.addEvent(it)
+                        }
+                        this.clickOccupation = selectionDrag
+                    }
+                } else {
+                    val clickOccupation = clickOccupation
+                    if (clickOccupation == ClickOccupation.None) {
+                        // begin selection rectangle
+                        val newClick = ClickOccupation.CreatingSelection(this, Vector2(mouseVector))
+                        this.clickOccupation = newClick
+                    }
                 }
             }
         }
@@ -372,10 +461,10 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             if (clickOccupation.isNewOrCopy) {
                 if (validPlacement) {
                     // place+selection action
-//                    remix.addActionWithoutMutating(ActionGroup(listOf(
-//                            EntityPlaceAction(this, this.selection),
-//                            EntitySelectionAction(this, clickOccupation.previousSelection, this.selection)
-//                    )))
+                    this.addActionWithoutMutating(ActionGroup(listOf(
+                            EventPlaceAction(this.selection),
+                            EventSelectionAction(clickOccupation.previousSelection, this.selection)
+                    )))
                 } else {
                     // delete silently
                     selection.forEach { engine.removeEvent(it) }
@@ -383,28 +472,27 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                     selection = clickOccupation.previousSelection
                 }
             } else {
-//                if (validPlacement) {
-//                    // move action
-//                    val sel = this.selection.toList()
-//                    remix.addActionWithoutMutating(EntityMoveAction(this, sel, sel.map { clickOccupation.oldBounds.getValue(it) }))
-//                } else if (deleting) {
-//                    // remove+selection action
-//                    remix.entities.removeAll(this.selection)
-//                    selection.filterIsInstance<ModelEntity<*>>().forEach { explodeEntity(it) }
-//                    val sel = this.selection.toList()
-//                    remix.addActionWithoutMutating(ActionGroup(listOf(
-//                            EntityRemoveAction(this, this.selection, sel.map { clickOccupation.oldBounds.getValue(it) }),
-//                            EntitySelectionAction(this, clickOccupation.previousSelection, listOf())
-//                    )))
-//                    this.selection = listOf()
-//                } else {
-//                    // revert positions silently
-//                    clickOccupation.oldBounds.forEach { entity, rect ->
-//                        entity.updateBounds {
-//                            entity.bounds.set(rect)
-//                        }
-//                    }
-//                }
+                if (validPlacement) {
+                    // move action
+                    val sel = this.selection.toList()
+                    this.addActionWithoutMutating(EventMoveAction(sel, sel.map { clickOccupation.oldBounds.getValue(it) }))
+                } else if (deleting) {
+                    // remove+selection action
+                    engine.removeAllEvents(this.selection)
+                    val sel = this.selection.toList()
+                    this.addActionWithoutMutating(ActionGroup(listOf(
+                            EventRemoveAction(this.selection, sel.map { clickOccupation.oldBounds.getValue(it) }),
+                            EventSelectionAction(clickOccupation.previousSelection, listOf())
+                    )))
+                    this.selection = listOf()
+                } else {
+                    // revert positions silently
+                    clickOccupation.oldBounds.forEach { (entity, rect) ->
+                        entity.updateBounds {
+                            entity.bounds.set(rect)
+                        }
+                    }
+                }
             }
 
             this.clickOccupation = ClickOccupation.None
@@ -421,11 +509,11 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                 // finish selection as ACTION
                 clickOccupation.updateRectangle()
                 val selectionRect = clickOccupation.rectangle
-//                val newSelection: List<Entity> = getSelectionMode().createNewSelection(remix.entities.toList(), this.selection.toList(), selectionRect)
-//                if (!this.selection.containsAll(newSelection) ||
-//                        (newSelection.size != this.selection.size)) {
-//                    remix.mutate(EntitySelectionAction(this, this.selection, newSelection))
-//                }
+                val newSelection: List<Event> = getSelectionMode().createNewSelection(engine.events.toList(), this.selection.toList(), selectionRect)
+                if (!this.selection.containsAll(newSelection) ||
+                        (newSelection.size != this.selection.size)) {
+                    this.mutate(EventSelectionAction(this.selection, newSelection))
+                }
             }
 
             this.clickOccupation = ClickOccupation.None
@@ -434,10 +522,10 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             if (button == Input.Buttons.LEFT && clickOccupation.isPlacementValid() &&
                     (clickOccupation.tracker.beat != clickOccupation.beat || clickOccupation.tracker.width != clickOccupation.width)) {
                 val copy = clickOccupation.tracker.createResizeCopy(clickOccupation.beat, clickOccupation.width)
-//                remix.mutate(ActionGroup(
-//                        TrackerAction(clickOccupation.tracker, true),
-//                        TrackerAction(copy, false)
-//                ))
+                this.mutate(ActionGroup(
+                        TrackerAction(clickOccupation.tracker, true),
+                        TrackerAction(copy, false)
+                ))
             }
 
             this.clickOccupation = ClickOccupation.None
@@ -472,6 +560,6 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
 
 
     fun getDebugString(): String {
-        return "updateMessageBar: ${Gdx.graphics.frameId - frameLastCallUpdateMessageBar}" + "\n${renderer.getDebugString()}"
+        return "updateMessageBar: ${Gdx.graphics.frameId - frameLastCallUpdateMessageBar}\nclickOccupation: ${clickOccupation::class.java.simpleName}" + "\n${renderer.getDebugString()}"
     }
 }

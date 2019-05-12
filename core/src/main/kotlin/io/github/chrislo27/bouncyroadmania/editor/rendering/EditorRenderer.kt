@@ -143,6 +143,10 @@ class EditorRenderer(val editor: Editor) {
                 it.render(batch, this.editor)
             }
         }
+        // Stripe board in invalid positions
+        if (editor.selection.isNotEmpty()) {
+            this.renderStripeBoard(batch, main.shapeRenderer)
+        }
 
         // beat lines
         this.renderBeatLines(batch, beatRange, trackYOffset, true)

@@ -43,6 +43,12 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         batch.setColor(1f, 1f, 1f, 1f)
     }
 
+    fun startOff(firstBouncer: Bouncer = engine.bouncers.first()) {
+        posX = firstBouncer.posX
+        posY = firstBouncer.posY
+        bounce(firstBouncer, engine.bouncers[firstBouncer.index + 1], false)
+    }
+
     fun bounce(from: Bouncer, next: Bouncer, startFromCurrentPos: Boolean,
                startBeat: Float = if (startFromCurrentPos) engine.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce),
                endBeat: Float = if (fellOff) (startBeat + beatsPerBounce) else (sentOutAt + (bouncesSoFar + 1) * beatsPerBounce)) {
@@ -96,13 +102,15 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                         AssetRegistry.get<Sound>("sfx_splash").play()
                     }
                 } else if (newFrom != null) {
-                    if (!newFrom.isPlayer) {
+                    if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
                         bouncesSoFar++
                         if (fallOff == null) {
                             prepareFallOff()
                         }
                         bounce(newFrom, next, false)
-                        if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
+                        if (newFrom.isPlayer) {
+                            newFrom.playSound()
+                        } else if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
                                         ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
                             if (!newFrom.isSilent) {
                                 engine.lastBounceTinkSound[newFrom.soundHandle] = engine.seconds
@@ -143,7 +151,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         if (bounce != null) {
             val newFrom = bounce.toBouncer
             val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + 1)
-            if (next != null && next.isPlayer && this.fallOff == null) {
+            if (next != null && next.isPlayer && this.fallOff == null && engine.requiresPlayerInput) {
                 // Set the fall off time
                 val expectedBeat = sentOutAt + (bouncesSoFar + 1) * beatsPerBounce
                 val expectedSeconds = engine.tempos.beatsToSeconds(expectedBeat)

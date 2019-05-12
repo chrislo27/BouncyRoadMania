@@ -56,6 +56,8 @@ class Engine : Clock() {
                     AssetRegistry.stopAllSounds()
 //                    music?.music?.pause()
                     BeadsSoundSystem.stop()
+                    entities.clear()
+                    addBouncers()
                 }
                 PlayState.PAUSED -> {
                     AssetRegistry.pauseAllSounds()
@@ -121,6 +123,8 @@ class Engine : Clock() {
         private set
     val lastBounceTinkSound: MutableMap<String, Float> = mutableMapOf()
 
+    var requiresPlayerInput: Boolean = true
+
     // Visuals
     val gradientLast: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
     val gradientFirst: Color = Color(0f, 0f, 0f, 1f)
@@ -182,6 +186,28 @@ class Engine : Clock() {
         val oldSize = events.size
         (events as MutableList) -= event
         if (events.size != oldSize) {
+            recomputeCachedData()
+        }
+    }
+
+    fun addAllEvents(events: Collection<Event>) {
+        this.events as MutableList
+        val oldSize = this.events.size
+        events.forEach {
+            if (it !in this.events) {
+                this.events += it
+            }
+        }
+        if (this.events.size != oldSize) {
+            recomputeCachedData()
+        }
+    }
+
+    fun removeAllEvents(events: Collection<Event>) {
+        this.events as MutableList
+        val oldSize = this.events.size
+        this.events.removeAll(events)
+        if (this.events.size != oldSize) {
             recomputeCachedData()
         }
     }

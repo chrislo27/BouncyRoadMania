@@ -11,6 +11,11 @@ class EndEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(e
 
     override val canBeCopied: Boolean = false
 
+    init {
+        this.bounds.width = 0.125f
+        this.bounds.height = engine.trackCount.toFloat()
+    }
+
     override fun render(batch: SpriteBatch, editor: Editor) {
         val oldColor = batch.packedColor
         val theme = editor.theme

@@ -9,7 +9,7 @@ class Instantiator(val id: String, val deprecatedIDs: List<String>,
                    val name: String, val nameIsLocalizationKey: Boolean,
                    val summary: String, val summaryIsLocalizationKey: Boolean,
                    val desc: String, val descIsLocalizationKey: Boolean,
-                   val factory: Instantiator.(Engine) -> Event) {
+                   val factory: Instantiator.(Engine) -> List<Event>) {
 
     val displayName: String
         get() = if (nameIsLocalizationKey) Localization[name] else name

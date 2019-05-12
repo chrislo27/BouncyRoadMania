@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.util.RectanglePool
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.util.gdxutils.drawRect
-import io.github.chrislo27.toolboks.util.gdxutils.fillRect
-import io.github.chrislo27.toolboks.util.gdxutils.maxX
+import io.github.chrislo27.toolboks.util.gdxutils.*
 
 
 abstract class Event(val engine: Engine) {
@@ -32,6 +31,12 @@ abstract class Event(val engine: Engine) {
     open val canBeCopied: Boolean = true
     open val isStretchable: Boolean = false
     open val renderText: String = ""
+    var needsNameTooltip: Boolean = false
+        protected set
+
+    init {
+        this.bounds.width = 1f
+    }
 
     open fun getRenderColor(editor: Editor, theme: EditorTheme): Color {
         return theme.events.generic
@@ -88,6 +93,49 @@ abstract class Event(val engine: Engine) {
         batch.drawRect(x, y,
                 width, height,
                 editor.renderer.toScaleX(BORDER), editor.renderer.toScaleY(BORDER))
+
+
+        batch.packedColor = oldColor
+        val oldFontColor = font.color
+        val fontScale = 0.6f
+        font.color = textColor
+        font.data.setScale(oldFontSizeX * fontScale, oldFontSizeY * fontScale)
+        // width - iconSizeX - 6 * (editor.toScaleX(BORDER))
+        val allottedWidth = width - 2 * (editor.renderer.toScaleX(BORDER))
+        val allottedHeight = height - 4 * (editor.renderer.toScaleY(BORDER))
+
+        val textHeight = font.getTextHeight(text, allottedWidth, true)
+        val textX = x + 1 * (editor.renderer.toScaleX(BORDER))
+        val textY = y + height / 2
+        if (textHeight > allottedHeight) {
+            val ratio = Math.min(allottedWidth / (font.getTextWidth(text, allottedWidth, false)), allottedHeight / textHeight)
+            font.data.setScale(ratio * font.data.scaleX, ratio * font.data.scaleY)
+        }
+        needsNameTooltip = textHeight > allottedHeight
+        var newTextWidth = allottedWidth
+        val camera = editor.renderer.trackCamera
+        val outerBound = camera.position.x + camera.viewportWidth / 2 * camera.zoom
+        if (textX + newTextWidth > outerBound) {
+            newTextWidth = (outerBound) - textX
+        }
+        newTextWidth = newTextWidth.coerceAtLeast(font.getTextWidth(text)).coerceAtMost(allottedWidth)
+
+        font.draw(batch, text, textX, textY + font.getTextHeight(text, newTextWidth, true) / 2, newTextWidth, Align.right, true)
+
+//        when (editor.scrollMode) {
+//            Editor.ScrollMode.PITCH -> {
+//                if (this is IRepitchable && (this.canBeRepitched || this.semitone != 0)) {
+//                    drawCornerText(editor, batch, getTextForSemitone(semitone), !this.canBeRepitched, x, y)
+//                }
+//            }
+//            Editor.ScrollMode.VOLUME -> {
+//                if (this is IVolumetric && (this.isVolumetric || this.volumePercent != IVolumetric.DEFAULT_VOLUME)) {
+//                    drawCornerText(editor, batch, IVolumetric.getVolumeText(this.volumePercent), !this.isVolumetric, x, y)
+//                }
+//            }
+//        }
+        font.color = oldFontColor
+        font.data.setScale(oldFontSizeX, oldFontSizeY)
     }
 
     abstract fun copy(): Event

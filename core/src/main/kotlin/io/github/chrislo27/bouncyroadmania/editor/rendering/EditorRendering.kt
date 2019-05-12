@@ -1,15 +1,20 @@
 package io.github.chrislo27.bouncyroadmania.editor.rendering
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.bouncyroadmania.BRMania
+import io.github.chrislo27.bouncyroadmania.editor.ClickOccupation
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignature
+import io.github.chrislo27.bouncyroadmania.util.RectanglePool
+import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.MathHelper
-import io.github.chrislo27.toolboks.util.gdxutils.drawCompressed
-import io.github.chrislo27.toolboks.util.gdxutils.fillRect
-import io.github.chrislo27.toolboks.util.gdxutils.getTextWidth
+import io.github.chrislo27.toolboks.util.gdxutils.*
+import kotlin.math.roundToInt
 
 
 fun EditorRenderer.renderBeatNumbers(batch: SpriteBatch, beatRange: IntRange, font: BitmapFont) {
@@ -113,4 +118,41 @@ fun EditorRenderer.renderHorizontalTrackLines(batch: SpriteBatch, startX: Float,
         batch.fillRect(startX, trackYOffset + i.toFloat(), width, toScaleY(Editor.TRACK_LINE_THICKNESS))
     }
     batch.setColor(1f, 1f, 1f, 1f)
+}
+
+fun EditorRenderer.renderStripeBoard(batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
+    val clickOccupation = editor.clickOccupation
+    if (clickOccupation is ClickOccupation.SelectionDrag) {
+        val oldColor = batch.packedColor
+        val rect = RectanglePool.obtain()
+        rect.set(clickOccupation.lerpLeft, clickOccupation.lerpBottom, clickOccupation.lerpRight - clickOccupation.lerpLeft, clickOccupation.lerpTop - clickOccupation.lerpBottom)
+
+        if ((!clickOccupation.isPlacementValid() || clickOccupation.isInDeleteZone())) {
+            batch.setColor(1f, 0f, 0f, 0.15f)
+            batch.fillRect(rect)
+
+            val camera = trackCamera
+            shapeRenderer.projectionMatrix = camera.combined
+            shapeRenderer.prepareStencilMask(batch) {
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+                shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height)
+                shapeRenderer.end()
+            }.useStencilMask {
+                val tex = AssetRegistry.get<Texture>("ui_stripe_board")
+                val scale = 2f
+                val w = tex.width.toFloat() / BRMania.WIDTH * camera.viewportWidth / scale
+                val h = tex.height.toFloat() / BRMania.HEIGHT * camera.viewportHeight / scale
+                for (x in 0..(BRMania.WIDTH / tex.width * scale).roundToInt() + 2) {
+                    for (y in 0..(BRMania.HEIGHT / tex.height * scale).roundToInt() + 2) {
+                        batch.draw(tex, x * w - camera.viewportWidth / 2 * camera.zoom + camera.position.x, y * h - camera.viewportHeight / 2 * camera.zoom + camera.position.y, w, h)
+                    }
+                }
+            }
+            batch.setColor(1f, 0f, 0f, 0.5f)
+            batch.drawRect(rect, toScaleX(Editor.SELECTION_BORDER) * 2, toScaleY(Editor.SELECTION_BORDER) * 2)
+        }
+
+        batch.packedColor = oldColor
+        RectanglePool.free(rect)
+    }
 }

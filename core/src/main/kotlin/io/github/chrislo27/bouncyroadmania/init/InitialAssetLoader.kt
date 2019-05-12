@@ -1,8 +1,10 @@
 package io.github.chrislo27.bouncyroadmania.init
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
@@ -39,6 +41,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_play", "images/ui/icon/play.png")
         AssetRegistry.loadAsset<Texture>("ui_stop", "images/ui/icon/stop.png")
         AssetRegistry.loadAsset<Texture>("ui_exit", "images/ui/icon/exit.png")
+        AssetRegistry.loadAsset<Texture>("ui_stripe_board", "images/ui/stripe_board.png")
 
         AssetRegistry.loadAsset<Texture>("tool_selection", "images/tool/selection.png")
         AssetRegistry.loadAsset<Texture>("tool_tempo_change", "images/tool/tempo_change.png")
@@ -61,6 +64,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
+        assets["cursor_horizontal_resize"] =
+                Gdx.graphics.newCursor(Pixmap(Gdx.files.internal("images/cursor/horizontal_resize.png")), 16, 8)
     }
 
 }
