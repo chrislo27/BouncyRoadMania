@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Matrix4
 import io.github.chrislo27.bouncyroadmania.engine.entity.*
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
+import io.github.chrislo27.bouncyroadmania.engine.event.PlaybackCompletion
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
@@ -68,12 +69,12 @@ class Engine : Clock() {
                     if (old == PlayState.STOPPED) {
                         recomputeCachedData()
                         seconds = tempos.beatsToSeconds(playbackStart)
-                        entities.forEach {
-//                            if (it.getUpperUpdateableBound() < beat) {
-//                                it.playbackCompletion = PlaybackCompletion.FINISHED
-//                            } else {
-//                                it.playbackCompletion = PlaybackCompletion.WAITING
-//                            }
+                        events.forEach {
+                            if (it.getUpperUpdateableBound() < beat) {
+                                it.playbackCompletion = PlaybackCompletion.FINISHED
+                            } else {
+                                it.playbackCompletion = PlaybackCompletion.WAITING
+                            }
                         }
 
 //                        lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
@@ -190,6 +191,23 @@ class Engine : Clock() {
         duration = events.firstOrNull { it is EndEvent }?.bounds?.x ?: Float.POSITIVE_INFINITY
     }
 
+    fun eventUpdate(event: Event) {
+        if (event.playbackCompletion == PlaybackCompletion.WAITING) {
+            if (event.isUpdateable(beat)) {
+                event.playbackCompletion = PlaybackCompletion.PLAYING
+                event.onStart()
+            }
+        }
+
+        if (event.playbackCompletion == PlaybackCompletion.PLAYING) {
+            event.whilePlaying()
+            if (beat >= event.getUpperUpdateableBound()) {
+                event.playbackCompletion = PlaybackCompletion.FINISHED
+                event.onEnd()
+            }
+        }
+    }
+
     override fun update(delta: Float) {
         // No super update
         if (playState != PlayState.PLAYING)
@@ -197,6 +215,12 @@ class Engine : Clock() {
 
         // Timing
         seconds += delta
+
+        events.forEach { event ->
+            if (event.playbackCompletion != PlaybackCompletion.FINISHED) {
+                eventUpdate(event)
+            }
+        }
 
         // Updating
         entities.forEach {

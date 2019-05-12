@@ -3,10 +3,11 @@ package io.github.chrislo27.bouncyroadmania.engine.event
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.registry.Instantiator
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 
-class EndEvent(engine: Engine) : Event(engine) {
+class EndEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
 
     override val canBeCopied: Boolean = false
 

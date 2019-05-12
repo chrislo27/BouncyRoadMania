@@ -1,7 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.editor.stage
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
@@ -11,11 +10,12 @@ import io.github.chrislo27.toolboks.ui.*
 
 
 class EditorStage(val editor: Editor)
-    : Stage<EditorScreen>(null, OrthographicCamera().apply { setToOrtho(false, 1280f, 720f) }, 1280f, 720f) {
+    : Stage<EditorScreen>(null, editor.main.defaultCamera, 1280f, 720f) {
 
     val toolbarStage: ToolbarStage
     val timelineStage: TimelineStage
     val messageBarStage: Stage<EditorScreen>
+    val pickerStage: PickerStage
     
     val messageLabel: TextLabel<EditorScreen>
     val controlsLabel: TextLabel<EditorScreen>
@@ -35,8 +35,9 @@ class EditorStage(val editor: Editor)
         }
         elements += timelineStage
 
+        val messageBarHeight = 32f
         messageBarStage = Stage(this, this.camera, this.pixelsWidth, this.pixelsHeight).apply {
-            this.location.set(screenHeight = 0f, screenY = 0f, pixelY = 0f, pixelHeight = 32f)
+            this.location.set(screenHeight = 0f, screenY = 0f, pixelY = 0f, pixelHeight = messageBarHeight)
             elements += ColourPane(this, this).apply {
                 this.colour.set(0f, 0f, 0f, 0.75f)
             }
@@ -60,6 +61,11 @@ class EditorStage(val editor: Editor)
             this.location.set(screenHeight = 0.5f, screenY = 0.5f)
         }
         messageBarStage.elements += controlsLabel
+
+        pickerStage = PickerStage(editor, this, palette).apply {
+            this.location.set(screenWidth = 1f, screenHeight = 0f, pixelY = messageBarHeight, pixelHeight = 160f)
+        }
+        elements += pickerStage
 
         this.tooltipElement = TextLabel(palette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), this, this).apply {
             this.isLocalizationKey = false
@@ -89,6 +95,7 @@ class EditorStage(val editor: Editor)
      */
     fun decideVisibility() {
         timelineStage.visible = editor.editMode != EditMode.PARAMETERS
+        pickerStage.visible = editor.editMode == EditMode.EVENTS
     }
 
 }

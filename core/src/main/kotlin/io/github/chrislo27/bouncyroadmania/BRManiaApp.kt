@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
+import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
 import io.github.chrislo27.toolboks.ResizeAction
@@ -42,6 +42,9 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
         init {
             Colors.put("X", Color.CLEAR)
+            Colors.put("NOTE", Color.CYAN)
+            Colors.put("WARN", Color.ORANGE)
+            Colors.put("ERROR", Color.RED)
         }
     }
 

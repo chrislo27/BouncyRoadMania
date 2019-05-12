@@ -38,6 +38,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         internal val TRACKER_MINUTES_FORMATTER = DecimalFormat("00", DecimalFormatSymbols())
         val ONE_DECIMAL_PLACE_FORMATTER = DecimalFormat("0.0", DecimalFormatSymbols())
         val TWO_DECIMAL_PLACES_FORMATTER = DecimalFormat("0.00", DecimalFormatSymbols())
+        val ARROWS: List<String> = listOf("▲", "▼", "△", "▽", "➡")
     }
 
     val theme: EditorTheme get() = main.editorTheme

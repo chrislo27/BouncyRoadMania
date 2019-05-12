@@ -13,6 +13,7 @@ import io.github.chrislo27.bouncyroadmania.util.RectanglePool
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
+import io.github.chrislo27.toolboks.util.gdxutils.maxX
 
 
 abstract class Event(val engine: Engine) {
@@ -23,6 +24,7 @@ abstract class Event(val engine: Engine) {
         const val BORDER: Float = 4f
     }
 
+    var playbackCompletion: PlaybackCompletion = PlaybackCompletion.WAITING
     var isSelected: Boolean = false
     val bounds: Rectangle = Rectangle(0f, 0f, 0f, 1f)
     val lerpDifference: Rectangle = Rectangle()
@@ -31,7 +33,7 @@ abstract class Event(val engine: Engine) {
     open val isStretchable: Boolean = false
     open val renderText: String = ""
 
-    open fun getRenderColor(editor:Editor, theme: EditorTheme): Color {
+    open fun getRenderColor(editor: Editor, theme: EditorTheme): Color {
         return theme.events.generic
     }
 
@@ -89,6 +91,25 @@ abstract class Event(val engine: Engine) {
     }
 
     abstract fun copy(): Event
+
+    open fun onStart() {
+
+    }
+
+    open fun whilePlaying() {
+
+    }
+
+    open fun onEnd() {
+
+    }
+
+    fun getLowerUpdateableBound(): Float = bounds.x
+    fun getUpperUpdateableBound(): Float = bounds.maxX
+
+    open fun isUpdateable(beat: Float): Boolean {
+        return beat in getLowerUpdateableBound()..getUpperUpdateableBound()
+    }
 
     open fun updateInterpolation(forceUpdate: Boolean) {
         if (forceUpdate) {
