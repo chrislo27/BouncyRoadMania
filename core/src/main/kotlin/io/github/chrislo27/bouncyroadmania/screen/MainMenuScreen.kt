@@ -44,7 +44,6 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         private val TMP_MATRIX = Matrix4()
         private val MUSIC_CREDIT: String by lazy { MusicCredit.credit("Balloon Game") }
         private val MUSIC_BPM = 105f
-        private val MUSIC_DURATION: Float = 91.428f
         private val TITLE = BRMania.TITLE.split(' ').map { "$it " }
         private val CYCLE_COLOURS: List<Color> by lazy {
             val tex = AssetRegistry.get<Texture>("tex_main_menu_gradient")
