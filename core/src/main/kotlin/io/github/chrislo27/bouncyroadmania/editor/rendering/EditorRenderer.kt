@@ -156,6 +156,10 @@ class EditorRenderer(val editor: Editor) {
         // bottom trackers
         this.renderBottomTrackers(batch, beatRange)
 
+        main.shapeRenderer.projectionMatrix = trackCamera.combined
+        this.renderOtherUI(batch, main.shapeRenderer, beatRange, font)
+        main.shapeRenderer.projectionMatrix = main.defaultCamera.combined
+
         font.unscaleFont()
         batch.end()
         batch.projectionMatrix = TMP_MATRIX

@@ -278,6 +278,15 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         return null
     }
 
+
+    fun getSelectionMode(): SelectionMode {
+        return when {
+            !Gdx.input.isAltDown() && !Gdx.input.isControlDown() && Gdx.input.isShiftDown() -> SelectionMode.ADD
+            !Gdx.input.isAltDown() && Gdx.input.isControlDown() && !Gdx.input.isShiftDown() -> SelectionMode.INVERT
+            else -> SelectionMode.REPLACE
+        }
+    }
+
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (clickOccupation != ClickOccupation.None || engine.playState != PlayState.STOPPED || editMode != EditMode.EVENTS)
             return false
@@ -306,6 +315,13 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                     ClickOccupation.Music(this, button == Input.Buttons.MIDDLE)
                 } else {
                     ClickOccupation.Playback(this)
+                }
+            } else {
+                val clickOccupation = clickOccupation
+                if (clickOccupation == ClickOccupation.None) {
+                    // begin selection rectangle
+                    val newClick = ClickOccupation.CreatingSelection(this, Vector2(mouseVector))
+                    this.clickOccupation = newClick
                 }
             }
         }
