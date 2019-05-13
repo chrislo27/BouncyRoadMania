@@ -157,6 +157,9 @@ class EditorRenderer(val editor: Editor) {
         // top trackers
         this.renderTopTrackers(batch, beatRange, trackYOffset)
 
+        // time signatures
+        this.renderTimeSignatures(batch, beatRange)
+
         // bottom trackers
         this.renderBottomTrackers(batch, beatRange)
 

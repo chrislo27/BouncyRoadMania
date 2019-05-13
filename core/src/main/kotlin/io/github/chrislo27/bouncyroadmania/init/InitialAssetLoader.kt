@@ -42,6 +42,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_stop", "images/ui/icon/stop.png")
         AssetRegistry.loadAsset<Texture>("ui_exit", "images/ui/icon/exit.png")
         AssetRegistry.loadAsset<Texture>("ui_stripe_board", "images/ui/stripe_board.png")
+        AssetRegistry.loadAsset<Texture>("ui_selector", "images/ui/selector/generic.png")
 
         AssetRegistry.loadAsset<Texture>("tool_selection", "images/tool/selection.png")
         AssetRegistry.loadAsset<Texture>("tool_tempo_change", "images/tool/tempo_change.png")

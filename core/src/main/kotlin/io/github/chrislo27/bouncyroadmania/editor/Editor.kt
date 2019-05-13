@@ -17,7 +17,10 @@ import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
+import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignature
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
+import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumeChange
+import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -25,6 +28,7 @@ import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.*
 import kotlin.properties.Delegates
 
 
@@ -54,17 +58,21 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         updateMessageBar()
         engine.requiresPlayerInput = false // newVal == EditMode.ENGINE
     }
-    val stage: EditorStage = EditorStage(this)
     val engine: Engine = Engine()
     var currentTool: Tool by Delegates.observable(Tool.SELECTION) { _, _, _ -> updateMessageBar() }
     var snap: Float = 0.25f
     var clickOccupation: ClickOccupation = ClickOccupation.None
+        set(value) {
+            field = value
+            updateMessageBar()
+        }
     var selection: List<Event> = listOf()
         set(value) {
             field.forEach { it.isSelected = false }
             field = value
             field.forEach { it.isSelected = true }
         }
+    val stage: EditorStage = EditorStage(this)
 
     val renderer: EditorRenderer = EditorRenderer(this)
     private var frameLastCallUpdateMessageBar: Long = -1
@@ -90,8 +98,92 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         val message = StringBuilder()
         val controls = StringBuilder()
 
+        fun StringBuilder.separator(): StringBuilder {
+            if (this.isNotEmpty())
+                this.append(" - ")
+            return this
+        }
+
         when (editMode) {
             EditMode.PARAMETERS -> message.append(Localization["editor.msg.parameters"])
+            EditMode.EVENTS -> {
+                when (currentTool) {
+                    Tool.SELECTION -> {
+                        val clickOccupation = this.clickOccupation
+                        if (selection.isNotEmpty()) {
+                            message.append(
+                                    Localization["editor.msg.numSelected", this.selection.size.toString()])
+
+                            if (clickOccupation == ClickOccupation.None) {
+                                if (selection.all { it.canBeCopied }) {
+                                    controls.separator().append(Localization["editor.msg.copyHint"])
+                                }
+
+                                if (selection.isNotEmpty()) {
+                                    if (selection.all { it.isStretchable }) {
+                                        controls.separator().append(Localization["editor.msg.stretchable"])
+                                    }
+                                }
+                            } else if (clickOccupation is ClickOccupation.SelectionDrag) {
+                                if (!clickOccupation.isPlacementValid()) {
+                                    if (clickOccupation.isInDeleteZone()) {
+                                        message.separator().append(Localization["editor.msg.deletingSelection"])
+                                    } else {
+                                        message.separator().append(Localization["editor.msg.invalidPlacement"])
+                                    }
+                                }
+                            }
+                        }
+
+                        if (clickOccupation is ClickOccupation.CreatingSelection) {
+                            val selectionMode = getSelectionMode()
+                            val newSelectionCount = engine.events.count { selectionMode.wouldEventBeIncluded(it, clickOccupation.rectangle, engine.events, this.selection) } - (if (selectionMode == SelectionMode.ADD) (this.selection.size) else 0)
+                            if (newSelectionCount > 0) {
+                                controls.separator().append(Localization[if (selectionMode == SelectionMode.ADD) {
+                                    "editor.msg.selectionHint.count.add"
+                                } else "editor.msg.selectionHint.count", newSelectionCount])
+                            }
+                            controls.separator().append(Localization["editor.msg.selectionHint"])
+                        }
+                    }
+                    Tool.TIME_SIGNATURE -> {
+                        controls.append(Localization["editor.msg.timeSignature"])
+                    }
+                    Tool.TEMPO_CHANGE -> {
+                        controls.append(Localization["editor.msg.tempoChange"])
+                        val tracker = getTrackerOnMouse(TempoChange::class.java, true) as? TempoChange
+                        if (tracker != null) {
+                            var totalWidth = ((tracker.container.map as NavigableMap).higherEntry(tracker.endBeat)?.value?.beat ?: engine.lastPoint) - tracker.beat
+                            if (totalWidth < 0f) {
+                                totalWidth = Float.POSITIVE_INFINITY
+                            }
+                            if (tracker.isZeroWidth) {
+                                message.append(Localization["editor.msg.tracker.info", tracker.text, totalWidth])
+                            } else {
+                                message.append(Localization["editor.msg.tracker.info.stretch", TempoChange.getFormattedText(tracker.previousBpm), tracker.text, tracker.width, totalWidth])
+                            }
+                        }
+                    }
+                    Tool.MUSIC_VOLUME -> {
+                        controls.append(Localization["editor.msg.musicVolume"])
+                        val tracker = getTrackerOnMouse(MusicVolumeChange::class.java, true) as? MusicVolumeChange
+                        if (tracker != null) {
+                            var totalWidth = ((tracker.container.map as NavigableMap).higherEntry(tracker.endBeat)?.value?.beat ?: engine.lastPoint) - tracker.beat
+                            if (totalWidth < 0f) {
+                                totalWidth = Float.POSITIVE_INFINITY
+                            }
+                            if (tracker.isZeroWidth) {
+                                message.append(Localization["editor.msg.tracker.info", tracker.text, totalWidth])
+                            } else {
+                                message.append(Localization["editor.msg.tracker.info.stretch", MusicVolumeChange.getFormattedText(tracker.previousVolume), tracker.text, tracker.width, totalWidth])
+                            }
+                        }
+                    }
+                    Tool.SWING -> {
+                        controls.append(Localization["editor.msg.swing"])
+                    }
+                }
+            }
             else -> {
             }
         }
@@ -424,6 +516,52 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                     }
                 }
             }
+        } else if (tool == Tool.TIME_SIGNATURE) {
+            val inputX = renderer.trackCamera.getInputX()
+            val inputBeat = Math.floor(inputX.toDouble() / snap).toFloat() * snap
+            val timeSig: TimeSignature? = engine.timeSignatures.getTimeSignature(inputBeat)?.takeIf { MathUtils.isEqual(inputBeat, it.beat) }
+
+            if (button == Input.Buttons.RIGHT && timeSig != null) {
+                this.mutate(TimeSignatureAction(timeSig, true))
+            } else if (button == Input.Buttons.LEFT && timeSig == null) {
+                val timeSigAt = engine.timeSignatures.getTimeSignature(inputBeat)
+                this.mutate(TimeSignatureAction(
+                        TimeSignature(engine.timeSignatures, inputBeat,
+                                timeSigAt?.beatsPerMeasure ?: TimeSignature.DEFAULT_NOTE_UNIT,
+                                timeSigAt?.beatUnit ?: TimeSignature.DEFAULT_NOTE_UNIT), false))
+            }
+        } else if (tool.isTrackerRelated) {
+            val tracker: Tracker<*>? = getTrackerOnMouse(tool.trackerClass!!.java, true)
+            val mouseX = renderer.trackCamera.getInputX()
+            val beat = MathHelper.snapToNearest(mouseX, snap)
+
+            if (button == Input.Buttons.RIGHT && tracker != null) {
+                this.mutate(TrackerAction(tracker, true))
+            } else if (button == Input.Buttons.LEFT) {
+                if (tracker != null && tracker.allowsResize) {
+                    val left = MathUtils.isEqual(tracker.beat, mouseX, snap * 0.5f)
+                    val right = MathUtils.isEqual(tracker.endBeat, mouseX, snap * 0.5f)
+                    if (left || right) {
+                        clickOccupation = ClickOccupation.TrackerResize(tracker, mouseX - tracker.beat, left)
+                    }
+                } else if (getTrackerOnMouse(tool.trackerClass.java, false) == null) {
+                    val tr = when (tool) {
+                        Tool.TEMPO_CHANGE -> {
+                            val tempoScale = if (shift && !alt) 0.5f else if (!shift && alt) 2f else 1f
+                            TempoChange(engine.tempos, beat, (engine.tempos.tempoAt(beat) * tempoScale).coerceIn(TempoChange.MIN_TEMPO, TempoChange.MAX_TEMPO), engine.tempos.swingAt(beat), 0f)
+                        }
+                        Tool.MUSIC_VOLUME -> {
+                            MusicVolumeChange(engine.musicVolumes, beat,
+                                    0f,
+                                    Math.round(engine.musicVolumes.volumeAt(beat) * 100)
+                                            .coerceIn(0, MusicVolumeChange.MAX_VOLUME))
+                        }
+                        else -> error("Tracker creation not supported for tool $tool")
+                    }
+                    val action: TrackerAction = TrackerAction(tr, false)
+                    this.mutate(action)
+                }
+            }
         }
 
         return true
@@ -544,7 +682,25 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         return false
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+    override fun keyDown(keycode: Int): Boolean {
+        if (stage.isTyping || clickOccupation != ClickOccupation.None)
+            return false
+        if (keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
+            val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
+            if (!Gdx.input.isControlDown() && !Gdx.input.isAltDown() && !Gdx.input.isShiftDown()) {
+                if (number in 0 until Tool.VALUES.size) {
+                    currentTool = Tool.VALUES[number]
+                    stage.pickerStage.updateLabels()
+                    return true
+                }
+            }
+        } else if (keycode == Input.Keys.Q || keycode == Input.Keys.E) {
+            val dir = if (keycode == Input.Keys.E) 1 else -1
+            val values = EditMode.VALUES
+            val nextIndex = values.indexOf(editMode) + dir
+            editMode = values[if (nextIndex < 0) (values.size - 1) else if (nextIndex >= values.size) 0 else nextIndex]
+            return true
+        }
         return false
     }
 
@@ -553,6 +709,104 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     }
 
     override fun scrolled(amount: Int): Boolean {
+        if (engine.playState != PlayState.STOPPED) {
+            return false
+        }
+
+        val camera = renderer.trackCamera
+        val selection = selection
+        val tool = currentTool
+        val control = Gdx.input.isControlDown()
+        val shift = Gdx.input.isShiftDown()
+        if (tool == Tool.TIME_SIGNATURE) {
+            val inputX = camera.getInputX()
+            val timeSig = engine.timeSignatures.getTimeSignature(inputX)
+            val inputBeat = Math.floor(inputX.toDouble() / snap).toFloat() * snap
+            if (timeSig != null && MathUtils.isEqual(inputBeat, timeSig.beat)) {
+                if (!shift) {
+                    val change = -amount * (if (control) 5 else 1)
+                    val newDivisions = (timeSig.beatsPerMeasure + change)
+                            .coerceIn(TimeSignature.LOWER_BEATS_PER_MEASURE, TimeSignature.UPPER_BEATS_PER_MEASURE)
+                    if ((change < 0 && timeSig.beatsPerMeasure > TimeSignature.LOWER_BEATS_PER_MEASURE) || (change > 0 && timeSig.beatsPerMeasure < TimeSignature.UPPER_BEATS_PER_MEASURE)) {
+                        val lastAction: TimeSigValueChange? = this.getUndoStack().peekFirst() as? TimeSigValueChange?
+                        val result = TimeSignature(engine.timeSignatures, timeSig.beat, newDivisions, timeSig.beatUnit)
+
+                        if (lastAction != null && lastAction.current === timeSig) {
+                            lastAction.current = result
+                            lastAction.redo(this)
+                        } else {
+                            this.mutate(TimeSigValueChange(timeSig, result))
+                        }
+                        return true
+                    }
+                } else if (shift && !control) {
+                    val change = -amount
+                    val index = TimeSignature.NOTE_UNITS.indexOf(timeSig.beatUnit).takeUnless { it == -1 } ?: TimeSignature.NOTE_UNITS.indexOf(TimeSignature.DEFAULT_NOTE_UNIT)
+                    val newUnits = TimeSignature.NOTE_UNITS[(index + change).coerceIn(0, TimeSignature.NOTE_UNITS.size - 1)]
+                    if (newUnits != timeSig.beatUnit) {
+                        val lastAction: TimeSigValueChange? = this.getUndoStack().peekFirst() as? TimeSigValueChange?
+                        val result = TimeSignature(engine.timeSignatures, timeSig.beat, timeSig.beatsPerMeasure, newUnits)
+
+                        if (lastAction != null && lastAction.current === timeSig) {
+                            lastAction.current = result
+                            lastAction.redo(this)
+                        } else {
+                            this.mutate(TimeSigValueChange(timeSig, result))
+                        }
+                        return true
+                    }
+                }
+            }
+        } else if (tool.isTrackerRelated) {
+            val tracker = getTrackerOnMouse(tool.trackerClass?.java, true)
+            if (tracker != null) {
+                val result = tracker.scroll(-amount, control, shift)
+
+                if (result != null) {
+                    val lastAction: TrackerValueChange? = this.getUndoStack().peekFirst() as? TrackerValueChange?
+
+                    if (lastAction != null && lastAction.current === tracker) {
+                        lastAction.current = result
+                        lastAction.redo(this)
+                    } else {
+                        this.mutate(TrackerValueChange(tracker, result))
+                    }
+                }
+
+                return true
+            }
+        } else if (tool == Tool.SWING) {
+            val tracker = getTrackerOnMouse(TempoChange::class.java, true) as? TempoChange?
+            if (tracker != null) {
+                val result = tracker.scrollSwing(-amount, control, shift)
+
+                if (result != null) {
+                    val lastAction: TrackerValueChange? = this.getUndoStack().peekFirst() as? TrackerValueChange?
+
+                    if (lastAction != null && lastAction.current === tracker) {
+                        lastAction.current = result
+                        lastAction.redo(this)
+                    } else {
+                        this.mutate(TrackerValueChange(tracker, result))
+                    }
+                }
+
+                return true
+            }
+        }
+
+        if (shift && tool != Tool.TIME_SIGNATURE) {
+            // Camera scrolling left/right (CTRL/SHIFT+CTRL)
+            val amt = (amount * if (control) 5f else 1f)
+            camera.position.x += amt
+            camera.update()
+
+            return true
+        }
+        return false
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         return false
     }
 
@@ -563,11 +817,6 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         return false
     }
-
-    override fun keyDown(keycode: Int): Boolean {
-        return false
-    }
-
 
     fun getDebugString(): String {
         return "updateMessageBar: ${Gdx.graphics.frameId - frameLastCallUpdateMessageBar}\nclickOccupation: ${clickOccupation::class.java.simpleName}" + "\n${renderer.getDebugString()}"

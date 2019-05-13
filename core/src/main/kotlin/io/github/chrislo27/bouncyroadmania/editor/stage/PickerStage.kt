@@ -19,6 +19,7 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
     val displayScrollDown: Button<EditorScreen>
     val summary: TextLabel<EditorScreen>
     val desc: TextLabel<EditorScreen>
+    val toolButtons: List<ToolButton>
 
     init {
         val main = editor.main
@@ -69,7 +70,7 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
         // Title and description
         val titleAmt = 0.2f
         summary = TextLabel(palette, this, this).apply {
-            this.location.set(screenHeight = titleAmt * 0.75f, screenY = 1f - titleAmt, screenX = separator, screenWidth = 1f - separator, pixelX = 8f, pixelWidth = -16f)
+            this.location.set(screenHeight = titleAmt * 0.75f, screenY = 1f - titleAmt, screenX = separator, screenWidth = 1f - separator, pixelX = 8f, pixelWidth = -16f - (Tool.VALUES.size * 32f))
             this.isLocalizationKey = false
             this.textAlign = Align.left
             this.textWrapping = false
@@ -87,6 +88,15 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
         }
         elements += desc
 
+        toolButtons = mutableListOf()
+        val numTools = Tool.VALUES.size
+        Tool.VALUES.forEachIndexed { i, tool ->
+            toolButtons += ToolButton(editor, tool, palette, this).apply {
+                this.location.set(screenX = 1f, screenY = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = (numTools - i) * -32f, pixelY = -32f, pixelWidth = 32f, pixelHeight = 32f)
+            }
+        }
+        elements.addAll(toolButtons)
+
         updateLabels()
     }
 
@@ -100,6 +110,9 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
             val instantiator = list[index]
             summary.text = instantiator.displaySummary
             desc.text = instantiator.displayDesc
+        }
+        toolButtons.forEach {
+            it.selected = it.tool == editor.currentTool
         }
     }
 

@@ -5,17 +5,71 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.editor.ClickOccupation
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.editor.Tool
+import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignature
 import io.github.chrislo27.bouncyroadmania.util.RectanglePool
+import io.github.chrislo27.bouncyroadmania.util.scaleFont
+import io.github.chrislo27.bouncyroadmania.util.unscaleFont
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
 import kotlin.math.roundToInt
 
+private fun EditorRenderer.renderTimeSignature(batch: SpriteBatch, beat: Float, lowerText: String, upperText: String, bigFont: BitmapFont, heightOfTrack: Float) {
+    val x = beat
+    val startY = 0f + toScaleY(Editor.TRACK_LINE_THICKNESS)
+    val maxWidth = 1f
+
+    val lowerWidth = bigFont.getTextWidth(lowerText, maxWidth, false).coerceAtMost(maxWidth)
+    val upperWidth = bigFont.getTextWidth(upperText, maxWidth, false).coerceAtMost(maxWidth)
+    val biggerWidth = Math.max(lowerWidth, upperWidth)
+
+    bigFont.drawCompressed(batch, lowerText,
+            x + biggerWidth * 0.5f - lowerWidth * 0.5f,
+            startY + bigFont.capHeight,
+            maxWidth, Align.left)
+    bigFont.drawCompressed(batch, upperText,
+            x + biggerWidth * 0.5f - upperWidth * 0.5f,
+            startY + heightOfTrack,
+            maxWidth, Align.left)
+}
+
+fun EditorRenderer.renderTimeSignatures(batch: SpriteBatch, beatRange: IntRange) {
+    val timeSignatures = engine.timeSignatures
+    val bigFont = main.kurokaneFont
+    val heightOfTrack = engine.trackCount.toFloat() - toScaleY(Editor.TRACK_LINE_THICKNESS) * 2f
+    val inputX = trackCamera.getInputX()
+    val inputBeat = Math.floor(inputX.toDouble() / editor.snap).toFloat() * editor.snap
+    bigFont.scaleFont(trackCamera)
+    bigFont.scaleMul((heightOfTrack * 0.5f - 0.075f * (heightOfTrack / Engine.DEFAULT_TRACK_COUNT)) / bigFont.capHeight)
+
+    timeSignatures.map.values.forEach { timeSig ->
+        if (timeSig.beat.roundToInt() !in beatRange) return@forEach
+        if (editor.currentTool == Tool.TIME_SIGNATURE && MathUtils.isEqual(timeSig.beat, inputBeat) && engine.playState == PlayState.STOPPED) {
+            bigFont.color = theme.selection.border
+        } else {
+            bigFont.setColor(theme.trackLine.r, theme.trackLine.g, theme.trackLine.b, theme.trackLine.a * 0.75f)
+        }
+
+        renderTimeSignature(batch, timeSig.beat, timeSig.lowerText, timeSig.upperText, bigFont, heightOfTrack)
+    }
+
+    if (editor.currentTool == Tool.TIME_SIGNATURE && engine.timeSignatures.map[inputBeat] == null && engine.playState == PlayState.STOPPED) {
+        bigFont.setColor(theme.trackLine.r, theme.trackLine.g, theme.trackLine.b, theme.trackLine.a * MathUtils.lerp(0.2f, 0.35f, MathHelper.getTriangleWave(2f)))
+        val last = engine.timeSignatures.getTimeSignature(inputBeat)
+        renderTimeSignature(batch, inputBeat, last?.lowerText ?: TimeSignature.DEFAULT_NOTE_UNIT.toString(), last?.upperText ?: TimeSignature.DEFAULT_NOTE_UNIT.toString(), bigFont, heightOfTrack)
+    }
+
+    bigFont.setColor(1f, 1f, 1f, 1f)
+    bigFont.unscaleFont()
+}
 
 fun EditorRenderer.renderBeatNumbers(batch: SpriteBatch, beatRange: IntRange, font: BitmapFont) {
     val width = Editor.EVENT_WIDTH * 0.4f
