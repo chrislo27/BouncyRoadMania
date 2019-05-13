@@ -253,6 +253,10 @@ class Engine : Clock() {
             it.renderUpdate(delta)
         }
         entities.removeIf { it.kill }
+
+        if (playState != PlayState.STOPPED && beat >= duration) {
+            playState = PlayState.STOPPED
+        }
     }
 
     fun render(batch: SpriteBatch) {
