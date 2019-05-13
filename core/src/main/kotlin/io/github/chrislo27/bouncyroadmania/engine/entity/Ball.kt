@@ -94,7 +94,8 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
             if (alpha >= 1f) {
                 val newFrom = bounce.toBouncer
-                val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + alpha.toInt())
+                val intAlpha = alpha.toInt()
+                val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + intAlpha)
                 if (next == null || fellOff) {
                     this.bounce = null
                     this.kill = true
@@ -103,7 +104,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                     }
                 } else if (newFrom != null) {
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
-                        bouncesSoFar++
+                        bouncesSoFar += intAlpha
                         if (fallOff == null) {
                             prepareFallOff()
                         }
@@ -135,7 +136,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                                 // Fall off
                                 fellOff = true
                                 this.fallOff = null
-                                bouncesSoFar++
+                                bouncesSoFar += intAlpha
                                 newFrom.playSound(semitone = 0)
                                 bounce(newFrom, next, true)
                             }
