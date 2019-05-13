@@ -82,6 +82,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         Localization.addListener {
             updateMessageBar()
         }
+        editMode = editMode // Trigger observable
     }
 
     fun updateMessageBar() {
