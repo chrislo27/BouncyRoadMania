@@ -43,7 +43,7 @@ private fun EditorRenderer.renderTimeSignature(batch: SpriteBatch, beat: Float, 
 
 fun EditorRenderer.renderTimeSignatures(batch: SpriteBatch, beatRange: IntRange) {
     val timeSignatures = engine.timeSignatures
-    val bigFont = main.kurokaneFont
+    val bigFont = main.timeSignatureFont
     val heightOfTrack = engine.trackCount.toFloat() - toScaleY(Editor.TRACK_LINE_THICKNESS) * 2f
     val inputX = trackCamera.getInputX()
     val inputBeat = Math.floor(inputX.toDouble() / editor.snap).toFloat() * editor.snap

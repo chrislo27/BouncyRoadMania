@@ -113,6 +113,8 @@ class Engine : Clock() {
     var playbackStart: Float = 0f
     var musicStartSec: Float = 0f
 
+    var isMusicMuted: Boolean = false
+
     val events: List<Event> = mutableListOf()
 
     val entities: MutableList<Entity> = mutableListOf()

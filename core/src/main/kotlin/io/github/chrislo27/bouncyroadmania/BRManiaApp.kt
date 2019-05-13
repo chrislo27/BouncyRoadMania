@@ -75,7 +75,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     val defaultBorderedFontLargeKey = "default_bordered_font_large"
     val cometBorderedFontKey = "comet_bordered_font"
     val kurokaneBorderedFontKey = "kurokane_bordered_font"
-    val kurokaneFontKey = "kurokane_font"
+    val timeSignatureFontKey = "time_signature_font"
 
     val defaultFontFTF: FreeTypeFont get() = fonts[defaultFontKey]
     val defaultBorderedFontFTF: FreeTypeFont get() = fonts[defaultBorderedFontKey]
@@ -83,13 +83,13 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     val defaultBorderedFontLargeFTF: FreeTypeFont get() = fonts[defaultBorderedFontLargeKey]
     val cometBorderedFontFTF: FreeTypeFont get() = fonts[cometBorderedFontKey]
     val kurokaneBorderedFontFTF: FreeTypeFont get() = fonts[kurokaneBorderedFontKey]
-    val kurokaneFontFTF: FreeTypeFont get() = fonts[kurokaneFontKey]
+    val timeSignatureFontFTF: FreeTypeFont get() = fonts[timeSignatureFontKey]
 
     val defaultFontLarge: BitmapFont get() = defaultFontLargeFTF.font!!
     val defaultBorderedFontLarge: BitmapFont get() = defaultBorderedFontLargeFTF.font!!
     val cometBorderedFont: BitmapFont get() = cometBorderedFontFTF.font!!
     val kurokaneBorderedFont: BitmapFont get() = kurokaneBorderedFontFTF.font!!
-    val kurokaneFont: BitmapFont get() = kurokaneFontFTF.font!!
+    val timeSignatureFont: BitmapFont get() = timeSignatureFontFTF.font!!
 
     // End of Fonts
 
@@ -131,7 +131,15 @@ class BRManiaApp(logger: Logger, logToFile: File?)
             fonts[defaultBorderedFontLargeKey] = createDefaultLargeBorderedFont()
             fonts[cometBorderedFontKey] = createCometBorderedFont()
             fonts[kurokaneBorderedFontKey] = createKurokaneBorderedFont()
-            fonts[kurokaneFontKey] = createKurokaneFont()
+            fonts[timeSignatureFontKey] = FreeTypeFont(kurokaneFontFileHandle, emulatedSize, createDefaultTTFParameter().apply {
+                size *= 6
+                characters = "0123456789?_+-!&%"
+                incremental = false
+            }).setAfterLoad {
+                this.font!!.apply {
+                    setFixedWidthGlyphs("0123456789")
+                }
+            }
             fonts.loadUnloaded(defaultCamera.viewportWidth, defaultCamera.viewportHeight)
         }
 
@@ -262,13 +270,6 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
                     size *= 4
                     borderWidth *= 4
-                }).setAfterLoad(fontAfterLoadFunction)
-    }
-
-    private fun createKurokaneFont(): FreeTypeFont {
-        return FreeTypeFont(kurokaneFontFileHandle, emulatedSize, createDefaultTTFParameter()
-                .apply {
-                    size *= 4
                 }).setAfterLoad(fontAfterLoadFunction)
     }
 

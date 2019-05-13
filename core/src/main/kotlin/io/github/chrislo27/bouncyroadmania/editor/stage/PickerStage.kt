@@ -31,6 +31,12 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
         }
 
         val separator = 0.35f
+        // Scrolling display
+        display = PickerDisplay(this, parent.editor).apply {
+            this.location.set(0f, 0f, separator, 1f, 48f, 0f, -48f, 0f)
+        }
+        elements += display
+
         displayArrow = TextLabel(arrowPalette, this, this).apply {
             this.isLocalizationKey = false
             this.text = Editor.ARROWS[4]
@@ -44,6 +50,9 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
             })
             this.location.set(screenY = 1f, screenWidth = 0f, screenHeight = 0f, pixelWidth = 48f, pixelHeight = 48f, pixelY = -48f)
             this.background = false
+            this.leftClickAction = { _, _ ->
+                if (display.index > 0) display.index--
+            }
         }
         elements += displayScrollUp
         displayScrollDown = Button(arrowPalette, this, this).apply {
@@ -53,13 +62,11 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
             })
             this.location.set(screenY = 0f, screenWidth = 0f, screenHeight = 0f, pixelWidth = 48f, pixelHeight = 48f, pixelY = 0f)
             this.background = false
+            this.leftClickAction = { _, _ ->
+                if (display.index < EventRegistry.list.size - 1) display.index++
+            }
         }
         elements += displayScrollDown
-        // Scrolling display
-        display = PickerDisplay(this, parent.editor).apply {
-            this.location.set(0f, 0f, separator, 1f, 48f, 0f, -48f, 0f)
-        }
-        elements += display
 
         // Separator
         elements += ColourPane(this, this).apply {
