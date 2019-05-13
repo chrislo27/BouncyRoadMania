@@ -54,7 +54,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
         // Separator
         this.elements += ColourPane(this, this).apply {
             this.colour.set(1f, 1f, 1f, 0.5f)
-            this.location.set(0f, 0f, 0f, 0f, buttonPadding * 3 + buttonSize * 2 + buttonSize + buttonPadding * 1f - 1f, 2f, 2f, 36f)
+            this.location.set(0f, 0f, 0f, 0f, buttonPadding * 3 + buttonSize * 2 + buttonSize + buttonPadding * 0.5f - 1f, 2f, 2f, 36f)
         }
 
         // Separator
@@ -91,29 +91,39 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
         // Separator
         this.elements += ColourPane(this, this).apply {
             this.colour.set(1f, 1f, 1f, 0.5f)
-            this.location.set(0f, 0f, 0f, 0f, 640f - buttonSize / 2f + buttonSize * 2 + buttonPadding * 2 - 1f, 2f, 2f, 36f)
+            this.location.set(0f, 0f, 0f, 0f, 640f - buttonSize / 2f + buttonSize * 2 + buttonPadding * 1.5f - 1f, 2f, 2f, 36f)
         }
 
         this.elements += EditModeButton(EditMode.ENGINE, editor, palette, this, this).apply {
-            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 2 + buttonPadding * 3,
+            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 2 + buttonPadding * 2,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_edit_mode_engine"))
             })
         }
         this.elements += EditModeButton(EditMode.EVENTS, editor, palette, this, this).apply {
-            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 3 + buttonPadding * 4,
+            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 3 + buttonPadding * 3,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_edit_mode_events"))
             })
         }
         this.elements += EditModeButton(EditMode.PARAMETERS, editor, palette, this, this).apply {
-            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 4 + buttonPadding * 5,
+            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 4 + buttonPadding * 4,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_edit_mode_params"))
             })
+        }
+        // Separator
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(1f, 1f, 1f, 0.5f)
+            this.location.set(0f, 0f, 0f, 0f, 640f - buttonSize / 2f + buttonSize * 5 + buttonPadding * 4.5f - 1f, 2f, 2f, 36f)
+        }
+
+        this.elements += SnapButton(editor, palette, this, this).apply {
+            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f + buttonSize * 5 + buttonPadding * 5,
+                    pixelWidth = buttonSize * 4f, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
 
         // Bottom separator

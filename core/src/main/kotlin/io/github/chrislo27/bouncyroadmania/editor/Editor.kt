@@ -52,7 +52,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     var editMode: EditMode by Delegates.observable(EditMode.EVENTS) { _, oldVal, newVal ->
         stage.decideVisibility()
         updateMessageBar()
-        engine.requiresPlayerInput = newVal == EditMode.ENGINE
+        engine.requiresPlayerInput = false // newVal == EditMode.ENGINE
     }
     val stage: EditorStage = EditorStage(this)
     val engine: Engine = Engine()
@@ -153,85 +153,15 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                 }
             }
 
-            run clickCheck@{
-                val clickOccupation = clickOccupation
-                val tool = currentTool
-                val camera = renderer.trackCamera
-                val nearestSnap = MathHelper.snapToNearest(camera.getInputX(), snap)
-                if (tool == Tool.SELECTION) {
-                    when (clickOccupation) {
-                        is ClickOccupation.Music -> {
-                            setSubbeatSectionToMouse()
-                            engine.musicStartSec = if (Gdx.input.isShiftDown()) camera.getInputX() else nearestSnap
-                        }
-                        is ClickOccupation.Playback -> {
-                            setSubbeatSectionToMouse()
-                            engine.playbackStart = nearestSnap
-                        }
-                        is ClickOccupation.SelectionDrag -> {
-                            if (clickOccupation.isStretching) {
-                                val rootEntity = clickOccupation.clickedOn
-                                val rootBound = clickOccupation.oldBounds.getValue(rootEntity)
+//            if (editMode == EditMode.ENGINE && engine.playState == PlayState.PLAYING) {
+//                if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.S) || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+//                    engine.fireInput(InputType.DPAD)
+//                }
+//                if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+//                    engine.fireInput(InputType.A)
+//                }
+//            }
 
-                                fun stretch(entity: Event) {
-                                    val oldBound = clickOccupation.oldBounds.getValue(entity)
-                                    entity.updateBounds {
-                                        if (clickOccupation.stretchType == StretchRegion.LEFT) {
-                                            val oldRightSide = oldBound.x + oldBound.width
-
-                                            entity.bounds.x = (nearestSnap - (rootBound.x - oldBound.x)).coerceAtMost(oldRightSide - Event.MIN_STRETCH)
-                                            entity.bounds.width = oldRightSide - entity.bounds.x
-                                        } else if (clickOccupation.stretchType == StretchRegion.RIGHT) {
-                                            entity.bounds.width = (nearestSnap - oldBound.x - (rootBound.maxX - oldBound.maxX)).coerceAtLeast(Event.MIN_STRETCH)
-                                        }
-                                    }
-                                }
-
-                                stretch(rootEntity)
-                                this.selection.forEach { entity ->
-                                    if (entity === rootEntity) return@forEach
-                                    stretch(entity)
-                                }
-                            } else {
-                                clickOccupation.setPositionRelativeToMouse()
-                            }
-
-                            val subbeatSection = renderer.subbeatSection
-                            subbeatSection.enabled = true
-                            subbeatSection.start = Math.floor(clickOccupation.left.toDouble()).toFloat()
-                            subbeatSection.end = clickOccupation.right
-
-                            updateMessageBar()
-                        }
-                        is ClickOccupation.CreatingSelection -> {
-                            clickOccupation.updateRectangle()
-                            updateMessageBar()
-                        }
-                        ClickOccupation.None -> {
-                            if (selection.isNotEmpty() && !stage.isTyping) {
-                                if (Gdx.input.isKeyJustPressed(Input.Keys.FORWARD_DEL) || Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
-                                    this.selection.forEach { engine.removeEvent(it) }
-                                    this.addActionWithoutMutating(ActionGroup(listOf(
-                                            EventRemoveAction(this.selection,
-                                                    this.selection.map { Rectangle(it.bounds) }),
-                                            EventSelectionAction(this.selection.toList(), listOf())
-                                    )))
-                                    this.selection = listOf()
-
-                                    updateMessageBar()
-                                }
-                            }
-                        }
-                        is ClickOccupation.TrackerResize -> {
-                            // handled below
-                        }
-                    }
-                } else if (tool.isTrackerRelated) {
-                    if (clickOccupation is ClickOccupation.TrackerResize) {
-                        clickOccupation.updatePosition(nearestSnap)
-                    }
-                }
-            }
         }
 
         if (engine.playState == PlayState.PLAYING) {
@@ -241,9 +171,6 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         if (currentTool.isTrackerRelated) {
             updateMessageBar()
         }
-
-        if (engine.playState != PlayState.STOPPED)
-            return
 
         run stretchCursor@{
             val clickOccupation = clickOccupation
@@ -263,12 +190,94 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             }
         }
 
+        if (engine.playState != PlayState.STOPPED)
+            return
 
         if (currentTool.showSubbeatLines) {
             val subbeatSection = renderer.subbeatSection
             subbeatSection.enabled = true
             subbeatSection.start = Math.floor(renderer.trackCamera.getInputX().toDouble()).toFloat()
             subbeatSection.end = subbeatSection.start + 0.5f
+        }
+
+        run clickCheck@{
+            val clickOccupation = clickOccupation
+            val tool = currentTool
+            val camera = renderer.trackCamera
+            val nearestSnap = MathHelper.snapToNearest(camera.getInputX(), snap)
+            if (tool == Tool.SELECTION) {
+                when (clickOccupation) {
+                    is ClickOccupation.Music -> {
+                        setSubbeatSectionToMouse()
+                        engine.musicStartSec = if (Gdx.input.isShiftDown()) camera.getInputX() else nearestSnap
+                    }
+                    is ClickOccupation.Playback -> {
+                        setSubbeatSectionToMouse()
+                        engine.playbackStart = nearestSnap
+                    }
+                    is ClickOccupation.SelectionDrag -> {
+                        if (clickOccupation.isStretching) {
+                            val rootEntity = clickOccupation.clickedOn
+                            val rootBound = clickOccupation.oldBounds.getValue(rootEntity)
+
+                            fun stretch(entity: Event) {
+                                val oldBound = clickOccupation.oldBounds.getValue(entity)
+                                entity.updateBounds {
+                                    if (clickOccupation.stretchType == StretchRegion.LEFT) {
+                                        val oldRightSide = oldBound.x + oldBound.width
+
+                                        entity.bounds.x = (nearestSnap - (rootBound.x - oldBound.x)).coerceAtMost(oldRightSide - Event.MIN_STRETCH)
+                                        entity.bounds.width = oldRightSide - entity.bounds.x
+                                    } else if (clickOccupation.stretchType == StretchRegion.RIGHT) {
+                                        entity.bounds.width = (nearestSnap - oldBound.x - (rootBound.maxX - oldBound.maxX)).coerceAtLeast(Event.MIN_STRETCH)
+                                    }
+                                }
+                            }
+
+                            stretch(rootEntity)
+                            this.selection.forEach { entity ->
+                                if (entity === rootEntity) return@forEach
+                                stretch(entity)
+                            }
+                        } else {
+                            clickOccupation.setPositionRelativeToMouse()
+                        }
+
+                        val subbeatSection = renderer.subbeatSection
+                        subbeatSection.enabled = true
+                        subbeatSection.start = Math.floor(clickOccupation.left.toDouble()).toFloat()
+                        subbeatSection.end = clickOccupation.right
+
+                        updateMessageBar()
+                    }
+                    is ClickOccupation.CreatingSelection -> {
+                        clickOccupation.updateRectangle()
+                        updateMessageBar()
+                    }
+                    ClickOccupation.None -> {
+                        if (selection.isNotEmpty() && !stage.isTyping) {
+                            if (Gdx.input.isKeyJustPressed(Input.Keys.FORWARD_DEL) || Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
+                                this.selection.forEach { engine.removeEvent(it) }
+                                this.addActionWithoutMutating(ActionGroup(listOf(
+                                        EventRemoveAction(this.selection,
+                                                this.selection.map { Rectangle(it.bounds) }),
+                                        EventSelectionAction(this.selection.toList(), listOf())
+                                )))
+                                this.selection = listOf()
+
+                                updateMessageBar()
+                            }
+                        }
+                    }
+                    is ClickOccupation.TrackerResize -> {
+                        // handled below
+                    }
+                }
+            } else if (tool.isTrackerRelated) {
+                if (clickOccupation is ClickOccupation.TrackerResize) {
+                    clickOccupation.updatePosition(nearestSnap)
+                }
+            }
         }
 
     }
@@ -299,7 +308,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
 
         return null
     }
-    
+
     fun getStretchRegionForStretchable(beat: Float, event: Event): StretchRegion {
         if (!event.isStretchable)
             return StretchRegion.NONE
@@ -361,7 +370,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                     ClickOccupation.Playback(this)
                 }
             } else if (!isAnyTrackerButtonDown && isDraggingButtonDown) {
-                if (engine.events.any { mouseVector in it.bounds && it.isSelected}) {
+                if (engine.events.any { mouseVector in it.bounds && it.isSelected }) {
                     val inBounds = this.selection
                     val newSel = if (isCopying && inBounds.all { it.canBeCopied }) {
                         inBounds.map { it.copy() }
