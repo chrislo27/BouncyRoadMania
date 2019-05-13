@@ -94,6 +94,7 @@ abstract class Event(val engine: Engine) {
                 width, height,
                 editor.renderer.toScaleX(BORDER), editor.renderer.toScaleY(BORDER))
 
+        renderBeforeText(editor, batch)
 
         batch.packedColor = oldColor
         val oldFontColor = font.color
@@ -152,8 +153,8 @@ abstract class Event(val engine: Engine) {
 
     }
 
-    fun getLowerUpdateableBound(): Float = bounds.x
-    fun getUpperUpdateableBound(): Float = bounds.maxX
+    open fun getLowerUpdateableBound(): Float = bounds.x
+    open fun getUpperUpdateableBound(): Float = bounds.maxX
 
     open fun isUpdateable(beat: Float): Boolean {
         return beat in getLowerUpdateableBound()..getUpperUpdateableBound()
@@ -187,6 +188,10 @@ abstract class Event(val engine: Engine) {
     open fun inRenderRange(start: Float, end: Float): Boolean {
         return bounds.x + lerpDifference.x + bounds.width + lerpDifference.width >= start
                 && bounds.x + lerpDifference.x <= end
+    }
+
+    protected open fun renderBeforeText(editor: Editor, batch: SpriteBatch) {
+
     }
 
     /**
