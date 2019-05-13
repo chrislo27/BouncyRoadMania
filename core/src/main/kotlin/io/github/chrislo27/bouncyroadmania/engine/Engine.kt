@@ -112,7 +112,11 @@ class Engine : Clock() {
 
     var playbackStart: Float = 0f
     var musicStartSec: Float = 0f
-
+    var music: MusicData? = null
+        set(value) {
+            field?.dispose()
+            field = value
+        }
     var isMusicMuted: Boolean = false
 
     val events: List<Event> = mutableListOf()
