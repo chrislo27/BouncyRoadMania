@@ -93,7 +93,7 @@ class PickerDisplay(parent: PickerStage, val editor: Editor, val number: Int = 5
 
     override fun scrolled(amount: Int): Boolean {
         val list = EventRegistry.list
-        if (list.isNotEmpty()) {
+        if (list.isNotEmpty() && isMouseOver()) {
             val newIndex = index + amount
             index = newIndex.coerceIn(0, list.size - 1)
             return true
