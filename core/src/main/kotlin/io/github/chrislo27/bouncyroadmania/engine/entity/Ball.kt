@@ -106,7 +106,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
                         bouncesSoFar += intAlpha
                         if (fallOff == null) {
-                            prepareFallOff()
+                            prepareFallOff(intAlpha)
                         }
                         bounce(newFrom, next, false)
                         if (newFrom.isPlayer) {
@@ -147,11 +147,11 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         }
     }
 
-    private fun prepareFallOff() {
+    private fun prepareFallOff(increment: Int = 1) {
         val bounce = this.bounce
         if (bounce != null) {
             val newFrom = bounce.toBouncer
-            val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + 1)
+            val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + increment)
             if (next != null && next.isPlayer && this.fallOff == null && engine.requiresPlayerInput) {
                 // Set the fall off time
                 val expectedBeat = sentOutAt + (bouncesSoFar + 1) * beatsPerBounce
