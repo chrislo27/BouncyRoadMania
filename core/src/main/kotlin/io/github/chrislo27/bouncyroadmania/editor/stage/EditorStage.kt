@@ -11,7 +11,9 @@ import io.github.chrislo27.toolboks.ui.*
 
 class EditorStage(val editor: Editor)
     : Stage<EditorScreen>(null, editor.main.defaultCamera, 1280f, 720f) {
-
+    
+    val palette = BRManiaApp.instance.uiPalette
+    
     val toolbarStage: ToolbarStage
     val timelineStage: TimelineStage
     val messageBarStage: Stage<EditorScreen>
@@ -24,7 +26,6 @@ class EditorStage(val editor: Editor)
         private set
 
     init {
-        val palette = BRManiaApp.instance.uiPalette
         toolbarStage = ToolbarStage(this, palette).apply {
             this.location.set(screenHeight = 0f, screenY = 1f, pixelY = -40f, pixelHeight = 40f)
         }

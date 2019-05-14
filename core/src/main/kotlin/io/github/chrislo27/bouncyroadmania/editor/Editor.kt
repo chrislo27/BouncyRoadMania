@@ -3,18 +3,24 @@ package io.github.chrislo27.bouncyroadmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionGroup
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionHistory
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.impl.*
 import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
+import io.github.chrislo27.bouncyroadmania.editor.stage.LoadDragAndDropStage
+import io.github.chrislo27.bouncyroadmania.editor.stage.MenuOverlay
+import io.github.chrislo27.bouncyroadmania.editor.stage.MusicSelectStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
@@ -25,15 +31,17 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import io.github.chrislo27.toolboks.ui.ColourPane
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
+import java.io.File
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
 import kotlin.properties.Delegates
 
 
-class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
+class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lwjgl3WindowListener {
 
     companion object {
         const val EVENT_HEIGHT: Float = 48f
@@ -826,6 +834,68 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             return true
         }
         return false
+    }
+
+    override fun filesDropped(files: Array<out String>) {
+        // hack
+        for (element in stage.elements) {
+            if (element is MenuOverlay) {
+                val musicSelect = element.elements.filterIsInstance<MusicSelectStage>().firstOrNull()
+                if (musicSelect != null && !musicSelect.isLoading && !musicSelect.isChooserOpen) {
+                    val accepted = listOf(".wav", ".ogg", ".mp3")
+                    val path = files.firstOrNull { f ->
+                        accepted.any { f.toLowerCase(Locale.ROOT).endsWith(it) }
+                    }
+                    if (path != null) {
+                        val file = File(path)
+                        if (file.exists()) {
+                            musicSelect.loadFile(file)
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (clickOccupation == ClickOccupation.None && stage.elements.none { it is MenuOverlay }) {
+            val path = files.firstOrNull { it.toLowerCase(Locale.ROOT).endsWith(BRMania.FILE_EXTENSION.toLowerCase(Locale.ROOT)) }
+            if (path != null) {
+                val file = File(path)
+                if (file.exists()) {
+                    Gdx.app.postRunnable { 
+                        stage.elements += MenuOverlay(this, stage, stage.palette).apply {
+                            elements += ColourPane(this, this).apply {
+                                this.colour.set(0f, 0f, 0f, 0.75f)
+                            }
+                            elements += LoadDragAndDropStage(this@apply, this@Editor, file)
+                        }
+                        stage.updatePositions()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun closeRequested(): Boolean {
+        return true
+    }
+
+    override fun maximized(isMaximized: Boolean) {
+    }
+
+    override fun created(window: Lwjgl3Window) {
+    }
+
+    override fun focusLost() {
+    }
+
+    override fun focusGained() {
+    }
+
+    override fun refreshRequested() {
+    }
+
+    override fun iconified(isIconified: Boolean) {
     }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {

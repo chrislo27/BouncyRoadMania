@@ -20,5 +20,9 @@ open class MenuOverlay(val editor: Editor, parent: EditorStage, palette: UIPalet
             this.location.set(0f, 0f, 1f, 1f)
         }
     }
+    
+    fun removeSelf() {
+        (parent as Stage).removeChild(this)
+    }
 
 }

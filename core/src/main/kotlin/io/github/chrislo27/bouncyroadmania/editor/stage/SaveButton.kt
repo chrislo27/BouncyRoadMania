@@ -57,7 +57,7 @@ class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                 engine.saveTo(correctFile, false)
                                 editor.setFileHandles(FileHandle(correctFile))
                                 Gdx.app.postRunnable {
-                                    (this@overlay.parent as Stage).elements.remove(this@overlay)
+                                    this@overlay.removeSelf()
                                     isOpen = false
                                 }
                                 persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE, correctFile.parentFile)
@@ -73,7 +73,7 @@ class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                         })
                                         this.leftClickAction = { _, _ ->
                                             Gdx.app.postRunnable {
-                                                (this@overlay.parent as Stage).elements.remove(this@overlay)
+                                                this@overlay.removeSelf()
                                                 isOpen = false
                                             }
                                         }
@@ -84,7 +84,7 @@ class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                             }
                         } else {
                             Gdx.app.postRunnable {
-                                (this@overlay.parent as Stage).elements.remove(this@overlay)
+                                this@overlay.removeSelf()
                                 isOpen = false
                             }
                         }

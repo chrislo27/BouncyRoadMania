@@ -14,6 +14,9 @@ import io.github.chrislo27.toolboks.ui.*
 class ToolbarStage(parent: EditorStage, palette: UIPalette)
     : Stage<EditorScreen>(parent, parent.camera, parent.pixelsWidth, parent.pixelsHeight) {
 
+    val loadButton: LoadButton
+    val saveButton: SaveButton
+    
     init {
         elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, 0.5f)
@@ -33,7 +36,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.tooltipText = "editor.new"
             this.tooltipTextIsLocalizationKey = true
         }
-        this.elements += LoadButton(editor, palette, this, parent).apply {
+        loadButton = LoadButton(editor, palette, this, parent).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 2 + buttonSize,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
@@ -42,7 +45,8 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.tooltipText = "editor.load"
             this.tooltipTextIsLocalizationKey = true
         }
-        this.elements += SaveButton(editor, palette, this, parent).apply {
+        elements += loadButton
+        saveButton = SaveButton(editor, palette, this, parent).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 3 + buttonSize * 2,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
@@ -51,6 +55,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.tooltipText = "editor.save"
             this.tooltipTextIsLocalizationKey = true
         }
+        elements += saveButton
 
         // Separator
         this.elements += ColourPane(this, this).apply {

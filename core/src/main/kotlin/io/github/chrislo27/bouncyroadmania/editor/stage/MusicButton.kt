@@ -23,6 +23,7 @@ import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 class MusicButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScreen>, val editorStage: EditorStage)
@@ -70,7 +71,7 @@ class MusicButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorSc
     }
 }
 
-class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<EditorScreen>)
+class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: MenuOverlay)
     : GenericStage<EditorScreen>(palette, parent, parent.camera) {
 
     val label: TextLabel<EditorScreen>
@@ -80,8 +81,8 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
     val removeButton: Button<EditorScreen>
 
     @Volatile
-    private var isChooserOpen = false
-        set(value) {
+    var isChooserOpen = false
+        private set(value) {
             field = value
             closeLabel.visible = value
             selectButton.enabled = !value
@@ -90,8 +91,8 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
             moveMusicStartButton.enabled = !value && editor.engine.music != null && editor.engine.music?.music?.getStartOfSound() != -editor.engine.musicStartSec
         }
     @Volatile
-    private var isLoading = false
-        set(value) {
+    var isLoading = false
+        private set(value) {
             field = value
             selectButton.enabled = !value
             removeButton.enabled = !value
@@ -103,7 +104,7 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
         onBackButtonClick = {
             backButton.enabled = false
             Gdx.app.postRunnable {
-                (parent.parent as Stage).elements.remove(parent)
+                parent.removeSelf()
             }
         }
         backButton.visible = true
@@ -213,37 +214,43 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
                 val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)?.absolutePath, false, filter)
                 isChooserOpen = false
                 if (file != null) {
-                    isLoading = true
-                    try {
-                        Gdx.app.postRunnable {
-                            updateLabels()
-                        }
-                        val handle = FileHandle(file)
-                        val engine = editor.engine
-                        val progressListener = { progress: Float ->
-                            if ((progress * 100).toInt() < 100) {
-                                Gdx.app.postRunnable {
-                                    label.text = Localization["musicSelect.loadingMusic", (progress * 100).toInt()]
-                                }
-                            }
-                        }
-                        val musicData = MusicData(handle, engine, progressListener)
-                        engine.music = musicData
-                        isLoading = false
-                        persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, file.parentFile)
-                        Gdx.app.postRunnable {
-                            updateLabels()
-                        }
-                    } catch (t: Throwable) {
-                        t.printStackTrace()
-                        Gdx.app.postRunnable {
-                            updateLabels(t)
-                        }
-                    } finally {
-                        isLoading = false
+                    loadFile(file)
+                }
+            }
+        }
+    }
+
+    @Synchronized
+    fun loadFile(file: File) {
+        if (isLoading) return
+        isLoading = true
+        try {
+            Gdx.app.postRunnable {
+                updateLabels()
+            }
+            val handle = FileHandle(file)
+            val engine = editor.engine
+            val progressListener = { progress: Float ->
+                if ((progress * 100).toInt() < 100) {
+                    Gdx.app.postRunnable {
+                        label.text = Localization["musicSelect.loadingMusic", (progress * 100).toInt()]
                     }
                 }
             }
+            val musicData = MusicData(handle, engine, progressListener)
+            engine.music = musicData
+            isLoading = false
+            persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, file.parentFile)
+            Gdx.app.postRunnable {
+                updateLabels()
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            Gdx.app.postRunnable {
+                updateLabels(t)
+            }
+        } finally {
+            isLoading = false
         }
     }
 

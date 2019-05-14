@@ -2,6 +2,8 @@ package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
@@ -14,6 +16,8 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
     val editor: Editor = Editor(main)
     override val stage: EditorStage
         get() = editor.stage
+    
+    private var lastWindowListener: Lwjgl3WindowListener? = null
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
@@ -35,11 +39,15 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
     override fun show() {
         super.show()
         (Gdx.input.inputProcessor as? InputMultiplexer)?.addProcessor(editor)
+        val window = (Gdx.graphics as Lwjgl3Graphics).window
+        lastWindowListener = window.windowListener
+        window.windowListener = editor
     }
 
     override fun hide() {
         super.hide()
         (Gdx.input.inputProcessor as? InputMultiplexer)?.removeProcessor(editor)
+        (Gdx.graphics as Lwjgl3Graphics).window.windowListener = lastWindowListener
     }
 
     override fun getDebugString(): String? {
