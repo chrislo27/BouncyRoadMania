@@ -142,7 +142,7 @@ class TimelineStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
                 }
             }
 
-            if (editor.clickOccupation is ClickOccupation.Playback) {
+            if (editor.clickOccupation is ClickOccupation.Playback && (editor.editMode != EditMode.EVENTS && isMouseOver())) {
                 val percent = (stage.camera.getInputX() - location.realX) / location.realWidth
                 val time = editor.engine.playbackStart
                 val signedSec = engine.tempos.beatsToSeconds(time)
