@@ -84,7 +84,7 @@ fun EditorRenderer.renderBottomTrackers(batch: SpriteBatch, beatRange: IntRange)
     }
 
     fun getColorForTracker(tracker: Tracker<*>): Color {
-        return if (currentTracker === tracker && engine.playState == PlayState.STOPPED && !clickIsTrackerResize && (toolIsTrackerBased || (tool == Tool.SWING && currentTracker is TempoChange))) Color.WHITE else theme.getTrackerColour(currentTracker)
+        return if (currentTracker === tracker && engine.playState == PlayState.STOPPED && !clickIsTrackerResize && (toolIsTrackerBased || (tool == Tool.SWING && currentTracker is TempoChange))) Color.WHITE else theme.getTrackerColour(tracker)
     }
 
     fun Tracker<*>.render() {
