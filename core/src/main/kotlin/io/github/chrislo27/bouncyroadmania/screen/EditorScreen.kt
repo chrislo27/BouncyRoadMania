@@ -1,7 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.screen
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.Editor
@@ -31,11 +30,6 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
         super.renderUpdate()
 
         editor.renderUpdate()
-
-        // FIXME
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            main.screen = MainMenuScreen(main)
-        }
     }
 
     override fun show() {

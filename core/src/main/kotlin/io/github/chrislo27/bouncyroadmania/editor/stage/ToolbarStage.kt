@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
+import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.*
 
@@ -139,6 +140,20 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
         this.elements += ColourPane(this, this).apply {
             this.colour.set(1f, 1f, 1f, 0.5f)
             this.location.set(0f, 0f, 1f, 0f, pixelHeight = 1f)
+        }
+
+        // FIXME
+        this.elements += Button(palette, this, this).apply {
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_x"))
+            })
+            this.tooltipTextIsLocalizationKey = false
+            this.tooltipText = "Exit to Main Menu without saving"
+            this.leftClickAction = { _, _ ->
+                editor.main.screen = MainMenuScreen(editor.main)
+            }
+            this.location.set(1f, 1f, 0f, 0f, pixelX = - buttonSize - buttonPadding,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
     }
 
