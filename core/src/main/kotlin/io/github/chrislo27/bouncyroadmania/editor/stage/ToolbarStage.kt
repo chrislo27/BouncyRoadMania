@@ -42,7 +42,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.tooltipText = "editor.load"
             this.tooltipTextIsLocalizationKey = true
         }
-        this.elements += Button(palette, this, this).apply {
+        this.elements += SaveButton(editor, palette, this, parent).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 3 + buttonSize * 2,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {

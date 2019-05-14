@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.engine.MusicData
@@ -15,6 +16,7 @@ import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.MusicLoadingException
 import io.github.chrislo27.bouncyroadmania.stage.GenericStage
 import io.github.chrislo27.bouncyroadmania.util.TinyFDWrapper
+import io.github.chrislo27.bouncyroadmania.util.attemptRememberDirectory
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.*
@@ -52,7 +54,6 @@ class MusicButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorSc
 
     override fun onLeftClick(xPercent: Float, yPercent: Float) {
         super.onLeftClick(xPercent, yPercent)
-        // TODO
         Gdx.app.postRunnable {
             editorStage.elements += MenuOverlay(editor, editorStage, palette).apply {
                 elements += MusicSelectStage(editor, palette, this)
@@ -208,7 +209,7 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
             GlobalScope.launch {
                 isChooserOpen = true
                 val filter = TinyFDWrapper.Filter(listOf("*.ogg", "*.mp3", "*.wav"), Localization["musicSelect.fileFilter"])
-                val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], null, false, filter)
+                val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath, false, filter)
                 isChooserOpen = false
                 if (file != null) {
                     isLoading = true

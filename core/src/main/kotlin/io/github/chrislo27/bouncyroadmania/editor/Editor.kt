@@ -3,6 +3,7 @@ package io.github.chrislo27.bouncyroadmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -79,6 +80,8 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
     private var wasStretchCursor = false
     var cachedPlaybackStart: Pair<Float, String> = Float.POSITIVE_INFINITY to ""
     var cachedMusicStart: Pair<Float, String> = Float.POSITIVE_INFINITY to ""
+    var lastSaveFile: FileHandle? = null
+        private set
 
     private val mouseVector: Vector2 = Vector2()
         get() {
@@ -91,6 +94,12 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
             updateMessageBar()
         }
         editMode = editMode // Trigger observable
+    }
+
+
+    fun setFileHandles(baseFile: FileHandle) {
+        lastSaveFile = baseFile
+//        autosaveFile = baseFile.sibling(baseFile.nameWithoutExtension() + ".autosave.${BRMania.FILE_EXTENSION}")
     }
 
     fun updateMessageBar() {
