@@ -59,7 +59,22 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
         updateMessageBar()
         engine.requiresPlayerInput = false // newVal == EditMode.ENGINE
     }
-    val engine: Engine = Engine()
+    var engine: Engine = Engine()
+        set(value) {
+            field.dispose()
+            field = value
+
+//            autosaveFile = null
+            lastSaveFile = null
+            renderer.cameraPan = null
+            selection = listOf()
+            renderer.trackCamera.apply {
+                position.x = value.playbackStart
+                update()
+            }
+            value.events.forEach { it.updateInterpolation(true) }
+            value.requiresPlayerInput = false // newVal == EditMode.ENGINE
+        }
     var currentTool: Tool by Delegates.observable(Tool.SELECTION) { _, _, _ -> updateMessageBar() }
     var snap: Float = 0.25f
     var clickOccupation: ClickOccupation = ClickOccupation.None
@@ -504,18 +519,16 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor {
                 } else if (stage.pickerStage.isMouseOver()) {
                     val instantiator = EventRegistry.list.getOrNull(stage.pickerStage.display.index) ?: return false
                     val created = instantiator.factory(instantiator, engine)
-                    if (created.isNotEmpty()) {
-                        val oldSelection = selection.toList()
-                        selection = created.toList()
-                        val first = selection.first()
-                        val selectionDrag = ClickOccupation.SelectionDrag(this, first, first, Vector2(0f, 0f), true, false, oldSelection, StretchRegion.NONE)
-                        selectionDrag.setPositionRelativeToMouse()
-                        this.selection.forEach {
-                            it.updateInterpolation(true)
-                            engine.addEvent(it)
-                        }
-                        this.clickOccupation = selectionDrag
+                    val oldSelection = selection.toList()
+                    selection = listOf(created)
+                    val first = selection.first()
+                    val selectionDrag = ClickOccupation.SelectionDrag(this, first, first, Vector2(0f, 0f), true, false, oldSelection, StretchRegion.NONE)
+                    selectionDrag.setPositionRelativeToMouse()
+                    this.selection.forEach {
+                        it.updateInterpolation(true)
+                        engine.addEvent(it)
                     }
+                    this.clickOccupation = selectionDrag
                 } else {
                     val clickOccupation = clickOccupation
                     if (clickOccupation == ClickOccupation.None) {

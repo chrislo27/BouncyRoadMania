@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.engine.entity.*
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
@@ -19,10 +21,11 @@ import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSoundSystem
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
+import io.github.chrislo27.toolboks.version.Version
 import kotlin.properties.Delegates
 
 
-class Engine : Clock() {
+class Engine : Clock(), Disposable {
 
     companion object {
         private val TMP_MATRIX = Matrix4()
@@ -37,6 +40,7 @@ class Engine : Clock() {
         val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
     }
 
+    var version: Version = BRMania.VERSION.copy()
     val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
@@ -352,6 +356,10 @@ class Engine : Clock() {
             // play dud sound
             AssetRegistry.get<Sound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play()
         }
+    }
+
+    override fun dispose() {
+        music?.dispose()
     }
 
 }

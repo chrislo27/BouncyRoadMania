@@ -1,11 +1,11 @@
 package io.github.chrislo27.bouncyroadmania.editor.stage
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.editor.Editor
-import io.github.chrislo27.bouncyroadmania.engine.saveTo
+import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.unpack
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.util.TinyFDWrapper
 import io.github.chrislo27.bouncyroadmania.util.attemptRememberDirectory
@@ -17,9 +17,10 @@ import io.github.chrislo27.toolboks.ui.TextLabel
 import io.github.chrislo27.toolboks.ui.UIPalette
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.zip.ZipFile
 
 
-class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScreen>, val editorStage: EditorStage)
+class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScreen>, val editorStage: EditorStage)
     : Button<EditorScreen>(palette, parent, parent) {
 
     @Volatile
@@ -40,31 +41,26 @@ class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                     elements += label
 
                     GlobalScope.launch {
-                        val lastSaveFile = editor.lastSaveFile
                         val filter = TinyFDWrapper.Filter(listOf("*.${BRMania.FILE_EXTENSION}"), Localization["save.fileFilter"] + " (.${BRMania.FILE_EXTENSION})")
-                        val file = TinyFDWrapper.saveFile(Localization["save.fileChooserTitle"], lastSaveFile?.parent()?.file()?.absolutePath ?: attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE)?.absolutePath, filter)
+                        val file = TinyFDWrapper.openFile(Localization["load.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath, false, filter)
                         if (file != null) {
                             try {
-                                Gdx.app.postRunnable {
-                                    label.text = Localization["save.saving"]
+                                Gdx.app.postRunnable { 
+                                    label.text = Localization["load.loading"]
                                 }
-                                val correctFile = if (file.extension != BRMania.FILE_EXTENSION)
-                                    file.parentFile.resolve("${file.name}.${BRMania.FILE_EXTENSION}")
-                                else
-                                    file
-
-                                val engine = editor.engine
-                                engine.saveTo(correctFile, false)
-                                editor.setFileHandles(FileHandle(correctFile))
+                                val zipFile = ZipFile(file)
+                                val newEngine = Engine()
+                                newEngine.unpack(zipFile)
+                                editor.engine = newEngine
                                 Gdx.app.postRunnable {
                                     (this@overlay.parent as Stage).elements.remove(this@overlay)
                                     isOpen = false
                                 }
-                                persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE, correctFile.parentFile)
+                                persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, file.parentFile)
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Gdx.app.postRunnable {
-                                    label.text = Localization["save.failed", e::class.java.canonicalName]
+                                    label.text = Localization["load.failed", e::class.java.canonicalName]
                                     this@overlay.elements += Button(palette, this@overlay, this@overlay).apply {
                                         this.addLabel(TextLabel(palette, this, this.stage).apply {
                                             this.isLocalizationKey = true

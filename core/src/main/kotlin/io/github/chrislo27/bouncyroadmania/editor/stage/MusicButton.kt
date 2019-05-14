@@ -17,6 +17,7 @@ import io.github.chrislo27.bouncyroadmania.soundsystem.beads.MusicLoadingExcepti
 import io.github.chrislo27.bouncyroadmania.stage.GenericStage
 import io.github.chrislo27.bouncyroadmania.util.TinyFDWrapper
 import io.github.chrislo27.bouncyroadmania.util.attemptRememberDirectory
+import io.github.chrislo27.bouncyroadmania.util.persistDirectory
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.*
@@ -209,7 +210,7 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
             GlobalScope.launch {
                 isChooserOpen = true
                 val filter = TinyFDWrapper.Filter(listOf("*.ogg", "*.mp3", "*.wav"), Localization["musicSelect.fileFilter"])
-                val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath, false, filter)
+                val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)?.absolutePath, false, filter)
                 isChooserOpen = false
                 if (file != null) {
                     isLoading = true
@@ -229,6 +230,7 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: Stage<Edi
                         val musicData = MusicData(handle, engine, progressListener)
                         engine.music = musicData
                         isLoading = false
+                        persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, file.parentFile)
                         Gdx.app.postRunnable {
                             updateLabels()
                         }

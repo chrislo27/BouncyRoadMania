@@ -204,6 +204,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     override fun dispose() {
         super.dispose()
 //        httpClient.close()
+        BRMania.tmpMusic.emptyDirectory()
     }
 
     fun attemptFullscreen() {

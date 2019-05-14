@@ -15,14 +15,15 @@ object EventRegistry {
 
         fun add(instantiator: Instantiator) {
             tempMap[instantiator.id] = instantiator
+            instantiator.deprecatedIDs.forEach { tempMap[it] = instantiator }
             tempList += instantiator
         }
 
         add(Instantiator("deploy", listOf(), "instantiator.deploy.name", true, "instantiator.deploy.summary", true, "instantiator.deploy.desc", true) { engine ->
-            listOf(DeployEvent(engine, this))
+            DeployEvent(engine, this)
         })
         add(Instantiator("end", listOf(), "instantiator.end.name", true, "instantiator.end.summary", true, "instantiator.end.desc", true) { engine ->
-            listOf(EndEvent(engine, this))
+            EndEvent(engine, this)
         })
 
         map = tempMap

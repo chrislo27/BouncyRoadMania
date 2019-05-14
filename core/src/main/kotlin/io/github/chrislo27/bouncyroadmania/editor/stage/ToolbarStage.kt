@@ -33,7 +33,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.tooltipText = "editor.new"
             this.tooltipTextIsLocalizationKey = true
         }
-        this.elements += Button(palette, this, this).apply {
+        this.elements += LoadButton(editor, palette, this, parent).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 2 + buttonSize,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
@@ -175,7 +175,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.leftClickAction = { _, _ ->
                 editor.main.screen = MainMenuScreen(editor.main)
             }
-            this.location.set(1f, 1f, 0f, 0f, pixelX = - buttonSize - buttonPadding,
+            this.location.set(1f, 1f, 0f, 0f, pixelX = -buttonSize - buttonPadding,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
     }
