@@ -62,6 +62,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Sound>("sfx_dud_left", "sounds/dudL.wav")
         AssetRegistry.loadAsset<Sound>("sfx_dud_right", "sounds/dudR.wav")
         AssetRegistry.loadAsset<Sound>("sfx_splash", "sounds/splash.wav")
+        AssetRegistry.loadAsset<Sound>("sfx_cowbell", "sounds/cowbell.ogg")
         AssetRegistry.loadAsset<Music>("music_br", "sounds/Bouncy Road.ogg")
 
         AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")

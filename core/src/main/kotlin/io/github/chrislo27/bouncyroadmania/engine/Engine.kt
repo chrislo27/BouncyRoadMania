@@ -80,8 +80,8 @@ class Engine : Clock() {
                             }
                         }
 
-//                        lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
-//                        lastMetronomeMeasurePart = -1
+                        lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
+                        lastMetronomeMeasurePart = -1
                     }
                     BeadsSoundSystem.resume()
                     if (music != null) {
@@ -114,6 +114,8 @@ class Engine : Clock() {
     var playbackStart: Float = 0f
     var musicStartSec: Float = 0f
     var metronome: Boolean = false
+    private var lastMetronomeMeasure: Int = -1
+    private var lastMetronomeMeasurePart: Int = -1
     var music: MusicData? = null
         set(value) {
             field?.dispose()
@@ -300,6 +302,17 @@ class Engine : Clock() {
             it.renderUpdate(delta)
         }
         entities.removeIf { it.kill }
+
+        val measure = timeSignatures.getMeasure(beat).takeIf { it >= 0 } ?: Math.floor(beat.toDouble()).toInt()
+        val measurePart = timeSignatures.getMeasurePart(beat)
+        if (lastMetronomeMeasure != measure || lastMetronomeMeasurePart != measurePart) {
+            lastMetronomeMeasure = measure
+            lastMetronomeMeasurePart = measurePart
+            if (metronome) {
+                val isStartOfMeasure = measurePart == 0
+                AssetRegistry.get<Sound>("sfx_cowbell").play(1.25f, if (isStartOfMeasure) 1.5f else 1.1f, 0f)
+            }
+        }
 
         if (playState != PlayState.STOPPED && beat >= duration) {
             playState = PlayState.STOPPED
