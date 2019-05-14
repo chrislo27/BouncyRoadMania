@@ -58,12 +58,35 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.location.set(0f, 0f, 0f, 0f, buttonPadding * 3 + buttonSize * 2 + buttonSize + buttonPadding * 0.5f - 1f, 2f, 2f, 36f)
         }
 
-        this.elements += MusicButton(editor, palette, this, parent).apply {
+        this.elements += UndoButton(editor, true, palette, this, this).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 4 + buttonSize * 3,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_back"))
+            })
+        }
+        this.elements += UndoButton(editor, false, palette, this, this).apply {
+            this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 5 + buttonSize * 4,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_back")).apply {
+                    flip(true, false)
+                }
+            })
+        }
+
+        // Separator
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(1f, 1f, 1f, 0.5f)
+            this.location.set(0f, 0f, 0f, 0f, buttonPadding * 5 + buttonSize * 4 + buttonSize + buttonPadding * 0.5f - 1f, 2f, 2f, 36f)
+        }
+
+        this.elements += MusicButton(editor, palette, this, parent).apply {
+            this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 6 + buttonSize * 5,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
         this.elements += MetronomeButton(editor, palette, this, parent).apply {
-            this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 5 + buttonSize * 4,
+            this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 7 + buttonSize * 6,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
 
