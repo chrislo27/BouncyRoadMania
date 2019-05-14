@@ -30,7 +30,7 @@ class EditorStage(val editor: Editor)
         }
         elements += toolbarStage
 
-        timelineStage = TimelineStage(this, palette).apply {
+        timelineStage = TimelineStage(editor, this, palette).apply {
             this.location.set(screenHeight = 0f, screenY = 1f, pixelY = -40f * 2f, pixelHeight = 40f)
         }
         elements += timelineStage
