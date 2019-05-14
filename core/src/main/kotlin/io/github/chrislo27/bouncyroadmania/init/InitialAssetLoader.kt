@@ -2,16 +2,20 @@ package io.github.chrislo27.bouncyroadmania.init
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
+import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSoundLoader
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
 class InitialAssetLoader : AssetRegistry.IAssetLoader {
 
     override fun addManagedAssets(manager: AssetManager) {
+        manager.setLoader(BeadsSound::class.java, BeadsSoundLoader(InternalFileHandleResolver()))
+        
         AssetRegistry.loadAsset<Texture>("tex_gradient", "images/game/gradient.png")
         AssetRegistry.loadAsset<Texture>("tex_ball", "images/game/ball.png")
         AssetRegistry.loadAsset<Texture>("tex_bouncer_blue", "images/game/blue.png")
@@ -57,12 +61,12 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tracker_tri", "images/ui/tracker_triangle.png")
         AssetRegistry.loadAsset<Texture>("tracker_right_tri_bordered", "images/ui/tracker_triangle_right_bordered.png")
 
-        AssetRegistry.loadAsset<Sound>("sfx_tink", "sounds/tink.ogg")
-        AssetRegistry.loadAsset<Sound>("sfx_cymbal", "sounds/cymbal.ogg")
-        AssetRegistry.loadAsset<Sound>("sfx_dud_left", "sounds/dudL.wav")
-        AssetRegistry.loadAsset<Sound>("sfx_dud_right", "sounds/dudR.wav")
-        AssetRegistry.loadAsset<Sound>("sfx_splash", "sounds/splash.wav")
-        AssetRegistry.loadAsset<Sound>("sfx_cowbell", "sounds/cowbell.ogg")
+        AssetRegistry.loadAsset<BeadsSound>("sfx_tink", "sounds/tink.ogg")
+        AssetRegistry.loadAsset<BeadsSound>("sfx_cymbal", "sounds/cymbal.ogg")
+        AssetRegistry.loadAsset<BeadsSound>("sfx_dud_left", "sounds/dudL.wav")
+        AssetRegistry.loadAsset<BeadsSound>("sfx_dud_right", "sounds/dudR.wav")
+        AssetRegistry.loadAsset<BeadsSound>("sfx_splash", "sounds/splash.wav")
+        AssetRegistry.loadAsset<BeadsSound>("sfx_cowbell", "sounds/cowbell.ogg")
         AssetRegistry.loadAsset<Music>("music_br", "sounds/Bouncy Road.ogg")
 
         AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")

@@ -1,8 +1,14 @@
 package io.github.chrislo27.bouncyroadmania.soundsystem.beads
 
+import com.badlogic.gdx.assets.AssetDescriptor
+import com.badlogic.gdx.assets.AssetLoaderParameters
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
+import com.badlogic.gdx.assets.loaders.FileHandleResolver
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.Array
 import io.github.chrislo27.bouncyroadmania.soundsystem.LoopParams
 import io.github.chrislo27.bouncyroadmania.soundsystem.Sound
-import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsAudio
 import net.beadsproject.beads.ugens.GranularSamplePlayer
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.beadsproject.beads.ugens.Static
@@ -101,4 +107,26 @@ class BeadsSound(val audio: BeadsAudio) : Sound {
     }
 
     fun getPlayer(id: Long): GainedSamplePlayer? = players[id]
+}
+
+class BeadsSoundLoader(resolver: FileHandleResolver) : AsynchronousAssetLoader<BeadsSound, BeadsSoundLoader.BeadsSoundLoaderParam>(resolver) {
+
+    class BeadsSoundLoaderParam : AssetLoaderParameters<BeadsSound>()
+
+    var sound: BeadsSound? = null
+
+    override fun getDependencies(fileName: String?, file: FileHandle?, parameter: BeadsSoundLoaderParam?): Array<AssetDescriptor<Any>>? {
+        return null
+    }
+
+    override fun loadAsync(manager: AssetManager, fileName: String, file: FileHandle, parameter: BeadsSoundLoaderParam?) {
+        sound = BeadsSoundSystem.newSound(file) as BeadsSound
+    }
+    
+    override fun loadSync(manager: AssetManager, fileName: String, file: FileHandle, parameter: BeadsSoundLoaderParam?): BeadsSound? {
+        val s = sound
+        sound = null
+        return s
+    }
+    
 }

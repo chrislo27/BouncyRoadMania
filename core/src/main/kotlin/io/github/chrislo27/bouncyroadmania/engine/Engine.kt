@@ -1,6 +1,5 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -17,6 +16,7 @@ import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
+import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSoundSystem
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
@@ -314,7 +314,7 @@ class Engine : Clock(), Disposable {
             lastMetronomeMeasurePart = measurePart
             if (metronome) {
                 val isStartOfMeasure = measurePart == 0
-                AssetRegistry.get<Sound>("sfx_cowbell").play(1.25f, if (isStartOfMeasure) 1.5f else 1.1f, 0f)
+                AssetRegistry.get<BeadsSound>("sfx_cowbell").play(loop = false, volume = 1.25f, pitch = if (isStartOfMeasure) 1.5f else 1.1f)
             }
         }
 
@@ -354,7 +354,7 @@ class Engine : Clock(), Disposable {
         bouncer.bounceAnimation()
         if (!any) {
             // play dud sound
-            AssetRegistry.get<Sound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play()
+            AssetRegistry.get<BeadsSound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play()
         }
     }
 

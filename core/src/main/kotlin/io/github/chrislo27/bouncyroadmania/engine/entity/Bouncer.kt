@@ -1,6 +1,5 @@
 package io.github.chrislo27.bouncyroadmania.engine.entity
 
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -8,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
+import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.util.Semitones
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
@@ -76,7 +76,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
     fun playSound(semitone: Int = this.semitone, volume: Float = 1f, forcePlay: Boolean = false) {
         if (!isSilent || forcePlay) {
             val width = engine.camera.viewportWidth
-            AssetRegistry.get<Sound>(soundHandle).play((1f - posZ).coerceIn(0.75f, 1f) * volume, Semitones.getALPitch(semitone), ((posX - (width / 2f)) / (width * 1.25f)).coerceIn(-1f, 1f))
+            AssetRegistry.get<BeadsSound>(soundHandle).play(loop = false, volume = (1f - posZ).coerceIn(0.75f, 1f) * volume, pitch = Semitones.getALPitch(semitone)/*, position = ((posX - (width / 2f)) / (width * 1.25)).coerceIn(-1.0, 1.0)*/)
         }
     }
 
