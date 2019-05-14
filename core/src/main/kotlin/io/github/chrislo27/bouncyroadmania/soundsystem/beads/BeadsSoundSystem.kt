@@ -103,9 +103,10 @@ object BeadsSoundSystem {
         nonrealtimeAudioContext.stop()
     }
 
-    fun newAudio(handle: FileHandle): BeadsAudio {
+    fun newAudio(handle: FileHandle, progressListener: (Float) -> Unit = {}): BeadsAudio {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         val beadsAudio = BeadsAudio(music.channels, music.rate)
+        progressListener(0f)
 
         music.reset()
 
@@ -167,6 +168,7 @@ object BeadsSoundSystem {
                 sample.putFrames(currentFrame, sampleData, 0, framesOfDataRead)
 
                 currentFrame += framesOfDataRead
+                progressListener(currentFrame.toFloat() / (nFrames + 1))
             }
             StreamUtils.closeQuietly(bufStream)
 
@@ -175,6 +177,7 @@ object BeadsSoundSystem {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
+            progressListener(1f)
         }
 
         music.dispose()
@@ -182,14 +185,14 @@ object BeadsSoundSystem {
         return beadsAudio
     }
 
-    fun newSound(handle: FileHandle): Sound {
-        return BeadsSound(newAudio(handle)).apply {
+    fun newSound(handle: FileHandle, progressListener: (Float) -> Unit = {}): Sound {
+        return BeadsSound(newAudio(handle, progressListener)).apply {
             sounds += this
         }
     }
 
-    fun newMusic(handle: FileHandle): Music {
-        return BeadsMusic(newAudio(handle))
+    fun newMusic(handle: FileHandle, progressListener: (Float) -> Unit = {}): Music {
+        return BeadsMusic(newAudio(handle, progressListener))
     }
 
     fun disposeSound(sound: BeadsSound) {

@@ -7,9 +7,9 @@ import io.github.chrislo27.bouncyroadmania.soundsystem.Music
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSoundSystem
 import java.io.InputStream
 
-class MusicData(handle: FileHandle, val engine: Engine) : Disposable {
+class MusicData(val handle: FileHandle, val engine: Engine, progressListener: (Float) -> Unit = {}) : Disposable {
 
-    val music: Music = BeadsSoundSystem.newMusic(handle)
+    val music: Music = BeadsSoundSystem.newMusic(handle, progressListener)
     private val reader: InputStream = handle.read()
 
     override fun dispose() {

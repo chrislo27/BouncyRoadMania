@@ -14,7 +14,6 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
     : Stage<EditorScreen>(parent, parent.camera, parent.pixelsWidth, parent.pixelsHeight) {
 
     init {
-        parent as EditorStage
         elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, 0.5f)
         }
@@ -60,6 +59,10 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
 
         this.elements += MusicButton(editor, palette, this, parent).apply {
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 4 + buttonSize * 3,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
+        }
+        this.elements += MetronomeButton(editor, palette, this, parent).apply {
+            this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 5 + buttonSize * 4,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
 

@@ -48,25 +48,26 @@ class Engine : Clock() {
     val trackersReverseView: List<TrackerContainer<*>> = trackers.asReversed()
     override var playState: PlayState by Delegates.observable(super.playState) { _, old, value ->
         if (old != value) {
+            val music = music
             entities.forEach { it.onPlayStateChanged(old, value) }
             lastBounceTinkSound.clear()
 
             when (value) {
                 PlayState.STOPPED -> {
                     AssetRegistry.stopAllSounds()
-//                    music?.music?.pause()
+                    music?.music?.pause()
                     BeadsSoundSystem.stop()
                     entities.clear()
                     addBouncers()
                 }
                 PlayState.PAUSED -> {
                     AssetRegistry.pauseAllSounds()
-//                    music?.music?.pause()
+                    music?.music?.pause()
                     BeadsSoundSystem.pause()
                 }
                 PlayState.PLAYING -> {
-//                    lastMusicPosition = -1f
-//                    scheduleMusicPlaying = true
+                    lastMusicPosition = -1f
+                    scheduleMusicPlaying = true
                     AssetRegistry.resumeAllSounds()
                     if (old == PlayState.STOPPED) {
                         recomputeCachedData()
@@ -83,15 +84,15 @@ class Engine : Clock() {
 //                        lastMetronomeMeasurePart = -1
                     }
                     BeadsSoundSystem.resume()
-//                    if (music != null) {
-//                        if (seconds >= musicStartSec) {
-//                            music.music.play()
-//                            setMusicVolume()
-//                            seekMusic()
-//                        } else {
-//                            music.music.stop()
-//                        }
-//                    }
+                    if (music != null) {
+                        if (seconds >= musicStartSec) {
+                            music.music.play()
+                            setMusicVolume()
+                            seekMusic()
+                        } else {
+                            music.music.stop()
+                        }
+                    }
                 }
             }
         }
@@ -112,12 +113,16 @@ class Engine : Clock() {
 
     var playbackStart: Float = 0f
     var musicStartSec: Float = 0f
+    var metronome: Boolean = false
     var music: MusicData? = null
         set(value) {
             field?.dispose()
             field = value
         }
     var isMusicMuted: Boolean = false
+    private var lastMusicPosition: Float = -1f
+    private var scheduleMusicPlaying = true
+    @Volatile var musicSeeking = false
 
     val events: List<Event> = mutableListOf()
 
@@ -218,6 +223,21 @@ class Engine : Clock() {
         }
     }
 
+    private fun setMusicVolume() {
+        val music = music ?: return
+        val shouldBe = if (isMusicMuted) 0f else musicVolumes.volumeAt(beat)
+        if (music.music.getVolume() != shouldBe) {
+            music.music.setVolume(shouldBe)
+        }
+    }
+
+    private fun seekMusic() {
+        val music = music ?: return
+        musicSeeking = true
+        music.music.setPosition(seconds - musicStartSec)
+        musicSeeking = false
+    }
+
     fun recomputeCachedData() {
         lastPoint = events.firstOrNull { it is EndEvent }?.bounds?.x ?: events.maxBy { it.bounds.maxX }?.bounds?.maxX ?: 0f
         duration = events.firstOrNull { it is EndEvent }?.bounds?.x ?: Float.POSITIVE_INFINITY
@@ -245,8 +265,29 @@ class Engine : Clock() {
         if (playState != PlayState.PLAYING)
             return
 
+        val music: MusicData? = music
+        music?.music?.update(if (playState == PlayState.PLAYING) (delta * 0.75f) else delta)
+
         // Timing
         seconds += delta
+
+        if (music != null) {
+            if (scheduleMusicPlaying && seconds >= musicStartSec) {
+                music.music.play()
+                scheduleMusicPlaying = false
+            }
+            if (music.music.isPlaying()) {
+                val oldPosition = lastMusicPosition
+                val position = music.music.getPosition()
+                lastMusicPosition = position
+
+                if (oldPosition != position) {
+                    seconds = position + musicStartSec
+                }
+
+                setMusicVolume()
+            }
+        }
 
         events.forEach { event ->
             if (event.playbackCompletion != PlaybackCompletion.FINISHED) {
