@@ -44,11 +44,11 @@ open class ParamsStage(parent: EditorStage)
         }
         title = TextLabel(palette, this, this).apply {
             this.textWrapping = false
-            this.location.set(screenX = 0f, screenWidth = 1f, screenY = 1f, screenHeight = 0f, pixelX = 4f + 32f, pixelWidth = -8f - (32f * 2), pixelHeight = 32f, pixelY = -32f)
+            this.location.set(screenX = 0f, screenWidth = 1f, screenY = 1f, screenHeight = 0f, pixelX = 4f + 32f, pixelWidth = -8f - (32f * 2), pixelHeight = 48f, pixelY = -48f)
         }
         elements += title
         contentStage = Stage(this, this.camera, this.pixelsWidth, this.pixelsHeight).apply {
-            this.location.set(screenX = 0f, screenY = 0f, screenWidth = 1f, screenHeight = 1f, pixelX = 8f, pixelY = 8f, pixelWidth = -16f, pixelHeight = -16f - 32f)
+            this.location.set(screenX = 0f, screenY = 0f, screenWidth = 1f, screenHeight = 1f, pixelX = 8f, pixelY = 8f, pixelWidth = -16f, pixelHeight = -(8f * 3) - 32f)
         }
         elements += contentStage
         updatePositions()

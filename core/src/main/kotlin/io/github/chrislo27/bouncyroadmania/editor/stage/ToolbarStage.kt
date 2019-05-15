@@ -18,6 +18,8 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
     val loadButton: LoadButton
     val saveButton: SaveButton
     
+    val tapalongButton: TapalongButton
+    
     init {
         elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, 0.5f)
@@ -96,6 +98,11 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 7 + buttonSize * 6,
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
+        tapalongButton = TapalongButton(editor, palette, this, parent).apply {
+            this.location.set(0f, 1f, 0f, 0f, pixelX = buttonPadding * 8 + buttonSize * 7,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
+        }
+        this.elements += tapalongButton
 
         // Separator
         this.elements += ColourPane(this, this).apply {
@@ -175,7 +182,7 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
         // FIXME
         this.elements += Button(palette, this, this).apply {
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
-                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_x"))
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_exit"))
             })
             this.tooltipTextIsLocalizationKey = false
             this.tooltipText = "Exit to Main Menu without saving"

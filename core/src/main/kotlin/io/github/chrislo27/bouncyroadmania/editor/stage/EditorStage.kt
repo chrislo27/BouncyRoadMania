@@ -139,6 +139,7 @@ class EditorStage(val editor: Editor)
     fun decideVisibility() {
         timelineStage.visible = editor.editMode != EditMode.PARAMETERS
         pickerStage.visible = editor.editMode == EditMode.EVENTS
+        toolbarStage.tapalongButton.enabled = editor.editMode == EditMode.EVENTS
     }
 
 }
