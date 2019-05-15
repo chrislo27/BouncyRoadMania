@@ -102,7 +102,7 @@ class EditorStage(val editor: Editor)
     }
 
     override fun onPlayStateChanged(oldState: PlayState, newState: PlayState) {
-        paramsStage?.visible = newState == PlayState.STOPPED
+        paramsStage?.takeIf { it.mustCloseWhenPlaying }?.visible = newState == PlayState.STOPPED
     }
 
     override fun onEventAdded(event: Event) {

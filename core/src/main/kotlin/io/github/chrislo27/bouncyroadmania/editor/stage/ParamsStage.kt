@@ -23,6 +23,7 @@ open class ParamsStage(parent: EditorStage)
     val palette: UIPalette = parent.palette
     val title: TextLabel<EditorScreen>
     val contentStage: Stage<EditorScreen>
+    open val mustCloseWhenPlaying: Boolean = true
 
     init {
         elements += ColourPane(this, this).apply {
@@ -56,6 +57,9 @@ open class ParamsStage(parent: EditorStage)
 
 @Suppress("LeakingThis")
 open class EventParamsStage<E : Event>(parent: EditorStage, val event: E) : ParamsStage(parent) {
+    
+    final override val mustCloseWhenPlaying: Boolean = true
+    
     val findButton: Button<EditorScreen>
 
     init {
