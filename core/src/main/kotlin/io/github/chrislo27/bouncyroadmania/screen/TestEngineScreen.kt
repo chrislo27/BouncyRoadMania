@@ -9,10 +9,10 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
-import io.github.chrislo27.bouncyroadmania.engine.entity.Ball
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.entity.Ball
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.Swing
@@ -117,12 +117,12 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             reload()
-            engine.seconds = -1.94805f - 0.552f
             engine.playState = PlayState.STOPPED
             AssetRegistry.get<Music>("music_br").play()
             Gdx.app.postRunnable {
                 Gdx.app.postRunnable {
                     engine.playState = PlayState.PLAYING
+                    engine.seconds = -1.94805f - 0.552f
                 }
             }
 
