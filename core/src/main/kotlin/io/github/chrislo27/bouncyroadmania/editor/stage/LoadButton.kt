@@ -1,6 +1,7 @@
 package io.github.chrislo27.bouncyroadmania.editor.stage
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
@@ -59,6 +60,7 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                 val newEngine = Engine()
                                 newEngine.unpack(zipFile)
                                 editor.engine = newEngine
+                                editor.setFileHandles(FileHandle(file))
                                 Gdx.app.postRunnable {
                                     this@overlay.removeSelf()
                                     isOpen = false
