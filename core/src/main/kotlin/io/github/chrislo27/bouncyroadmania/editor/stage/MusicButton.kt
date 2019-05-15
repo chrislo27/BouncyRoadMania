@@ -211,7 +211,7 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: MenuOverl
             GlobalScope.launch {
                 isChooserOpen = true
                 val filter = TinyFDWrapper.Filter(listOf("*.ogg", "*.mp3", "*.wav"), Localization["musicSelect.fileFilter"])
-                val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)?.absolutePath, false, filter)
+                val file = TinyFDWrapper.openFile(Localization["musicSelect.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)?.absolutePath?.plus("/"), false, filter)
                 isChooserOpen = false
                 if (file != null) {
                     loadFile(file)

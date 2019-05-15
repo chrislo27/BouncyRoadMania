@@ -42,7 +42,7 @@ class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                     GlobalScope.launch {
                         val lastSaveFile = editor.lastSaveFile
                         val filter = TinyFDWrapper.Filter(listOf("*.${BRMania.FILE_EXTENSION}"), Localization["save.fileFilter"] + " (.${BRMania.FILE_EXTENSION})")
-                        val file = TinyFDWrapper.saveFile(Localization["save.fileChooserTitle"], lastSaveFile?.file()?.absolutePath ?: attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE)?.absolutePath, filter)
+                        val file = TinyFDWrapper.saveFile(Localization["save.fileChooserTitle"], lastSaveFile?.file()?.absolutePath ?: attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE)?.absolutePath?.plus("/"), filter)
                         if (file != null) {
                             try {
                                 Gdx.app.postRunnable {
