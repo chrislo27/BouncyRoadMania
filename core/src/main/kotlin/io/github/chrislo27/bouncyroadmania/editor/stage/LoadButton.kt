@@ -66,6 +66,7 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                     isOpen = false
                                 }
                                 persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, file.parentFile)
+                                System.gc()
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Gdx.app.postRunnable {
@@ -74,7 +75,7 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                         this.addLabel(TextLabel(palette, this, this.stage).apply {
                                             this.isLocalizationKey = true
                                             this.textWrapping = false
-                                            this.text = "save.continue"
+                                            this.text = "continue"
                                         })
                                         this.leftClickAction = { _, _ ->
                                             Gdx.app.postRunnable {
