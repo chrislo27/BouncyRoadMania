@@ -112,7 +112,7 @@ class LoadDragAndDropStage(parent: MenuOverlay, val editor: Editor, val file: Fi
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
                 this.textWrapping = false
-                this.text = "load.dragAndDrop.confirm"
+                this.text = "yes"
             })
             this.leftClickAction = { _, _ ->
                 Gdx.app.postRunnable {
@@ -127,7 +127,7 @@ class LoadDragAndDropStage(parent: MenuOverlay, val editor: Editor, val file: Fi
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
                 this.textWrapping = false
-                this.text = "load.dragAndDrop.cancel"
+                this.text = "cancel"
             })
             this.leftClickAction = { _, _ ->
                 Gdx.app.postRunnable {

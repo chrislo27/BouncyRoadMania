@@ -69,7 +69,7 @@ class SaveButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                         this.addLabel(TextLabel(palette, this, this.stage).apply {
                                             this.isLocalizationKey = true
                                             this.textWrapping = false
-                                            this.text = "save.continue"
+                                            this.text = "continue"
                                         })
                                         this.leftClickAction = { _, _ ->
                                             Gdx.app.postRunnable {

@@ -300,6 +300,52 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
                     }
                 }
             }
+            if (engine.playState == PlayState.STOPPED && clickOccupation == ClickOccupation.None) {
+                if (control && !alt && !shift) {
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+                        stage.toolbarStage.newButton.onLeftClick(0f, 0f)
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+                        stage.toolbarStage.loadButton.onLeftClick(0f, 0f)
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+                        stage.toolbarStage.saveButton.onLeftClick(0f, 0f)
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+                        // Select following
+                        val selectionMinX: Float = this.selection.minBy { it.bounds.x }?.bounds?.x ?: engine.playbackStart
+                        val newSelection = engine.events.toList().filter { it.bounds.x >= selectionMinX }
+                        if (!this.selection.containsAll(newSelection) || (newSelection.size != this.selection.size)) {
+                            this.mutate(EventSelectionAction(this.selection, newSelection))
+                            updateMessageBar()
+                        }
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                        // Select preceding
+                        val selectionMaxX: Float = this.selection.maxBy { it.bounds.maxX }?.bounds?.maxX ?: engine.playbackStart
+                        val newSelection = engine.events.toList().filter { it.bounds.maxX <= selectionMaxX }
+                        if (!this.selection.containsAll(newSelection) || (newSelection.size != this.selection.size)) {
+                            this.mutate(EventSelectionAction(this.selection, newSelection))
+                            updateMessageBar()
+                        }
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+                        // Select between
+                        val selectionMinX: Float = this.selection.minBy { it.bounds.x }?.bounds?.x ?: 0f
+                        val selectionMaxX: Float = this.selection.maxBy { it.bounds.maxX }?.bounds?.maxX ?: 0f
+                        val newSelection = engine.events.toList().filter { it.bounds.x >= selectionMinX && it.bounds.maxX <= selectionMaxX }
+                        if (!this.selection.containsAll(newSelection) || (newSelection.size != this.selection.size)) {
+                            this.mutate(EventSelectionAction(this.selection, newSelection))
+                            updateMessageBar()
+                        }
+                    }
+                } else if (control && shift && !alt) {
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+                        // Select all
+                        val newSelection = engine.events.toList()
+                        val oldSelection = selection.toList()
+                        if (newSelection.size != oldSelection.size || !newSelection.containsAll(oldSelection)) {
+                            this.mutate(EventSelectionAction(oldSelection, newSelection))
+                            updateMessageBar()
+                        }
+                    }
+                }
+            }
 
         }
 
