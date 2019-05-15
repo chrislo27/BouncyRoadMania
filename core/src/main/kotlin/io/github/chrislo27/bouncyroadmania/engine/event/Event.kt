@@ -7,9 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.utils.Align
-import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
+import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
+import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.util.RectanglePool
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -31,6 +32,7 @@ abstract class Event(val engine: Engine) {
     open val isRendered: Boolean = true
     open val canBeCopied: Boolean = true
     open val isStretchable: Boolean = false
+    open val hasEditableParams: Boolean = false
     open val renderText: String = ""
     var needsNameTooltip: Boolean = false
         protected set
@@ -153,6 +155,10 @@ abstract class Event(val engine: Engine) {
     open fun onEnd() {
 
     }
+
+    open fun createParamsStage(editor: Editor, stage: EditorStage): EventParamsStage<*> =
+            if (hasEditableParams) error("This function should be overridden")
+            else throw NotImplementedError("Not implemented for events without editable params")
 
     open fun getLowerUpdateableBound(): Float = bounds.x
     open fun getUpperUpdateableBound(): Float = bounds.maxX

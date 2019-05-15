@@ -17,13 +17,12 @@ import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionGroup
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.ActionHistory
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.impl.*
 import io.github.chrislo27.bouncyroadmania.editor.rendering.EditorRenderer
-import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
-import io.github.chrislo27.bouncyroadmania.editor.stage.LoadDragAndDropStage
-import io.github.chrislo27.bouncyroadmania.editor.stage.MenuOverlay
-import io.github.chrislo27.bouncyroadmania.editor.stage.MusicSelectStage
+import io.github.chrislo27.bouncyroadmania.editor.stage.*
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.EngineEventListener
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
+import io.github.chrislo27.bouncyroadmania.engine.event.InstantiatedEvent
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignature
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumeChange
@@ -41,7 +40,7 @@ import java.util.*
 import kotlin.properties.Delegates
 
 
-class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lwjgl3WindowListener {
+class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lwjgl3WindowListener, EngineEventListener {
 
     companion object {
         const val EVENT_HEIGHT: Float = 48f
@@ -71,6 +70,8 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         set(value) {
             field.dispose()
             field = value
+            value.listeners[this] = Unit
+            stage.setParamsStage(null)
 
 //            autosaveFile = null
             lastSaveFile = null
@@ -117,6 +118,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
             updateMessageBar()
         }
         editMode = editMode // Trigger observable
+        engine = Engine()
     }
 
 
@@ -525,6 +527,18 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         return engine.events.firstOrNull { mouseVector in it.bounds }
     }
 
+    override fun onPlayStateChanged(oldState: PlayState, newState: PlayState) {
+        stage.onPlayStateChanged(oldState, newState)
+    }
+
+    override fun onEventAdded(event: Event) {
+        stage.onEventAdded(event)
+    }
+
+    override fun onEventRemoved(event: Event) {
+        stage.onEventRemoved(event)
+    }
+
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (clickOccupation != ClickOccupation.None || engine.playState != PlayState.STOPPED || editMode != EditMode.EVENTS)
             return false
@@ -548,7 +562,20 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         val tool = currentTool
         if (tool == Tool.SELECTION) {
             val firstEventInMouse: Event? = engine.events.firstOrNull { mouseVector in it.bounds }
-            if (isAnyTrackerButtonDown && firstEventInMouse == null) {
+            if (button == Input.Buttons.RIGHT && firstEventInMouse != null) {
+                if (firstEventInMouse.hasEditableParams) {
+                    val current = stage.paramsStage
+                    if (current is EventParamsStage<*> && current.event == firstEventInMouse) {
+                        stage.setParamsStage(null)
+                    } else {
+                        val newStage = firstEventInMouse.createParamsStage(this, stage)
+                        stage.setParamsStage(newStage)
+                    }
+                }
+            } else if (isMusicTrackerButtonDown && firstEventInMouse != null && firstEventInMouse is InstantiatedEvent) {
+                // Jump to that event in the picker
+                stage.pickerStage.display.index = EventRegistry.list.indexOf(firstEventInMouse.instantiator)
+            } else if (isAnyTrackerButtonDown && firstEventInMouse == null) {
                 clickOccupation = if (isMusicTrackerButtonDown) {
                     ClickOccupation.Music(this, button == Input.Buttons.MIDDLE)
                 } else {

@@ -22,6 +22,7 @@ import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
 import io.github.chrislo27.toolboks.version.Version
+import java.util.*
 import kotlin.properties.Delegates
 
 
@@ -99,6 +100,8 @@ class Engine : Clock(), Disposable {
                     }
                 }
             }
+
+            listeners.keys.forEach { it.onPlayStateChanged(old, value) }
         }
     }
 
@@ -141,6 +144,7 @@ class Engine : Clock(), Disposable {
     val lastBounceTinkSound: MutableMap<String, Float> = mutableMapOf()
 
     var requiresPlayerInput: Boolean = true
+    val listeners: WeakHashMap<EngineEventListener, Unit> = WeakHashMap()
 
     // Visuals
     val gradientLast: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
@@ -196,6 +200,7 @@ class Engine : Clock(), Disposable {
         if (event !in events) {
             (events as MutableList) += event
             recomputeCachedData()
+            listeners.keys.forEach { it.onEventAdded(event) }
         }
     }
 
@@ -204,6 +209,7 @@ class Engine : Clock(), Disposable {
         (events as MutableList) -= event
         if (events.size != oldSize) {
             recomputeCachedData()
+            listeners.keys.forEach { it.onEventRemoved(event) }
         }
     }
 
@@ -359,6 +365,7 @@ class Engine : Clock(), Disposable {
     }
 
     override fun dispose() {
+        listeners.clear()
         music?.dispose()
     }
 

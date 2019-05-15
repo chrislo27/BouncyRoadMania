@@ -2,11 +2,15 @@ package io.github.chrislo27.bouncyroadmania.engine.event
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
+import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
+import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.entity.Ball
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
+import io.github.chrislo27.bouncyroadmania.util.TrueCheckbox
 import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
@@ -15,6 +19,8 @@ import io.github.chrislo27.toolboks.util.gdxutils.maxX
 class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
 
     override val isStretchable: Boolean = true
+    override val hasEditableParams: Boolean = true
+    var firstBounceHasSound: Boolean = false
 
     init {
         this.bounds.width = 0.5f
@@ -31,6 +37,10 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
 
     override fun getUpperUpdateableBound(): Float {
         return bounds.maxX + (engine.bouncers.size - 1f).coerceAtLeast(0f)
+    }
+
+    override fun createParamsStage(editor: Editor, stage: EditorStage): EventParamsStage<DeployEvent> {
+        return DeployEventParamsStage(stage)
     }
 
     override fun renderBeforeText(editor: Editor, batch: SpriteBatch) {
@@ -53,8 +63,20 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
     }
 
     override fun onStart() {
-        engine.entities += Ball(engine, this.bounds.width, this.bounds.x).apply {
+        engine.entities += Ball(engine, this.bounds.width, this.bounds.x, firstBounceHasSound).apply {
             startOff()
+        }
+    }
+
+    override fun fromJson(node: ObjectNode) {
+        super.fromJson(node)
+        firstBounceHasSound = node["firstBounceHasSound"]?.asBoolean(false) ?: false
+    }
+
+    override fun toJson(node: ObjectNode) {
+        super.toJson(node)
+        if (firstBounceHasSound) {
+            node.put("firstBounceHasSound", firstBounceHasSound)
         }
     }
 
@@ -62,6 +84,26 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         return DeployEvent(engine, instantiator).also {
             it.bounds.set(this.bounds)
             it.updateInterpolation(true)
+            it.firstBounceHasSound = this.firstBounceHasSound
+        }
+    }
+    
+    inner class DeployEventParamsStage(parent: EditorStage) : EventParamsStage<DeployEvent>(parent, this@DeployEvent) {
+        init {
+            val size = 48f
+            val padding = 16f
+            contentStage.elements += TrueCheckbox(palette, contentStage, contentStage).apply {
+                this.checked = event.firstBounceHasSound
+                println(event.firstBounceHasSound)
+                this.textLabel.isLocalizationKey = true
+                this.textLabel.text = "deployEvent.firstBounceHasSound"
+                this.tooltipTextIsLocalizationKey = true
+                this.tooltipText = "deployEvent.firstBounceHasSound.tooltip"
+                this.checkedStateChanged = { value ->
+                    event.firstBounceHasSound = value
+                }
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size))
+            }
         }
     }
 

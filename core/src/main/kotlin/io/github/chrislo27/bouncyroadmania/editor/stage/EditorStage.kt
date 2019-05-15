@@ -5,14 +5,18 @@ import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.engine.EngineEventListener
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.toolboks.ui.*
 
 
 class EditorStage(val editor: Editor)
-    : Stage<EditorScreen>(null, editor.main.defaultCamera, 1280f, 720f) {
+    : Stage<EditorScreen>(null, editor.main.defaultCamera, 1280f, 720f), EngineEventListener {
     
     val palette = BRManiaApp.instance.uiPalette
+    val pickerHeight = 160f
     
     val toolbarStage: ToolbarStage
     val timelineStage: TimelineStage
@@ -21,6 +25,9 @@ class EditorStage(val editor: Editor)
     
     val messageLabel: TextLabel<EditorScreen>
     val controlsLabel: TextLabel<EditorScreen>
+    
+    var paramsStage: ParamsStage? = null
+        private set
 
     var isTyping: Boolean = false
         private set
@@ -64,7 +71,7 @@ class EditorStage(val editor: Editor)
         messageBarStage.elements += controlsLabel
 
         pickerStage = PickerStage(editor, this, palette).apply {
-            this.location.set(screenWidth = 1f, screenHeight = 0f, pixelY = messageBarHeight, pixelHeight = 160f)
+            this.location.set(screenWidth = 1f, screenHeight = 0f, pixelY = messageBarHeight, pixelHeight = pickerHeight)
         }
         elements += pickerStage
 
@@ -76,6 +83,36 @@ class EditorStage(val editor: Editor)
 
         stage.updatePositions()
         decideVisibility()
+    }
+    
+    fun setParamsStage(paramsStage: ParamsStage?) {
+        if (this.paramsStage != null) {
+            stage.removeChild(this.paramsStage!!)
+            stage.updatePositions()
+        }
+        this.paramsStage = paramsStage
+        if (paramsStage != null) {
+            stage.elements += paramsStage
+            val width = 0.35f
+            paramsStage.location.set(screenX = 1f - width, screenWidth = width, screenHeight = 0f, screenY = 0f, pixelY = pickerStage.location.pixelY + pickerHeight)
+            paramsStage.location.set(pixelHeight = 640f - paramsStage.location.pixelY)
+            paramsStage.updatePositions()
+        }
+        stage.updatePositions()
+    }
+
+    override fun onPlayStateChanged(oldState: PlayState, newState: PlayState) {
+        paramsStage?.visible = newState == PlayState.STOPPED
+    }
+
+    override fun onEventAdded(event: Event) {
+    }
+
+    override fun onEventRemoved(event: Event) {
+        val p = paramsStage
+        if (p != null && p is EventParamsStage<*> && p.event == event) {
+            setParamsStage(null)
+        }
     }
 
     override fun frameUpdate(screen: EditorScreen) {
