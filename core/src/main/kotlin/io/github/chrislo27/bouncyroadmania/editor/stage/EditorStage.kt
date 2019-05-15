@@ -114,6 +114,11 @@ class EditorStage(val editor: Editor)
             setParamsStage(null)
         }
     }
+    
+    fun onEditModeChanged(editMode: EditMode) {
+        decideVisibility()
+        setParamsStage(null)
+    }
 
     override fun frameUpdate(screen: EditorScreen) {
         super.frameUpdate(screen)

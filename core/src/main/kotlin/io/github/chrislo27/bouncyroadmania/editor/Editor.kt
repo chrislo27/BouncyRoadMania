@@ -62,7 +62,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
     val theme: EditorTheme get() = main.editorTheme
 
     var editMode: EditMode by Delegates.observable(EditMode.EVENTS) { _, oldVal, newVal ->
-        stage.decideVisibility()
+        stage.onEditModeChanged(newVal)
         updateMessageBar()
         engine.requiresPlayerInput = false // newVal == EditMode.ENGINE
     }
