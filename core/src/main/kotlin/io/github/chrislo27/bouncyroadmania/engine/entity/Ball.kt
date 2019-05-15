@@ -1,11 +1,11 @@
 package io.github.chrislo27.bouncyroadmania.engine.entity
 
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
+import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
@@ -100,7 +100,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                     this.bounce = null
                     this.kill = true
                     if (fellOff) {
-                        AssetRegistry.get<Sound>("sfx_splash").play()
+                        AssetRegistry.get<BeadsSound>("sfx_splash").play()
                     }
                 } else if (newFrom != null) {
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
