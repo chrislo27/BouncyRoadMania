@@ -1,7 +1,9 @@
 package io.github.chrislo27.bouncyroadmania.editor.stage
 
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.chrislo27.bouncyroadmania.editor.ClickOccupation
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.Tool
@@ -11,6 +13,8 @@ import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ImageLabel
 import io.github.chrislo27.toolboks.ui.UIPalette
+import io.github.chrislo27.toolboks.util.MathHelper
+import io.github.chrislo27.toolboks.util.gdxutils.setHSB
 
 
 class ToolButton(val editor: Editor, val tool: Tool,
@@ -56,6 +60,17 @@ class ToolButton(val editor: Editor, val tool: Tool,
 
     init {
         label.image = TextureRegion(tool.texture)
+    }
+
+    override fun render(screen: EditorScreen, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
+        if (tool == Tool.TEMPO_CHANGE) {
+            if (editor.engine.tempos.secondsMap.isEmpty()) {
+                label.tint.setHSB(MathHelper.getSawtoothWave(1.5f), 0.3f, 0.75f)
+            } else {
+                label.tint.set(1f, 1f, 1f, 1f)
+            }
+        }
+        super.render(screen, batch, shapeRenderer)
     }
 
     override fun onLeftClick(xPercent: Float, yPercent: Float) {
