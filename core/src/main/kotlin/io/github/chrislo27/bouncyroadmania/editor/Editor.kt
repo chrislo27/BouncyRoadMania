@@ -235,23 +235,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         engine.update(Gdx.graphics.deltaTime)
         val shift = Gdx.input.isShiftDown()
         val control = Gdx.input.isControlDown()
-
-        if (editMode == EditMode.EVENTS) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                renderer.trackCamera.position.x -= renderer.toScaleX(Editor.EVENT_WIDTH * 5 * Gdx.graphics.deltaTime * if (shift xor control) 6f else 1f)
-                renderer.cameraPan = null
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                renderer.trackCamera.position.x += renderer.toScaleX(Editor.EVENT_WIDTH * 5 * Gdx.graphics.deltaTime * if (shift xor control) 6f else 1f)
-                renderer.cameraPan = null
-            }
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.HOME)) {
-                renderer.cameraPan = CameraPan(renderer.trackCamera.position.x, 0f, 0.25f, Interpolation.exp10Out)
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.END)) {
-                renderer.cameraPan = CameraPan(renderer.trackCamera.position.x, engine.lastPoint, 0.25f, Interpolation.exp10Out)
-            }
-        }
+        val alt = Gdx.input.isAltDown()
 
         renderer.subbeatSection.enabled = false
 
@@ -285,6 +269,37 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
 //                    engine.fireInput(InputType.A)
 //                }
 //            }
+
+
+            if (editMode == EditMode.EVENTS && engine.playState == PlayState.STOPPED) {
+                if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && !alt && (control xor shift || (!control && !shift))) {
+                    renderer.trackCamera.position.x -= renderer.toScaleX(Editor.EVENT_WIDTH * 5 * Gdx.graphics.deltaTime * if (shift xor control) 6f else 1f)
+                    renderer.cameraPan = null
+                }
+                if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && !alt && (control xor shift || (!control && !shift))) {
+                    renderer.trackCamera.position.x += renderer.toScaleX(Editor.EVENT_WIDTH * 5 * Gdx.graphics.deltaTime * if (shift xor control) 6f else 1f)
+                    renderer.cameraPan = null
+                }
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.HOME) && !shift && !control && !alt) {
+                    renderer.cameraPan = CameraPan(renderer.trackCamera.position.x, 0f, 0.25f, Interpolation.exp10Out)
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.END) && !shift && !control && !alt) {
+                    renderer.cameraPan = CameraPan(renderer.trackCamera.position.x, engine.lastPoint, 0.25f, Interpolation.exp10Out)
+                }
+                
+                // undo/redo
+                if (control && !alt) {
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+                        if (shift) {
+                            this.redo()
+                        } else {
+                            this.undo()
+                        }
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.Y) && !shift && !alt) {
+                        this.redo()
+                    }
+                }
+            }
 
         }
 
@@ -715,9 +730,12 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
     override fun keyDown(keycode: Int): Boolean {
         if (stage.isTyping || clickOccupation != ClickOccupation.None)
             return false
+        val ctrl = Gdx.input.isControlDown()
+        val alt = Gdx.input.isAltDown()
+        val shift = Gdx.input.isShiftDown()
         if (keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
             val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
-            if (!Gdx.input.isControlDown() && !Gdx.input.isAltDown() && !Gdx.input.isShiftDown()) {
+            if (!ctrl && !alt && !shift) {
                 if (number in 0 until Tool.VALUES.size) {
                     currentTool = Tool.VALUES[number]
                     stage.pickerStage.updateLabels()
