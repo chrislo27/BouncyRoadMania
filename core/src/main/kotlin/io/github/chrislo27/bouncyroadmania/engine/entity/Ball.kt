@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.engine.entity
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
@@ -10,7 +11,8 @@ import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firstHasSound: Boolean = false) : Entity(engine) {
+class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firstHasSound: Boolean = false, val color: Color = Color(1f, 1f, 1f, 1f))
+    : Entity(engine) {
 
     data class Bounce(val fromX: Float, val fromY: Float, val fromZ: Float, val toX: Float, val toY: Float, val toZ: Float, val arcHeight: Float,
                       val startBeat: Float, val endBeat: Float, val fromBouncer: Bouncer, val toBouncer: Bouncer?)
@@ -38,6 +40,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 //                batch.setColor(1f, 0.9f, 0f, 1f)
 //            }
 //        }
+        batch.color = color
         batch.draw(tex, posX - tex.width / 2f, posY, tex.width * 0.5f, tex.height * 0.5f, tex.width * 1f, tex.height * 1f, scale, scale,
                 0f, 0, 0, tex.width, tex.height, false, false)
         batch.setColor(1f, 1f, 1f, 1f)
