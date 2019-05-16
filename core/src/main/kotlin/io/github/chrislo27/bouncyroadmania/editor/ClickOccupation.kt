@@ -21,7 +21,7 @@ sealed class ClickOccupation {
 
     object None : ClickOccupation()
 
-    class Playback(val editor: Editor)
+    class Playback(val editor: Editor, var useCentreOfCamera: Boolean = false)
         : ClickOccupation(), ReversibleAction<Editor>, TrackerBased {
         val old: Float = editor.engine.playbackStart
         override var finished: Boolean = false

@@ -121,7 +121,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         editMode = editMode // Trigger observable
         engine = Engine()
     }
-    
+
     fun setFileHandles(baseFile: FileHandle) {
         lastSaveFile = baseFile
 //        autosaveFile = baseFile.sibling(baseFile.nameWithoutExtension() + ".autosave.${BRMania.FILE_EXTENSION}")
@@ -291,7 +291,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
                 } else if (Gdx.input.isKeyJustPressed(Input.Keys.END) && !shift && !control && !alt) {
                     renderer.cameraPan = CameraPan(renderer.trackCamera.position.x, engine.lastPoint, 0.25f, Interpolation.exp10Out)
                 }
-                
+
                 // undo/redo
                 if (control && !alt) {
                     if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
@@ -403,7 +403,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
                     }
                     is ClickOccupation.Playback -> {
                         setSubbeatSectionToMouse()
-                        engine.playbackStart = nearestSnap
+                        engine.playbackStart = if (clickOccupation.useCentreOfCamera) MathHelper.snapToNearest(camera.position.x, snap) else nearestSnap
                     }
                     is ClickOccupation.SelectionDrag -> {
                         if (clickOccupation.isStretching) {
@@ -950,13 +950,13 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
                 }
             }
         }
-        
+
         if (clickOccupation == ClickOccupation.None && stage.elements.none { it is MenuOverlay }) {
             val path = files.firstOrNull { it.toLowerCase(Locale.ROOT).endsWith(BRMania.FILE_EXTENSION.toLowerCase(Locale.ROOT)) }
             if (path != null) {
                 val file = File(path)
                 if (file.exists()) {
-                    Gdx.app.postRunnable { 
+                    Gdx.app.postRunnable {
                         stage.elements += MenuOverlay(this, stage, stage.palette).apply {
                             elements += ColourPane(this, this).apply {
                                 this.colour.set(0f, 0f, 0f, 0.75f)

@@ -137,12 +137,17 @@ class TimelineStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
                             editor.renderer.trackCamera.position.x = endX
                         }
                     } else if (editor.clickOccupation == ClickOccupation.None && Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && editor.editMode == EditMode.ENGINE) {
-                        editor.clickOccupation = ClickOccupation.Playback(editor)
+                        editor.clickOccupation = ClickOccupation.Playback(editor, true)
                     }
                 }
             }
 
-            if (editor.clickOccupation is ClickOccupation.Playback && (editor.editMode != EditMode.EVENTS && isMouseOver())) {
+            val clickOccupation = editor.clickOccupation
+            if (clickOccupation is ClickOccupation.Playback) {
+                clickOccupation.useCentreOfCamera = isMouseOver()
+            }
+            
+            if (clickOccupation is ClickOccupation.Playback && (editor.editMode != EditMode.EVENTS && isMouseOver())) {
                 val percent = (stage.camera.getInputX() - location.realX) / location.realWidth
                 val time = editor.engine.playbackStart
                 val signedSec = engine.tempos.beatsToSeconds(time)
