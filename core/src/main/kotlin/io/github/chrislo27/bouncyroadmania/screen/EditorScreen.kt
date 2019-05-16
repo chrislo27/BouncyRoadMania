@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.toolboks.ToolboksScreen
 import org.lwjgl.opengl.GL20
 
@@ -46,6 +47,7 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
 
     override fun hide() {
         super.hide()
+        editor.engine.playState = PlayState.STOPPED
         (Gdx.input.inputProcessor as? InputMultiplexer)?.removeProcessor(editor)
         (Gdx.graphics as Lwjgl3Graphics).window.windowListener = lastWindowListener
     }
