@@ -48,7 +48,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
         elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, 0.5f)
         }
-        val labelWidth = 0.2f
+        val labelWidth = 0.15f
         // HSV labels
         elements += TextLabel(palette, this, this).apply {
             this.isLocalizationKey = false
@@ -82,15 +82,15 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
         hue = ImageLabel(palette, this, this).apply {
             this.renderType = ImageLabel.ImageRendering.RENDER_FULL
             this.image = TextureRegion(BRManiaApp.instance.hueBar)
-            this.location.set(screenX = labelWidth, screenWidth = 1f - labelWidth * 2, screenHeight = 0.15f, screenY = 0.75f + 0.05f)
+            this.location.set(screenX = labelWidth, screenWidth = 1f - labelWidth * 3, screenHeight = 0.15f, screenY = 0.75f + 0.05f)
         }
         elements += hue
         saturation = SatBar(this).apply {
-            this.location.set(screenX = labelWidth, screenWidth = 1f - labelWidth * 2, screenHeight = 0.15f, screenY = 0.5f + 0.05f)
+            this.location.set(screenX = labelWidth, screenWidth = 1f - labelWidth * 3, screenHeight = 0.15f, screenY = 0.5f + 0.05f)
         }
         elements += saturation
         value = ValueBar(this).apply {
-            this.location.set(screenX = labelWidth, screenWidth = 1f - labelWidth * 2, screenHeight = 0.15f, screenY = 0.25f + 0.05f)
+            this.location.set(screenX = labelWidth, screenWidth = 1f - labelWidth * 3, screenHeight = 0.15f, screenY = 0.25f + 0.05f)
         }
         elements += value
         hueArrow = MovingArrow(this).apply {
@@ -133,7 +133,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.canTypeText = { it in acceptedChars }
             this.characterLimit = 3
             this.textAlign = Align.left
-            this.location.set(screenX = 1f - labelWidth + 0.025f, screenWidth = labelWidth - 0.025f, screenHeight = 0.2f, screenY = 0.75f + 0.025f)
+            this.location.set(screenX = 1f - labelWidth * 2 + 0.025f, screenWidth = labelWidth * 2 - 0.05f, screenHeight = 0.2f, screenY = 0.75f + 0.025f)
         }
         elements += hueField
         satField = object : TextField<S>(palette, this@ColourPicker, this@ColourPicker) {
@@ -151,7 +151,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.canTypeText = { it in acceptedChars }
             this.characterLimit = 3
             this.textAlign = Align.left
-            this.location.set(screenX = 1f - labelWidth + 0.025f, screenWidth = labelWidth - 0.025f, screenHeight = 0.2f, screenY = 0.5f + 0.025f)
+            this.location.set(screenX = 1f - labelWidth * 2 + 0.025f, screenWidth = labelWidth * 2 - 0.05f, screenHeight = 0.2f, screenY = 0.5f + 0.025f)
         }
         elements += satField
         valueField = object : TextField<S>(palette, this@ColourPicker, this@ColourPicker) {
@@ -169,7 +169,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.canTypeText = { it in acceptedChars }
             this.characterLimit = 3
             this.textAlign = Align.left
-            this.location.set(screenX = 1f - labelWidth + 0.025f, screenWidth = labelWidth - 0.025f, screenHeight = 0.2f, screenY = 0.25f + 0.025f)
+            this.location.set(screenX = 1f - labelWidth * 2 + 0.025f, screenWidth = labelWidth * 2 - 0.05f, screenHeight = 0.2f, screenY = 0.25f + 0.025f)
         }
         elements += valueField
 
@@ -193,7 +193,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
         elements += hex
 
         display = ColourPane(this, this).apply {
-            this.location.set(screenX = 0.65f, screenWidth = 0.35f, screenHeight = 0.2f, screenY = 0.025f)
+            this.location.set(screenX = 0.65f, screenWidth = 0.325f, screenHeight = 0.2f, screenY = 0.025f)
         }
         elements += display
 
