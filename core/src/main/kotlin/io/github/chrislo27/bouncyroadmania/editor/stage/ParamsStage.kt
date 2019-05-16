@@ -36,7 +36,11 @@ open class ParamsStage(parent: EditorStage)
             this.location.set(screenX = 1f, screenY = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -32f, pixelY = -32f, pixelWidth = 32f, pixelHeight = 32f)
             this.leftClickAction = { _, _ ->
                 Gdx.app.postRunnable {
-                    parent.removeChild(this@ParamsStage)
+                    if (this@ParamsStage == parent.paramsStage) {
+                        parent.setParamsStage(null)
+                    } else {
+                        parent.removeChild(this@ParamsStage)
+                    }
                 }
             }
             tooltipTextIsLocalizationKey = true
@@ -57,9 +61,9 @@ open class ParamsStage(parent: EditorStage)
 
 @Suppress("LeakingThis")
 open class EventParamsStage<E : Event>(parent: EditorStage, val event: E) : ParamsStage(parent) {
-    
+
     final override val mustCloseWhenPlaying: Boolean = true
-    
+
     val findButton: Button<EditorScreen>
 
     init {
