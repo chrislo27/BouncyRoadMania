@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumeChange
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
+import io.github.chrislo27.bouncyroadmania.util.fromJsonString
+import io.github.chrislo27.bouncyroadmania.util.toJsonString
 
 
 class EditorTheme {
@@ -21,12 +23,6 @@ class EditorTheme {
                     events.generic.set(0.65f, 0.65f, 0.65f, 1f)
                 }
         )
-
-        private fun Color.toJsonString(): String = "#${if (this.a >= 1f) this.toString().take(6) else this.toString()}"
-        private fun Color.fromJsonString(str: String?) = try {
-            this.set(Color.valueOf(str))
-        } catch (ignored: Exception) {
-        }
     }
 
     class TrackersGroup {

@@ -7,6 +7,8 @@ import io.github.chrislo27.bouncyroadmania.engine.event.InstantiatedEvent
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignature
 import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.bouncyroadmania.util.JsonHandler
+import io.github.chrislo27.bouncyroadmania.util.fromJsonString
+import io.github.chrislo27.bouncyroadmania.util.toJsonString
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.version.Version
 import java.io.File
@@ -24,6 +26,9 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     root.put("musicStartSec", musicStartSec)
     root.put("trackCount", trackCount)
     root.put("isAutosave", isAutosave)
+    root.put("gradientFirst", gradientFirst.toJsonString())
+    root.put("gradientLast", gradientLast.toJsonString())
+    root.put("gradientDirection", gradientDirection.name)
 
     // music
     run {
@@ -73,6 +78,10 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     playbackStart = root["playbackStart"].floatValue()
     musicStartSec = root["musicStartSec"].floatValue()
     trackCount = root["trackCount"].intValue()
+    
+    gradientFirst.fromJsonString(root["gradientFirst"]?.asText())
+    gradientLast.fromJsonString(root["gradientLast"]?.asText())
+    gradientDirection = GradientDirection.VALUES.find { it.name == root["gradientDirection"]?.asText() } ?: gradientDirection
 
     removeAllEvents(events.toList())
     entities.clear()
