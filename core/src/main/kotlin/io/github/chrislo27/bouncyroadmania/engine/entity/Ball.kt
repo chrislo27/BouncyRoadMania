@@ -88,7 +88,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
             posX = MathUtils.lerp(bounce.fromX, bounce.toX, alphaClamped)
             posY = MathUtils.lerp(bounce.fromY, bounce.toY, alphaClamped) + bounce.arcHeight * WaveUtils.getBounceWave(alphaClamped)
-            posZ = MathUtils.lerp(bounce.fromZ, bounce.toZ, alphaClamped)
+            posZ = MathUtils.lerp(bounce.fromZ, bounce.toZ, alphaClamped) - 0.001f
             posY = if (alphaClamped <= 0.5f) {
                 MathUtils.lerp(bounce.fromY, bounce.fromY + bounce.arcHeight, WaveUtils.getBounceWave(alphaClamped))
             } else {
