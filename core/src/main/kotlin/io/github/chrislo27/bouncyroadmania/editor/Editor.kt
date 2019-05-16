@@ -72,6 +72,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
             field = value
             value.listeners[this] = Unit
             stage.setParamsStage(null)
+            stage.onEngineChange(value)
 
 //            autosaveFile = null
             lastSaveFile = null

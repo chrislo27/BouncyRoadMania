@@ -25,10 +25,10 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
 
     private val tmpColor = Color(1f, 1f, 1f, 1f)
     private val tmpArr = FloatArray(3)
-    private val colourRep = Color(1f, 1f, 1f, 1f)
     private val noSat = Color(1f, 1f, 1f, 1f)
     private val maxSat = Color(1f, 1f, 1f, 1f)
     val hsv: HSV = HSV(0f, 1f, 1f)
+    val currentColour = Color(1f, 1f, 1f, 1f)
 
     val hex: TextField<S>
     val display: ColourPane<S>
@@ -41,6 +41,8 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
     val hueArrow: MovingArrow
     val satArrow: MovingArrow
     val valueArrow: MovingArrow
+    
+    var onColourChange: (color: Color) -> Unit = {}
 
     init {
         elements += ColourPane(this, this).apply {
@@ -131,7 +133,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.canTypeText = { it in acceptedChars }
             this.characterLimit = 3
             this.textAlign = Align.left
-            this.location.set(screenX = 1f - labelWidth, screenWidth = labelWidth, screenHeight = 0.2f, screenY = 0.75f + 0.025f)
+            this.location.set(screenX = 1f - labelWidth + 0.025f, screenWidth = labelWidth - 0.025f, screenHeight = 0.2f, screenY = 0.75f + 0.025f)
         }
         elements += hueField
         satField = object : TextField<S>(palette, this@ColourPicker, this@ColourPicker) {
@@ -149,7 +151,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.canTypeText = { it in acceptedChars }
             this.characterLimit = 3
             this.textAlign = Align.left
-            this.location.set(screenX = 1f - labelWidth, screenWidth = labelWidth, screenHeight = 0.2f, screenY = 0.5f + 0.025f)
+            this.location.set(screenX = 1f - labelWidth + 0.025f, screenWidth = labelWidth - 0.025f, screenHeight = 0.2f, screenY = 0.5f + 0.025f)
         }
         elements += satField
         valueField = object : TextField<S>(palette, this@ColourPicker, this@ColourPicker) {
@@ -167,7 +169,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.canTypeText = { it in acceptedChars }
             this.characterLimit = 3
             this.textAlign = Align.left
-            this.location.set(screenX = 1f - labelWidth, screenWidth = labelWidth, screenHeight = 0.2f, screenY = 0.25f + 0.025f)
+            this.location.set(screenX = 1f - labelWidth + 0.025f, screenWidth = labelWidth - 0.025f, screenHeight = 0.2f, screenY = 0.25f + 0.025f)
         }
         elements += valueField
 
@@ -209,7 +211,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
 
     private fun onHsvChange() {
         hex.text = tmpColor.fromHsv(hsv.hue, hsv.saturation, hsv.value).toString().toUpperCase(Locale.ROOT).take(6)
-        colourRep.fromHsv(hsv.hue, hsv.saturation, hsv.value)
+        currentColour.fromHsv(hsv.hue, hsv.saturation, hsv.value)
         maxSat.fromHsv(hsv.hue, 1f, hsv.value)
         noSat.fromHsv(hsv.hue, 0f, hsv.value)
         display.colour.fromHsv(hsv.hue, hsv.saturation, hsv.value)
@@ -220,12 +222,14 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
         hueArrow.percentage = hsv.hue.coerceIn(0f, 360f) / 360f
         satArrow.percentage = hsv.saturation.coerceIn(0f, 1f)
         valueArrow.percentage = hsv.value.coerceIn(0f, 1f)
+        
+        onColourChange(currentColour)
     }
 
     inner class ValueBar(parent: ColourPicker<S>) : UIElement<S>(parent, parent) {
         override fun render(screen: S, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
-            batch.drawQuad(location.realX, location.realY, Color.BLACK, location.realX + location.realWidth, location.realY, colourRep,
-                    location.realX + location.realWidth, location.realY + location.realHeight, colourRep,
+            batch.drawQuad(location.realX, location.realY, Color.BLACK, location.realX + location.realWidth, location.realY, currentColour,
+                    location.realX + location.realWidth, location.realY + location.realHeight, currentColour,
                     location.realX, location.realY + location.realHeight, Color.BLACK)
         }
     }

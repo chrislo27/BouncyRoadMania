@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.EngineEventListener
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
@@ -22,6 +23,7 @@ class EditorStage(val editor: Editor)
     val timelineStage: TimelineStage
     val messageBarStage: Stage<EditorScreen>
     val pickerStage: PickerStage
+    val initialParamsStage: InitialParamsStage
     
     val messageLabel: TextLabel<EditorScreen>
     val controlsLabel: TextLabel<EditorScreen>
@@ -74,6 +76,11 @@ class EditorStage(val editor: Editor)
             this.location.set(screenWidth = 1f, screenHeight = 0f, pixelY = messageBarHeight, pixelHeight = pickerHeight)
         }
         elements += pickerStage
+        
+        initialParamsStage = InitialParamsStage(editor, this, palette).apply {
+            this.location.set(screenWidth = 1f, screenHeight = 0f, pixelY = messageBarHeight, pixelHeight = 648f)
+        }
+        elements += initialParamsStage
 
         this.tooltipElement = TextLabel(palette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), this, this).apply {
             this.isLocalizationKey = false
@@ -115,6 +122,10 @@ class EditorStage(val editor: Editor)
         }
     }
     
+    fun onEngineChange(engine: Engine) {
+        initialParamsStage.onEngineChange(engine)
+    }
+    
     fun onEditModeChanged(editMode: EditMode) {
         decideVisibility()
         setParamsStage(null)
@@ -140,6 +151,7 @@ class EditorStage(val editor: Editor)
         timelineStage.visible = editor.editMode != EditMode.PARAMETERS
         pickerStage.visible = editor.editMode == EditMode.EVENTS
         toolbarStage.tapalongButton.enabled = editor.editMode == EditMode.EVENTS
+        initialParamsStage.visible = editor.editMode == EditMode.PARAMETERS
     }
 
 }
