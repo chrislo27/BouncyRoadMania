@@ -14,7 +14,6 @@ import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ImageLabel
 import io.github.chrislo27.toolboks.ui.UIPalette
 import io.github.chrislo27.toolboks.util.MathHelper
-import io.github.chrislo27.toolboks.util.gdxutils.setHSB
 
 
 class ToolButton(val editor: Editor, val tool: Tool,
@@ -65,7 +64,7 @@ class ToolButton(val editor: Editor, val tool: Tool,
     override fun render(screen: EditorScreen, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
         if (tool == Tool.TEMPO_CHANGE) {
             if (editor.engine.tempos.secondsMap.isEmpty()) {
-                label.tint.setHSB(MathHelper.getSawtoothWave(1.5f), 0.3f, 0.75f)
+                label.tint.fromHsv(MathHelper.getSawtoothWave(1.5f) * 360f, 0.3f, 0.75f)
             } else {
                 label.tint.set(1f, 1f, 1f, 1f)
             }

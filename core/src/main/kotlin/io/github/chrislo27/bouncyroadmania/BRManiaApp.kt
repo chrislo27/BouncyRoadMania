@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
@@ -23,7 +24,6 @@ import io.github.chrislo27.toolboks.logging.Logger
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.UIPalette
 import io.github.chrislo27.toolboks.util.MathHelper
-import io.github.chrislo27.toolboks.util.gdxutils.setHSB
 import org.lwjgl.glfw.GLFW
 import java.io.File
 
@@ -100,6 +100,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     var editorTheme: EditorTheme = EditorTheme.DEFAULT_THEMES.getValue("light")
 
     private var lastWindowed: Pair<Int, Int> = BRMania.WIDTH to BRMania.HEIGHT
+    lateinit var hueBar: Texture
+        private set
 
     override fun getTitle(): String = "${BRMania.TITLE} ${BRMania.VERSION}"
 
@@ -145,6 +147,20 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
 
+        // generate hue bar
+        run {
+            val pixmap = Pixmap(360, 1, Pixmap.Format.RGBA8888)
+            val tmpColor = Color(1f, 1f, 1f, 1f)
+            for (i in 0 until 360) {
+                tmpColor.fromHsv(i.toFloat(), 1f, 1f)
+                pixmap.setColor(tmpColor)
+                pixmap.drawPixel(i, 0)
+            }
+            hueBar = Texture(pixmap).apply {
+                this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            }
+        }
+
         // screens
         run {
             fun addOtherScreens() {
@@ -162,7 +178,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     }
 
     override fun preRender() {
-        rainbowColor.setHSB(MathHelper.getSawtoothWave(2f), 0.8f, 0.8f)
+        rainbowColor.fromHsv(MathHelper.getSawtoothWave(2f) * 360f, 0.8f, 0.8f)
         Colors.put(RAINBOW_STR, rainbowColor)
         super.preRender()
     }
@@ -205,6 +221,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         super.dispose()
 //        httpClient.close()
         BRMania.tmpMusic.emptyDirectory()
+        hueBar.dispose()
     }
 
     fun attemptFullscreen() {

@@ -28,6 +28,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_checkbox_x", "images/ui/checkbox/x.png")
         AssetRegistry.loadAsset<Texture>("ui_checkbox_checked", "images/ui/checkbox/checked.png")
         AssetRegistry.loadAsset<Texture>("ui_checkbox_unchecked", "images/ui/checkbox/unchecked.png")
+        AssetRegistry.loadAsset<Texture>("ui_colour_picker_arrow", "images/ui/colour_picker_arrow.png")
         AssetRegistry.loadAsset<Texture>("ui_back", "images/ui/icon/back.png")
         AssetRegistry.loadAsset<Texture>("ui_music", "images/ui/icon/music_button.png")
         AssetRegistry.loadAsset<Texture>("ui_music_muted", "images/ui/icon/music_button_muted.png")
