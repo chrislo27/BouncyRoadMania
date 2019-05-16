@@ -5,15 +5,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.entity.Ball
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
+import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.util.TrueCheckbox
 import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
+import java.lang.ref.WeakReference
 
 
 class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
@@ -92,16 +95,30 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         init {
             val size = 48f
             val padding = 16f
-            contentStage.elements += TrueCheckbox(palette, contentStage, contentStage).apply {
+            contentStage.elements += object : TrueCheckbox<EditorScreen>(palette, contentStage, contentStage) {
+                private val thisCheckbox: TrueCheckbox<EditorScreen> = this
+                override fun onLeftClick(xPercent: Float, yPercent: Float) {
+                    super.onLeftClick(xPercent, yPercent)
+                    parent.editor.mutate(object : ReversibleAction<Editor> {
+                        val checkbox: WeakReference<TrueCheckbox<EditorScreen>> = WeakReference(thisCheckbox)
+                        val value = checked
+                        override fun redo(context: Editor) {
+                            event.firstBounceHasSound = value
+                            checkbox.get()?.checked = value
+                        }
+
+                        override fun undo(context: Editor) {
+                            event.firstBounceHasSound = !value
+                            checkbox.get()?.checked = !value
+                        }
+                    })
+                }
+            }.apply {
                 this.checked = event.firstBounceHasSound
-                println(event.firstBounceHasSound)
                 this.textLabel.isLocalizationKey = true
                 this.textLabel.text = "deployEvent.firstBounceHasSound"
                 this.tooltipTextIsLocalizationKey = true
                 this.tooltipText = "deployEvent.firstBounceHasSound.tooltip"
-                this.checkedStateChanged = { value ->
-                    event.firstBounceHasSound = value
-                }
                 this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size))
             }
         }
