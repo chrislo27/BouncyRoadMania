@@ -19,7 +19,7 @@ open class PaperProjection(var scaleCoeff: Float = 1.0f) {
         sprites.sortWith(comparator)
 
         sprites.forEach { able ->
-            if (able.posZ >= 0f) {
+            if (able.posZ > -1f) {
                 val realZ = able.posZ + 1f
                 able.render(batch, scaleCoeff / realZ)
             }
