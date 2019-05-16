@@ -81,6 +81,13 @@ class Engine : Clock(), Disposable {
                         seconds = tempos.beatsToSeconds(playbackStart)
                         events.forEach {
                             if (it.getUpperUpdateableBound() < beat) {
+                                if (it.shouldAlwaysBeSimulated) {
+                                    it.playbackCompletion = PlaybackCompletion.PLAYING
+                                    it.onStart()
+                                    it.whilePlaying()
+                                    it.playbackCompletion = PlaybackCompletion.FINISHED
+                                    it.onEnd()
+                                }
                                 it.playbackCompletion = PlaybackCompletion.FINISHED
                             } else {
                                 it.playbackCompletion = PlaybackCompletion.WAITING
@@ -133,7 +140,8 @@ class Engine : Clock(), Disposable {
     var isMusicMuted: Boolean = false
     private var lastMusicPosition: Float = -1f
     private var scheduleMusicPlaying = true
-    @Volatile var musicSeeking = false
+    @Volatile
+    var musicSeeking = false
 
     val events: List<Event> = mutableListOf()
 
