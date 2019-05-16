@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
-import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.*
@@ -118,14 +117,6 @@ class TapalongStage(parent: EditorStage) : ParamsStage(parent) {
             this.textAlign = Align.right
             this.fontScaleMultiplier = 0.85f
             this.location.set(screenHeight = 0f, screenX = 0f, screenWidth = 0.3f, pixelHeight = 64f, pixelY = 134f + 192f)
-        }
-//        contentStage.elements += ImageLabel(palette, contentStage, contentStage).apply {
-////            this.image = TextureRegion(AssetRegistry.get<Texture>("ui_dog_in_sink"))
-//            this.location.set(screenHeight = 0f, screenX = 0.3f, screenWidth = 0.4f, pixelHeight = 134f + 192f - 32f * 2 - 102, pixelY = 102f + 32f)
-//        }
-        contentStage.elements += ColourPicker(palette, contentStage, contentStage).apply {
-
-            this.location.set(screenHeight = 0f, screenX = 0f, screenWidth = 1f, pixelHeight = 134f + 192f - 32f * 2 - 102, pixelY = 102f + 32f)
         }
 
         contentStage.elements += Button(palette, contentStage, contentStage).apply {
