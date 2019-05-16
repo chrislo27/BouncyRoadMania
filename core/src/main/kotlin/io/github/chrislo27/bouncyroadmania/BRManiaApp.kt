@@ -35,7 +35,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         lateinit var instance: BRManiaApp
             private set
 
-//        val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setFollowRedirect(true).setCompressionEnforced(true))
+//        val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setThreadFactory {Thread(it).apply{ isDaemon = true }}.setFollowRedirect(true).setCompressionEnforced(true))
 
         private const val RAINBOW_STR = "RAINBOW"
         private val rainbowColor: Color = Color()

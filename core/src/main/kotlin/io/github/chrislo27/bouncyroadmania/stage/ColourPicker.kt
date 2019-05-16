@@ -97,7 +97,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.location.set(hue.location)
             this.onPercentageChange = {
                 hsv.hue = it * 360f
-                onHsvChange()
+                onHsvChange(true)
             }
         }
         elements += hueArrow
@@ -105,7 +105,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.location.set(saturation.location)
             this.onPercentageChange = {
                 hsv.saturation = it
-                onHsvChange()
+                onHsvChange(true)
             }
         }
         elements += satArrow
@@ -113,7 +113,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.location.set(value.location)
             this.onPercentageChange = {
                 hsv.value = it
-                onHsvChange()
+                onHsvChange(true)
             }
         }
         elements += valueArrow
@@ -122,7 +122,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             override fun onEnterPressed(): Boolean {
                 hasFocus = false
                 hsv.hue = text.toIntOrNull()?.toFloat()?.coerceIn(0f, 360f) ?: 0f
-                onHsvChange()
+                onHsvChange(true)
                 return true
             }
         }.apply {
@@ -140,7 +140,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             override fun onEnterPressed(): Boolean {
                 hasFocus = false
                 hsv.saturation = text.toIntOrNull()?.toFloat()?.coerceIn(0f, 100f)?.div(100f) ?: 0f
-                onHsvChange()
+                onHsvChange(true)
                 return true
             }
         }.apply {
@@ -158,7 +158,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             override fun onEnterPressed(): Boolean {
                 hasFocus = false
                 hsv.value = text.toIntOrNull()?.toFloat()?.coerceIn(0f, 100f)?.div(100f) ?: 0f
-                onHsvChange()
+                onHsvChange(true)
                 return true
             }
         }.apply {
@@ -200,16 +200,16 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
         setColor(Color.WHITE)
     }
 
-    fun setColor(color: Color) {
+    fun setColor(color: Color, triggerListener: Boolean = true) {
         val arr = tmpArr
         color.toHsv(arr)
         hsv.hue = arr[0]
         hsv.saturation = arr[1]
         hsv.value = arr[2]
-        onHsvChange()
+        onHsvChange(triggerListener)
     }
 
-    private fun onHsvChange() {
+    private fun onHsvChange(triggerListener: Boolean) {
         hex.text = tmpColor.fromHsv(hsv.hue, hsv.saturation, hsv.value).toString().toUpperCase(Locale.ROOT).take(6)
         currentColour.fromHsv(hsv.hue, hsv.saturation, hsv.value)
         maxSat.fromHsv(hsv.hue, 1f, hsv.value)
@@ -223,7 +223,8 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
         satArrow.percentage = hsv.saturation.coerceIn(0f, 1f)
         valueArrow.percentage = hsv.value.coerceIn(0f, 1f)
         
-        onColourChange(currentColour)
+        if (triggerListener)
+            onColourChange(currentColour)
     }
 
     inner class ValueBar(parent: ColourPicker<S>) : UIElement<S>(parent, parent) {

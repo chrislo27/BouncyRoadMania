@@ -3,16 +3,19 @@ package io.github.chrislo27.bouncyroadmania.engine.event
 import com.badlogic.gdx.graphics.Color
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
+import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
 import io.github.chrislo27.bouncyroadmania.util.fromJsonString
 import io.github.chrislo27.bouncyroadmania.util.toJsonString
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.TextLabel
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
+import java.lang.ref.WeakReference
 
 
 class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first: Boolean)
@@ -98,10 +101,22 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
                     val mostRecentColor = engine.events.sortedBy { it.bounds.maxX }.asReversed()
                             .filterIsInstance<GradientChangeEvent>()
                             .find { it.first == first && it.bounds.maxX < bounds.maxX && it != this@GradientChangeEvent }
-                    val c = mostRecentColor?.color ?: gradientOrigin
-                    this@GradientChangeEvent.color.set(c)
-                    this@GradientChangeEvent.onColorChange()
-                    colourPicker.setColor(c)
+                    val c = Color(mostRecentColor?.color ?: gradientOrigin)
+                    parent.editor.mutate(object : ReversibleAction<Editor> {
+                        val picker: WeakReference<ColourPicker<EditorScreen>> = WeakReference(colourPicker)
+                        val lastColor = Color(this@GradientChangeEvent.color)
+                        override fun redo(context: Editor) {
+                            this@GradientChangeEvent.color.set(c)
+                            this@GradientChangeEvent.onColorChange()
+                            picker.get()?.setColor(c, false)
+                        }
+
+                        override fun undo(context: Editor) {
+                            this@GradientChangeEvent.color.set(lastColor)
+                            this@GradientChangeEvent.onColorChange()
+                            picker.get()?.setColor(lastColor, false)
+                        }
+                    })
                 }
                 this.location.set(screenY = 0.175f, screenHeight = 0.15f)
             }
@@ -113,9 +128,22 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
                     this.text = "gradientChangeEvent.resetToInitial"
                 })
                 this.leftClickAction = { _, _ ->
-                    this@GradientChangeEvent.color.set(gradientOrigin)
-                    this@GradientChangeEvent.onColorChange()
-                    colourPicker.setColor(gradientOrigin)
+                    val c = Color(gradientOrigin)
+                    parent.editor.mutate(object : ReversibleAction<Editor> {
+                        val picker: WeakReference<ColourPicker<EditorScreen>> = WeakReference(colourPicker)
+                        val lastColor = Color(this@GradientChangeEvent.color)
+                        override fun redo(context: Editor) {
+                            this@GradientChangeEvent.color.set(c)
+                            this@GradientChangeEvent.onColorChange()
+                            picker.get()?.setColor(c, false)
+                        }
+
+                        override fun undo(context: Editor) {
+                            this@GradientChangeEvent.color.set(lastColor)
+                            this@GradientChangeEvent.onColorChange()
+                            picker.get()?.setColor(lastColor, false)
+                        }
+                    })
                 }
                 this.location.set(screenY = 0f, screenHeight = 0.15f)
             }
