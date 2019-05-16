@@ -26,8 +26,8 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     root.put("musicStartSec", musicStartSec)
     root.put("trackCount", trackCount)
     root.put("isAutosave", isAutosave)
-    root.put("gradientFirst", gradientFirst.toJsonString())
-    root.put("gradientLast", gradientLast.toJsonString())
+    root.put("gradientFirst", gradientStart.toJsonString())
+    root.put("gradientLast", gradientEnd.toJsonString())
     root.put("gradientDirection", gradientDirection.name)
 
     // music
@@ -79,8 +79,8 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     musicStartSec = root["musicStartSec"].floatValue()
     trackCount = root["trackCount"].intValue()
     
-    gradientFirst.fromJsonString(root["gradientFirst"]?.asText())
-    gradientLast.fromJsonString(root["gradientLast"]?.asText())
+    gradientStart.fromJsonString(root["gradientFirst"]?.asText())
+    gradientEnd.fromJsonString(root["gradientLast"]?.asText())
     gradientDirection = GradientDirection.VALUES.find { it.name == root["gradientDirection"]?.asText() } ?: gradientDirection
 
     removeAllEvents(events.toList())

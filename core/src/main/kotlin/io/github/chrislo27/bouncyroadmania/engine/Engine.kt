@@ -64,6 +64,8 @@ class Engine : Clock(), Disposable {
                     BeadsSoundSystem.stop()
                     entities.clear()
                     addBouncers()
+                    gradientCurrentStart.set(gradientStart)
+                    gradientCurrentEnd.set(gradientEnd)
                 }
                 PlayState.PAUSED -> {
                     AssetRegistry.pauseAllSounds()
@@ -147,8 +149,10 @@ class Engine : Clock(), Disposable {
     val listeners: WeakHashMap<EngineEventListener, Unit> = WeakHashMap()
 
     // Visuals
-    val gradientLast: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
-    val gradientFirst: Color = Color(0f, 0f, 0f, 1f)
+    val gradientEnd: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
+    val gradientStart: Color = Color(0f, 0f, 0f, 1f)
+    val gradientCurrentEnd: Color = Color(1f, 1f, 1f, 1f).set(gradientEnd)
+    val gradientCurrentStart: Color = Color(0f, 0f, 0f, 1f).set(gradientStart)
     var gradientDirection: GradientDirection = GradientDirection.VERTICAL
 
     fun addBouncers() {
@@ -219,6 +223,7 @@ class Engine : Clock(), Disposable {
         events.forEach {
             if (it !in this.events) {
                 this.events += it
+                listeners.keys.forEach { l -> l.onEventAdded(it) }
             }
         }
         if (this.events.size != oldSize) {
@@ -230,6 +235,7 @@ class Engine : Clock(), Disposable {
         this.events as MutableList
         val oldSize = this.events.size
         this.events.removeAll(events)
+        events.forEach { listeners.keys.forEach { l -> l.onEventRemoved(it) } }
         if (this.events.size != oldSize) {
             recomputeCachedData()
         }
@@ -336,9 +342,9 @@ class Engine : Clock(), Disposable {
         batch.begin()
         // gradient
         if (gradientDirection == GradientDirection.VERTICAL) {
-            batch.drawQuad(0f, 0f, gradientFirst, camera.viewportWidth, 0f, gradientFirst, camera.viewportWidth, camera.viewportHeight, gradientLast, 0f, camera.viewportHeight, gradientLast)
+            batch.drawQuad(0f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentStart, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, 0f, camera.viewportHeight, gradientCurrentEnd)
         } else {
-            batch.drawQuad(0f, 0f, gradientFirst, camera.viewportWidth, 0f, gradientLast, camera.viewportWidth, camera.viewportHeight, gradientLast, 0f, camera.viewportHeight, gradientFirst)
+            batch.drawQuad(0f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentEnd, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, 0f, camera.viewportHeight, gradientCurrentStart)
         }
         projector.render(batch, entities)
         batch.end()

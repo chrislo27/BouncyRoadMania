@@ -140,9 +140,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         setToOrtho(false, 1280f, 720f)
     }
     val gradientStart: Color = Color().set(CYCLE_COLOURS.last()).apply {
-        engine.gradientLast.set(this)
+        engine.gradientEnd.set(this)
     }
-    val gradientTop: Color get() = engine.gradientLast
+    val gradientTop: Color get() = engine.gradientEnd
     val music: Music by lazy {
         AssetRegistry.get<Music>("music_main_menu").apply {
             isLooping = true

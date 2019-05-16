@@ -182,9 +182,9 @@ class EditorRenderer(val editor: Editor) {
         batch.begin()
         with(engine) {
             if (gradientDirection == GradientDirection.VERTICAL) {
-                batch.drawQuad(0f, 0f, gradientFirst, staticCamera.viewportWidth, 0f, gradientFirst, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientLast, 0f, staticCamera.viewportHeight, gradientLast)
+                batch.drawQuad(0f, 0f, gradientStart, staticCamera.viewportWidth, 0f, gradientStart, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientEnd, 0f, staticCamera.viewportHeight, gradientEnd)
             } else {
-                batch.drawQuad(0f, 0f, gradientFirst, staticCamera.viewportWidth, 0f, gradientLast, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientLast, 0f, staticCamera.viewportHeight, gradientFirst)
+                batch.drawQuad(0f, 0f, gradientStart, staticCamera.viewportWidth, 0f, gradientEnd, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientEnd, 0f, staticCamera.viewportHeight, gradientStart)
             }
         }
         batch.end()

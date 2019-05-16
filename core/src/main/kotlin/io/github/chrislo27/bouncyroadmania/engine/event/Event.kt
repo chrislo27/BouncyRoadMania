@@ -33,6 +33,7 @@ abstract class Event(val engine: Engine) {
     open val canBeCopied: Boolean = true
     open val isStretchable: Boolean = false
     open val hasEditableParams: Boolean = false
+    open val shouldAlwaysBeSimulated: Boolean = false
     open val renderText: String = ""
     var needsNameTooltip: Boolean = false
         protected set

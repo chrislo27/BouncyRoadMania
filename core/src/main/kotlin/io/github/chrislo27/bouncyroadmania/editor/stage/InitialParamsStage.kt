@@ -33,7 +33,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         gradientFirst = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
-                engine.gradientFirst.set(c)
+                engine.gradientStart.set(c)
             }
         }
         elements += gradientFirst
@@ -47,7 +47,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         gradientLast = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.05f, screenY = 0.5f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
-                engine.gradientLast.set(c)
+                engine.gradientEnd.set(c)
             }
         }
         elements += gradientLast
@@ -56,9 +56,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_swap"))
             })
             this.leftClickAction = { _, _ ->
-                val tmp = Color(1f, 1f, 1f, 1f).set(engine.gradientFirst)
-                engine.gradientFirst.set(engine.gradientLast)
-                engine.gradientLast.set(tmp)
+                val tmp = Color(1f, 1f, 1f, 1f).set(engine.gradientStart)
+                engine.gradientStart.set(engine.gradientEnd)
+                engine.gradientEnd.set(tmp)
                 updateColours()
             }
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0f, screenHeight = 0f,
@@ -99,8 +99,8 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
     }
 
     fun updateColours(engine: Engine = this.engine) {
-        gradientFirst.setColor(engine.gradientFirst)
-        gradientLast.setColor(engine.gradientLast)
+        gradientFirst.setColor(engine.gradientStart)
+        gradientLast.setColor(engine.gradientEnd)
     }
 
     fun onEngineChange(engine: Engine) {

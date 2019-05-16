@@ -121,8 +121,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         editMode = editMode // Trigger observable
         engine = Engine()
     }
-
-
+    
     fun setFileHandles(baseFile: FileHandle) {
         lastSaveFile = baseFile
 //        autosaveFile = baseFile.sibling(baseFile.nameWithoutExtension() + ".autosave.${BRMania.FILE_EXTENSION}")
@@ -150,6 +149,9 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
                                     Localization["editor.msg.numSelected", this.selection.size.toString()])
 
                             if (clickOccupation == ClickOccupation.None) {
+                                if (selection.any { it.hasEditableParams }) {
+                                    controls.separator().append(Localization["editor.msg.openParams"])
+                                }
                                 if (selection.all { it.canBeCopied }) {
                                     controls.separator().append(Localization["editor.msg.copyHint"])
                                 }
