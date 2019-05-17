@@ -293,7 +293,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
         menus["main"] = listOf(
                 MenuItem("mainMenu.play") {
-                    main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                    // TODO
                 },
                 MenuItem("mainMenu.edit") {
                     val editor = EditorScreen(main) // ScreenRegistry.getNonNull("editor")
@@ -333,6 +333,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
         // Test menus
         menus["test"] = listOf(
+                MenuItem("TestEngineScreen", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                },
                 MenuItem("TinyFD", isLocalizationKey = false) {
                     currentMenuKey = "test_tinyfd"
                 },
