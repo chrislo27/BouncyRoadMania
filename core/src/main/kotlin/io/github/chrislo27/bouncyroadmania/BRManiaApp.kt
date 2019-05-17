@@ -15,6 +15,8 @@ import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
+import io.github.chrislo27.bouncyroadmania.util.JsonHandler
+import io.github.chrislo27.bouncyroadmania.util.ReleaseObject
 import io.github.chrislo27.toolboks.ResizeAction
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.ToolboksGame
@@ -24,6 +26,12 @@ import io.github.chrislo27.toolboks.logging.Logger
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.ui.UIPalette
 import io.github.chrislo27.toolboks.util.MathHelper
+import io.github.chrislo27.toolboks.version.Version
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.asynchttpclient.AsyncHttpClient
+import org.asynchttpclient.DefaultAsyncHttpClientConfig
+import org.asynchttpclient.Dsl
 import org.lwjgl.glfw.GLFW
 import java.io.File
 
@@ -35,7 +43,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         lateinit var instance: BRManiaApp
             private set
 
-//        val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setThreadFactory {Thread(it).apply{ isDaemon = true }}.setFollowRedirect(true).setCompressionEnforced(true))
+        val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setThreadFactory { Thread(it).apply { isDaemon = true } }.setFollowRedirect(true).setCompressionEnforced(true))
 
         private const val RAINBOW_STR = "RAINBOW"
         private val rainbowColor: Color = Color()
@@ -101,6 +109,10 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
     private var lastWindowed: Pair<Int, Int> = BRMania.WIDTH to BRMania.HEIGHT
     lateinit var hueBar: Texture
+        private set
+    
+    @Volatile
+    var githubVersion: Version = Version.RETRIEVING
         private set
 
     override fun getTitle(): String = "${BRMania.TITLE} ${BRMania.VERSION}"
@@ -175,6 +187,30 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         // preferences
         preferences = Gdx.app.getPreferences("BouncyRoadMania")
         editorTheme = EditorTheme.DEFAULT_THEMES[preferences.getString("editorTheme", "")] ?: editorTheme
+        
+        GlobalScope.launch {
+            try {
+                val nano = System.nanoTime()
+                val obj = JsonHandler.fromJson<ReleaseObject>(
+                        httpClient.prepareGet(BRMania.RELEASE_API_URL).execute().get().responseBody)
+
+                githubVersion = Version.fromStringOrNull(obj.tag_name ?: "???") ?: Version.UNKNOWN
+                Toolboks.LOGGER.info(
+                        "Fetched latest version from GitHub in ${(System.nanoTime() - nano) / 1_000_000f} ms, is $githubVersion")
+
+                val v = githubVersion
+                if (!v.isUnknown) {
+                    if (v > BRMania.VERSION) {
+                        preferences.putInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE,
+                                preferences.getInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE, 0) + 1)
+                    } else {
+                        preferences.putInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE, 0)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     override fun preRender() {
@@ -219,7 +255,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
 
     override fun dispose() {
         super.dispose()
-//        httpClient.close()
+        httpClient.close()
         BRMania.tmpMusic.emptyDirectory()
         hueBar.dispose()
     }
@@ -235,7 +271,6 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     }
 
     fun attemptResetWindow() {
-
         Gdx.graphics.setWindowedMode(BRMania.WIDTH, BRMania.HEIGHT)
     }
 

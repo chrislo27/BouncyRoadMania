@@ -19,6 +19,7 @@ object BRMania {
     }
 
     val FILE_EXTENSION: String = "brmania"
+    const val RELEASE_API_URL = "https://api.github.com/repos/chrislo27/BouncyRoadMania/releases/latest"
 
     lateinit var launchArguments: List<String>
 
