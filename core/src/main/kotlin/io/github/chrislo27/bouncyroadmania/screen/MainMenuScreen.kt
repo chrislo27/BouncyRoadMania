@@ -34,6 +34,7 @@ import io.github.chrislo27.toolboks.ui.Stage
 import io.github.chrislo27.toolboks.ui.TextLabel
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
+import io.github.chrislo27.toolboks.version.Version
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
@@ -139,9 +140,6 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    val gradientStart: Color = Color().set(CYCLE_COLOURS.last()).apply {
-        engine.gradientCurrentEnd.set(this)
-    }
     val gradientTop: Color get() = engine.gradientCurrentEnd
     val music: Music by lazy {
         AssetRegistry.get<Music>("music_main_menu").apply {
@@ -151,8 +149,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var lastMusicPos = 0f
     private val events: MutableList<Event> = mutableListOf()
 
-    override val stage: Stage<MainMenuScreen> = Stage(null, camera, camera.viewportWidth, camera.viewportHeight)
-    private val fullscreenButton: Button<MainMenuScreen> = object : Button<MainMenuScreen>(main.uiPalette, stage, stage){
+    override val stage: Stage<MainMenuScreen> = Stage(null, main.defaultCamera, camera.viewportWidth, camera.viewportHeight)
+    private val fullscreenButton: Button<MainMenuScreen> = object : Button<MainMenuScreen>(main.uiPalette, stage, stage) {
         var fullscreenState = Gdx.graphics.isFullscreen
 
         override fun render(screen: MainMenuScreen, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
@@ -189,6 +187,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.tooltipText = "mainMenu.tooltip.fullscreen"
         }
     }
+    private val versionButton: Button<MainMenuScreen>
+    private var lastGhVersion: Version = Version.UNKNOWN
 
     val titleWiggle: FloatArray = FloatArray(3) { 0f }
     val menuPadding = 64f
@@ -254,14 +254,43 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "mainMenu.tooltip.resetWindow"
         }
+        versionButton = Button(main.uiPalette, stage, stage).apply {
+            this.addLabel(TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), this, this.stage).apply {
+                this.isLocalizationKey = false
+                this.text = BRMania.VERSION.toString()
+                this.textAlign = Align.left
+                this.textWrapping = false
+                this.fontScaleMultiplier = 0.5f
+            })
+            this.location.set(screenWidth = 0f, screenHeight = 0f, pixelX = 4f, pixelWidth = 256f, pixelHeight = 24f)
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "mainMenu.checkForUpdates"
+            this.leftClickAction = { _, _ ->
+                Gdx.net.openURI("https://github.com/chrislo27/BouncyRoadMania/releases/latest")
+            }
+        }
+        stage.elements += versionButton
+        stage.elements += Button(main.uiPalette, stage, stage).apply {
+            this.location.set(screenX = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -450f - 4f, pixelWidth = 450f, pixelHeight = 16f * 3)
+            this.addLabel(TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), this, this.stage).apply {
+                this.isLocalizationKey = false
+                this.text = MUSIC_CREDIT
+                this.textAlign = Align.right
+                this.textWrapping = false
+                this.fontScaleMultiplier = 0.5f
+            })
+            this.leftClickAction = { _, _ ->
+                Gdx.net.openURI("https://incompetech.com")
+            }
+        }
 
         stage.updatePositions()
     }
 
     init {
         val mainDebugItem = MenuItem("Debug", isLocalizationKey = false) {
-                    currentMenuKey = "test"
-                }
+            currentMenuKey = "test"
+        }
         menus["main"] = listOf(
                 MenuItem("mainMenu.play") {
                     main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
@@ -508,8 +537,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         val creditPadding = 4f
         val creditWidth = camera.viewportWidth - creditPadding * 4f
         val creditHeight = borderedFont.lineHeight * 3f
-        borderedFont.drawCompressed(batch, MUSIC_CREDIT, camera.viewportWidth - creditPadding - creditWidth, creditHeight, creditWidth, Align.right)
-        borderedFont.drawCompressed(batch, BRMania.VERSION.toString(), creditPadding, borderedFont.lineHeight, creditWidth, Align.left)
+//        borderedFont.drawCompressed(batch, MUSIC_CREDIT, camera.viewportWidth - creditPadding - creditWidth, creditHeight, creditWidth, Align.right)
         borderedFont.unscaleFont()
 
         val titleFont = main.cometBorderedFont
@@ -580,6 +608,13 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 c.action.invoke()
             }
             clickedOnMenu = null
+        }
+        val ghv = main.githubVersion
+        if (ghv != lastGhVersion) {
+            if (!ghv.isUnknown) {
+                versionButton.tooltipText = "mainMenu.checkForUpdates.new"
+                (versionButton.labels.first() as TextLabel).textColor = if (main.preferences.getInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE, 0) >= 3) Color.RED else Color.ORANGE
+            }
         }
     }
 
