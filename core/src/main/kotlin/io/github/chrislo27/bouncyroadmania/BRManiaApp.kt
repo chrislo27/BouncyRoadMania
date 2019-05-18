@@ -114,6 +114,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     @Volatile
     var githubVersion: Version = Version.RETRIEVING
         private set
+    var secondsElapsed: Float = 0f
+        private set
 
     override fun getTitle(): String = "${BRMania.TITLE} ${BRMania.VERSION}"
 
@@ -214,6 +216,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     }
 
     override fun preRender() {
+        secondsElapsed += Gdx.graphics.deltaTime
         rainbowColor.fromHsv(MathHelper.getSawtoothWave(2f) * 360f, 0.8f, 0.8f)
         Colors.put(RAINBOW_STR, rainbowColor)
         super.preRender()
