@@ -77,6 +77,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Music>("music_br", "sounds/Bouncy Road.ogg")
 
         AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")
+        AssetRegistry.loadAsset<Music>("music_play_screen", "music/Faster_Does_It.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
