@@ -24,3 +24,6 @@ Installation is straightforward.
 ## Licensing and Credits
 Much of this program has assets and code used from the [Rhythm Heaven Remix Editor](https://github.com/chrislo27/RhythmHeavenRemixEditor).
 As such, it retains the [GNU General Public License v3.0](LICENSE.txt) license.
+
+Some menus have music made by [Kevin MacLeod (incompetech.com)](https://incompetech.com/), licensed under
+Creative Commons: By Attribution 3.0 (CC BY 3.0). Respective credit for each piece is visible in the menu they play in.
