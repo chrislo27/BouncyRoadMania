@@ -8,7 +8,7 @@ import io.github.chrislo27.toolboks.version.Version
 object BRMania {
 
     const val TITLE = "Bouncy Road Mania"
-    val VERSION: Version = Version(0, 1, 0, "")
+    val VERSION: Version = Version(0, 2, 0, "DEVELOPMENT")
     const val WIDTH = 1280
     const val HEIGHT = 720
     val BRMANIA_FOLDER: FileHandle by lazy { (Gdx.files.external(".bouncyroadmania/")).apply(FileHandle::mkdirs) }
