@@ -212,11 +212,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var inactiveTime: Float = 0f
 
     init {
-        stage.tooltipElement = TextLabel(main.uiPalette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), stage, stage).apply {
+        val palette = main.uiPalette
+        stage.tooltipElement = TextLabel(palette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), stage, stage).apply {
             this.textAlign = Align.center
             this.background = true
         }
-        stage.elements += object : Button<MainMenuScreen>(main.uiPalette, stage, stage) {
+        stage.elements += object : Button<MainMenuScreen>(palette, stage, stage) {
             val unmuted = TextureRegion(AssetRegistry.get<Texture>("ui_music"))
             val muted = TextureRegion(AssetRegistry.get<Texture>("ui_music_muted"))
             val label = ImageLabel(palette, this, this.stage).apply {
@@ -243,7 +244,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.tooltipText = "mainMenu.tooltip.${if (!muted) "mute" else "unmute"}Music"
         }
         stage.elements += fullscreenButton
-        stage.elements += Button(main.uiPalette, stage, stage).apply {
+        stage.elements += Button(palette, stage, stage).apply {
             this.location.set(screenWidth = 0f, screenHeight = 0f,
                     pixelWidth = 32f, pixelHeight = 32f, pixelX = camera.viewportWidth - 32f * 3, pixelY = camera.viewportHeight - 32f)
             this.leftClickAction = { _, _ ->
@@ -256,7 +257,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "mainMenu.tooltip.resetWindow"
         }
-        versionButton = Button(main.uiPalette, stage, stage).apply {
+        versionButton = Button(palette, stage, stage).apply {
             this.addLabel(TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), this, this.stage).apply {
                 this.isLocalizationKey = false
                 this.text = BRMania.VERSION.toString()
@@ -272,7 +273,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             }
         }
         stage.elements += versionButton
-        stage.elements += Button(main.uiPalette, stage, stage).apply {
+        stage.elements += Button(palette, stage, stage).apply {
             this.location.set(screenX = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -450f - 4f, pixelWidth = 450f, pixelHeight = 16f * 3)
             this.addLabel(TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), this, this.stage).apply {
                 this.isLocalizationKey = false
@@ -284,6 +285,14 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             this.leftClickAction = { _, _ ->
                 Gdx.net.openURI("https://incompetech.com")
             }
+        }
+        stage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), stage, stage).apply {
+            this.location.set(screenX = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -450f - 4f, pixelWidth = 450f, pixelHeight = 16f * 4 + 32 * 3)
+            this.isLocalizationKey = false
+            this.text = "This game is a work-in-progress.\nAll features are subject to change."
+            this.textAlign = Align.right
+            this.textWrapping = false
+            this.fontScaleMultiplier = 0.75f
         }
 
         stage.updatePositions()
