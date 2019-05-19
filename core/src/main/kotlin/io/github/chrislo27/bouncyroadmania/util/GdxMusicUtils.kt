@@ -11,6 +11,9 @@ fun Music.fadeTo(volume: Float, duration: Float, stopIfZero: Boolean = true) {
     val newVolume = volume.coerceIn(0f, 1f)
     if (duration <= 0f || originalVolume == volume || !this.isPlaying) {
         this.volume = volume
+        if (newVolume <= 0f && stopIfZero) {
+            this.stop()
+        }
         return
     }
     val startSeconds = BRManiaApp.instance.secondsElapsed
