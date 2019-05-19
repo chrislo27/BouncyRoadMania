@@ -15,7 +15,6 @@ Also check out the [Rhythm Heaven Remix Editor](https://github.com/chrislo27/Rhy
 * Windows 7 or newer, Mac OS X 10.11 (El Capitan) or macOS 10.12 (Sierra) or newer, Linux (recommended Ubuntu 18.04 LTS or newer)
 
 ## Installation
-**NOTE: at the time of this writing, no public releases are available yet.** You'll have to compile it from the source code in order to use it.<br>
 Installation is straightforward.
 1. Go [to the most recent release](https://github.com/chrislo27/BouncyRoadMania/releases/latest) and download the `BouncyRoadMania_X.zip` file, where `X` is the version number.
 2. Once downloaded, extract this zip file to a location like the Desktop. On Windows, open the zip file and click Extract. On macOS, use [The Unarchiver](https://theunarchiver.com/) to extract the zip file.
