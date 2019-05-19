@@ -35,7 +35,7 @@ import java.util.*
 import java.util.zip.ZipFile
 
 
-class PlayScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, PlayScreen>(main), Lwjgl3WindowListener {
+class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelectScreen>(main), Lwjgl3WindowListener {
 
     companion object {
         private val MUSIC_CREDIT: String by lazy { MusicCredit.credit("Faster Does It") }
@@ -58,18 +58,18 @@ class PlayScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, PlayScreen>(main
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    override val stage: Stage<PlayScreen> = Stage(null, main.defaultCamera, camera.viewportWidth, camera.viewportHeight)
+    override val stage: Stage<GameSelectScreen> = Stage(null, main.defaultCamera, camera.viewportWidth, camera.viewportHeight)
     val music: Music by lazy {
         AssetRegistry.get<Music>("music_play_screen").apply {
             isLooping = true
         }
     }
 
-    val label: TextLabel<PlayScreen>
-    val backButton: Button<PlayScreen>
-    val playButton: Button<PlayScreen>
-    val openButton: Button<PlayScreen>
-    val openDiffButton: Button<PlayScreen>
+    val label: TextLabel<GameSelectScreen>
+    val backButton: Button<GameSelectScreen>
+    val playButton: Button<GameSelectScreen>
+    val openButton: Button<GameSelectScreen>
+    val openDiffButton: Button<GameSelectScreen>
     @Volatile
     private var loadState: LoadState = LoadState.None
         set(value) {
@@ -90,7 +90,7 @@ class PlayScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, PlayScreen>(main
         stage.elements += ColourPane(stage, stage).apply {
             this.colour.set(1f, 1f, 1f, 1f)
         }
-        stage.elements += object : Button<PlayScreen>(palette, stage, stage) {
+        stage.elements += object : Button<GameSelectScreen>(palette, stage, stage) {
             val unmuted = TextureRegion(AssetRegistry.get<Texture>("ui_music"))
             val muted = TextureRegion(AssetRegistry.get<Texture>("ui_music_muted"))
             val label = ImageLabel(palette, this, this.stage).apply {
