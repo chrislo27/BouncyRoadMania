@@ -68,6 +68,18 @@ class BeadsMusic(val audio: BeadsAudio) : Music {
         player.pitch.value = pitch
     }
 
+    override fun setLooping(loops: Boolean) {
+        player.player.loopType = if (loops) SamplePlayer.LoopType.LOOP_FORWARDS else SamplePlayer.LoopType.NO_LOOP_FORWARDS
+    }
+
+    override fun isLooping(): Boolean {
+        return player.player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS
+    }
+
+    override fun getDuration(): Float {
+        return (audio.sample.length / 1000.0).toFloat()
+    }
+
     override fun dispose() {
 //        player.player.pause(true)
 //        player.player.kill()

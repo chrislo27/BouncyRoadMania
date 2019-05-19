@@ -28,5 +28,11 @@ interface Music : Disposable {
     fun isPlaying(): Boolean
 
     fun getStartOfSound(): Float
+    
+    fun getDuration(): Float
+    
+    fun setLooping(loops: Boolean)
+    
+    fun isLooping(): Boolean
 
 }

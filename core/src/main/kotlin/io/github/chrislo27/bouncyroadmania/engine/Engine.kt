@@ -51,8 +51,11 @@ class Engine : Clock(), Disposable {
     val musicVolumes: MusicVolumes = MusicVolumes()
     val trackers: List<TrackerContainer<*>> = listOf(tempos, musicVolumes)
     val trackersReverseView: List<TrackerContainer<*>> = trackers.asReversed()
-    override var playState: PlayState by Delegates.observable(super.playState) { _, old, value ->
+    override var playState: PlayState by Delegates.vetoable(super.playState) { _, old, value ->
         if (old != value) {
+            if (value == PlayState.PLAYING && tempos.secondsMap.isEmpty()) {
+//                return@vetoable false
+            }
             val music = music
             entities.forEach { it.onPlayStateChanged(old, value) }
             lastBounceTinkSound.clear()
@@ -112,6 +115,7 @@ class Engine : Clock(), Disposable {
 
             listeners.keys.forEach { it.onPlayStateChanged(old, value) }
         }
+        true
     }
 
     var trackCount: Int = DEFAULT_TRACK_COUNT
@@ -142,7 +146,9 @@ class Engine : Clock(), Disposable {
     private var scheduleMusicPlaying = true
     @Volatile
     var musicSeeking = false
-
+    var loopIndex: Int = 0
+        private set
+    
     val events: List<Event> = mutableListOf()
 
     val entities: MutableList<Entity> = mutableListOf()
@@ -260,7 +266,15 @@ class Engine : Clock(), Disposable {
     private fun seekMusic() {
         val music = music ?: return
         musicSeeking = true
-        music.music.setPosition(seconds - musicStartSec)
+        val loops = music.music.isLooping()
+        val s = seconds
+        if (loops) {
+            val loopPos = (s - musicStartSec) % music.music.getDuration()
+            music.music.setPosition(loopPos)
+            loopIndex = ((seconds - musicStartSec) / music.music.getDuration()).toInt()
+        } else {
+            music.music.setPosition(s - musicStartSec)
+        }
         musicSeeking = false
     }
 
@@ -304,11 +318,18 @@ class Engine : Clock(), Disposable {
             }
             if (music.music.isPlaying()) {
                 val oldPosition = lastMusicPosition
-                val position = music.music.getPosition()
-                lastMusicPosition = position
+                val newPosition = music.music.getPosition()
+                lastMusicPosition = newPosition
 
-                if (oldPosition != position) {
-                    seconds = position + musicStartSec
+                if (oldPosition != newPosition) {
+                    seconds = if (music.music.isLooping()) {
+                        if (newPosition < oldPosition) {
+                            loopIndex++
+                        }
+                        newPosition + musicStartSec + loopIndex * music.music.getDuration()
+                    } else {
+                        newPosition + musicStartSec
+                    }
                 }
 
                 setMusicVolume()

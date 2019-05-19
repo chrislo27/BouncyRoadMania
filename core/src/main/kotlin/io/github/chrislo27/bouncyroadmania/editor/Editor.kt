@@ -1005,6 +1005,6 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
     }
 
     fun getDebugString(): String {
-        return "updateMessageBar: ${Gdx.graphics.frameId - frameLastCallUpdateMessageBar}\nclickOccupation: ${clickOccupation::class.java.simpleName}" + "\n${renderer.getDebugString()}"
+        return "updateMessageBar: ${Gdx.graphics.frameId - frameLastCallUpdateMessageBar}\nclickOccupation: ${clickOccupation::class.java.simpleName}\nlooping: ${engine.music?.music?.isLooping()}\nloopIndex: ${engine.loopIndex}" + "\n${renderer.getDebugString()}"
     }
 }
