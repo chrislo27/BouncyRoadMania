@@ -61,6 +61,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             }
             ret
         }
+        private val INACTIVE_TIME = 10f
     }
 
     private open inner class Event(val beat: Float, val duration: Float) {
@@ -208,6 +209,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     val currentMenu: List<MenuItem> get() = menus[currentMenuKey] ?: emptyList()
     private var clickedOnMenu: MenuItem? = null
     private var stopMusicOnHide = true
+    private var inactiveTime: Float = 0f
 
     init {
         stage.tooltipElement = TextLabel(main.uiPalette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), stage, stage).apply {
@@ -386,6 +388,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     fun reload() {
         engine.entities.clear()
+        engine.requiresPlayerInput = false
         engine.seconds = 0f
         engine.tempos.clear()
         engine.tempos.add(TempoChange(engine.tempos, 0f, MUSIC_BPM, Swing.STRAIGHT, 0f))
@@ -530,58 +533,51 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         engine.render(batch)
 
         // UI rendering
-        TMP_MATRIX.set(batch.projectionMatrix)
-        camera.update()
-        batch.projectionMatrix = camera.combined
-        batch.begin()
+        if (inactiveTime < INACTIVE_TIME) {
+            TMP_MATRIX.set(batch.projectionMatrix)
+            camera.update()
+            batch.projectionMatrix = camera.combined
+            batch.begin()
 
-        val borderedFont = main.defaultBorderedFont
-        borderedFont.scaleFont(camera)
-        borderedFont.scaleMul(0.5f)
-        val creditPadding = 4f
-        val creditWidth = camera.viewportWidth - creditPadding * 4f
-        val creditHeight = borderedFont.lineHeight * 3f
-//        borderedFont.drawCompressed(batch, MUSIC_CREDIT, camera.viewportWidth - creditPadding - creditWidth, creditHeight, creditWidth, Align.right)
-        borderedFont.unscaleFont()
-
-        val titleFont = main.cometBorderedFont
-        titleFont.scaleFont(camera)
-        titleFont.scaleMul(0.6f)
-        var titleX = menuPadding / 2f
-        TITLE.forEachIndexed { i, s ->
-            titleX += titleFont.draw(batch, s, titleX, menuTop + titleFont.lineHeight + titleFont.capHeight * titleWiggle[i]).width
-        }
-//        titleFont.drawCompressed(batch, BRMania.TITLE, menuPadding / 2, menuTop + titleFont.lineHeight, camera.viewportWidth - menuPadding * 2, Align.left)
-        titleFont.unscaleFont()
-
-        val menuIndex = getMenuIndex()
-        val currentMenu = currentMenu
-        val menuFont = main.kurokaneBorderedFont
-        menuFont.scaleFont(camera)
-        menuFont.scaleMul(0.35f)
-        menuAnimations.forEach { animation ->
-            renderMenu(batch, menus.getValue(animation.key), menuFont,
-                    Interpolation.smooth.apply(0f, -menuPadding, animation.progress) + (if (animation.reversed) menuPadding else 0f),
-                    0f, Interpolation.smooth.apply(1f, 0f, if (!animation.reversed) animation.progress else (1f - animation.progress)))
-        }
-        if (menuAnimations.none { it.reversed && it.key == currentMenuKey }) {
-            renderMenu(batch, currentMenu, menuFont, 0f, 0f, 1f)
-        }
-
-        val c = clickedOnMenu
-        if (menuIndex in 0 until currentMenu.size && (c == null || c === currentMenu[menuIndex])) {
-            if (!currentMenu[menuIndex].enabled) {
-                menuFont.setColor(0.5f, 0.5f, 0.5f, 0f)
-            } else if (c != null && c === currentMenu[menuIndex]) {
-                menuFont.setColor(0.5f, 1f, 1f, 1f)
+            val titleFont = main.cometBorderedFont
+            titleFont.scaleFont(camera)
+            titleFont.scaleMul(0.6f)
+            var titleX = menuPadding / 2f
+            TITLE.forEachIndexed { i, s ->
+                titleX += titleFont.draw(batch, s, titleX, menuTop + titleFont.lineHeight + titleFont.capHeight * titleWiggle[i]).width
             }
-            menuFont.drawCompressed(batch, "> ", 0f + MathHelper.getSineWave(60f / MUSIC_BPM) * 10f, menuTop + menuFont.capHeight * 0.15f - menuFont.lineHeight * menuIndex, menuPadding, Align.right)
-            menuFont.setColor(1f, 1f, 1f, 1f)
-        }
-        menuFont.unscaleFont()
+            titleFont.unscaleFont()
 
-        batch.end()
-        batch.projectionMatrix = TMP_MATRIX
+            val menuIndex = getMenuIndex()
+            val currentMenu = currentMenu
+            val menuFont = main.kurokaneBorderedFont
+            menuFont.scaleFont(camera)
+            menuFont.scaleMul(0.35f)
+            menuAnimations.forEach { animation ->
+                renderMenu(batch, menus.getValue(animation.key), menuFont,
+                        Interpolation.smooth.apply(0f, -menuPadding, animation.progress) + (if (animation.reversed) menuPadding else 0f),
+                        0f, Interpolation.smooth.apply(1f, 0f, if (!animation.reversed) animation.progress else (1f - animation.progress)))
+            }
+            if (menuAnimations.none { it.reversed && it.key == currentMenuKey }) {
+                renderMenu(batch, currentMenu, menuFont, 0f, 0f, 1f)
+            }
+
+            val c = clickedOnMenu
+            if (menuIndex in 0 until currentMenu.size && (c == null || c === currentMenu[menuIndex])) {
+                if (!currentMenu[menuIndex].enabled) {
+                    menuFont.setColor(0.5f, 0.5f, 0.5f, 0f)
+                } else if (c != null && c === currentMenu[menuIndex]) {
+                    menuFont.setColor(0.5f, 1f, 1f, 1f)
+                }
+                menuFont.drawCompressed(batch, "> ", 0f + MathHelper.getSineWave(60f / MUSIC_BPM) * 10f, menuTop + menuFont.capHeight * 0.15f - menuFont.lineHeight * menuIndex, menuPadding, Align.right)
+                menuFont.setColor(1f, 1f, 1f, 1f)
+            }
+            menuFont.unscaleFont()
+
+            batch.end()
+            batch.projectionMatrix = TMP_MATRIX
+        }
+        stage.visible = inactiveTime < INACTIVE_TIME
 
         super.render(delta)
     }
@@ -620,6 +616,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 (versionButton.labels.first() as TextLabel).textColor = if (main.preferences.getInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE, 0) >= 3) Color.RED else Color.ORANGE
             }
         }
+        inactiveTime += Gdx.graphics.deltaTime
     }
 
     override fun resize(width: Int, height: Int) {
@@ -637,7 +634,28 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             |events: ${events.size}
             |music: ${music.position}
             |  offset: ${engine.seconds - music.position}
+            |inactiveTime: $inactiveTime
         """.trimMargin()
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        inactiveTime = 0f
+        return super.mouseMoved(screenX, screenY)
+    }
+
+    override fun scrolled(amount: Int): Boolean {
+        inactiveTime = 0f
+        return super.scrolled(amount)
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        inactiveTime = 0f
+        return super.keyDown(keycode)
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        inactiveTime = 0f
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
     override fun hide() {
