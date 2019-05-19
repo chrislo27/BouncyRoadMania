@@ -21,6 +21,7 @@ import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.unpack
 import io.github.chrislo27.bouncyroadmania.util.*
+import io.github.chrislo27.bouncyroadmania.util.transition.FadeIn
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
@@ -35,7 +36,8 @@ import java.util.*
 import java.util.zip.ZipFile
 
 
-class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelectScreen>(main), Lwjgl3WindowListener {
+class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
+    : ToolboksScreen<BRManiaApp, GameSelectScreen>(main), Lwjgl3WindowListener {
 
     companion object {
         private val MUSIC_CREDIT: String by lazy { MusicCredit.credit("Faster Does It") }
@@ -133,7 +135,7 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
             this.colour.set(palette.backColor)
             this.location.set(screenX = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -4f, pixelWidth = 4f, pixelHeight = 16f * 3)
         }
-        
+
         stage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), stage, stage).apply {
             this.location.set(screenX = 0f, screenWidth = 0f, screenHeight = 0f, pixelX = 0f, pixelWidth = 220f, pixelHeight = 70f)
             this.isLocalizationKey = false
@@ -148,18 +150,22 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
             this.isLocalizationKey = false
             this.textWrapping = false
             this.location.set(screenY = 0.225f, screenHeight = 0.725f)
-            this.text = Localization["play.select"]
+            this.text = labelText ?: Localization["gameSelect.select"]
             this.background = true
         }
         stage.elements += label
         playButton = Button(palette.copy(highlightedBackColor = Color(0.125f, 0.5f, 0.125f, 0.75f), clickedBackColor = Color(0f, 0.75f, 0.5f, 0.75f)), stage, stage).apply {
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
-                this.text = "play.playButton"
+                this.text = "gameSelect.playButton"
                 this.textWrapping = false
             })
             this.leftClickAction = { _, _ ->
-                
+                val loadState = loadState
+                if (loadState is LoadState.Loaded) {
+                    val nextScreen = PlayingScreen(main, loadState.engine)
+                    main.screen = TransitionScreen(main, main.screen, nextScreen, WipeTo(Color.BLACK, 0.35f), FadeIn(0.45f, Color.BLACK))
+                }
             }
             this.location.set(screenX = 0.3f, screenWidth = 0.4f, screenY = 0.1f, screenHeight = 0.1f)
             this.visible = false
@@ -168,7 +174,7 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
         openButton = Button(palette, stage, stage).apply {
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
-                this.text = "play.openButton"
+                this.text = "gameSelect.openButton"
                 this.textWrapping = false
             })
             this.leftClickAction = { _, _ ->
@@ -183,7 +189,7 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
         openDiffButton = Button(palette, stage, stage).apply {
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
-                this.text = "play.openDifferentButton"
+                this.text = "gameSelect.openDifferentButton"
                 this.fontScaleMultiplier = 0.85f
                 this.textWrapping = false
             })
@@ -206,7 +212,7 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
                 backToMainMenu()
             }
             this.tooltipTextIsLocalizationKey = true
-            this.tooltipText = "play.back"
+            this.tooltipText = "gameSelect.back"
         }
         stage.elements += backButton
 
@@ -252,12 +258,22 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
                     newEngine.unpack(zipFile)
                     persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, file.parentFile)
                     System.gc()
-                    Gdx.app.postRunnable {
-                        loadState = LoadState.Loaded(newEngine)
-                        label.text = Localization["play.readyToPlay", file.name]
-                        playButton.visible = true
-                        openDiffButton.visible = true
-                        openButton.visible = false
+                    if (newEngine.duration.isInfinite()) {
+                        Gdx.app.postRunnable {
+                            loadState = LoadState.None
+                            label.text = Localization["gameSelect.incomplete", file.name]
+                            playButton.visible = false
+                            openDiffButton.visible = false
+                            openButton.visible = true
+                        }
+                    } else {
+                        Gdx.app.postRunnable {
+                            loadState = LoadState.Loaded(newEngine)
+                            label.text = Localization["gameSelect.readyToPlay", file.name]
+                            playButton.visible = true
+                            openDiffButton.visible = true
+                            openButton.visible = false
+                        }
                     }
                 } catch (e: Exception) {
                     loadState = LoadState.None
@@ -271,7 +287,7 @@ class GameSelectScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, GameSelect
             } else {
                 Gdx.app.postRunnable {
                     loadState = LoadState.None
-                    label.text = Localization["play.select"]
+                    label.text = Localization["gameSelect.select"]
                 }
             }
         }

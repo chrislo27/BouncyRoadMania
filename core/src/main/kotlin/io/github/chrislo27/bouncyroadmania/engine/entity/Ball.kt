@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
@@ -17,13 +18,13 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
     data class Bounce(val fromX: Float, val fromY: Float, val fromZ: Float, val toX: Float, val toY: Float, val toZ: Float, val arcHeight: Float,
                       val startBeat: Float, val endBeat: Float, val fromBouncer: Bouncer, val toBouncer: Bouncer?)
 
-    private data class FallOff(val minSeconds: Float, val maxSeconds: Float, val bouncer: Bouncer)
+    private data class FallOff(val perfectSeconds: Float, val minSeconds: Float, val maxSeconds: Float, val bouncer: Bouncer)
 
     val sentOutAt: Float = sendOutAt
     var bouncesSoFar: Int = 0
     var bounce: Bounce? = null
-    var fellOff: Boolean = false
-        private set
+    private var fellOff: FallOff? = null
+    val didFallOff: Boolean get() = fellOff != null
 
     // The ball will "fall off" after this seconds so long if bounce's toBouncer is a player
     private var fallOff: FallOff? = null
@@ -54,11 +55,11 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
     fun bounce(from: Bouncer, next: Bouncer, startFromCurrentPos: Boolean,
                startBeat: Float = if (startFromCurrentPos) engine.beat else (sentOutAt + (bouncesSoFar) * beatsPerBounce),
-               endBeat: Float = if (fellOff) (startBeat + beatsPerBounce) else (sentOutAt + (bouncesSoFar + 1) * beatsPerBounce)) {
+               endBeat: Float = if (fellOff != null) (startBeat + beatsPerBounce) else (sentOutAt + (bouncesSoFar + 1) * beatsPerBounce)) {
         val fromPos: Entity = if (startFromCurrentPos) this else from
         val fellOff = this.fellOff
-        val nextX = if (fellOff) MathUtils.lerp(fromPos.posX, next.posX, 0.5f) else next.posX
-        this.bounce = Bounce(fromPos.posX, fromPos.posY, fromPos.posZ, nextX, if (fellOff) -32f else next.posY, next.posZ,
+        val nextX = if (fellOff != null) MathUtils.lerp(fromPos.posX, next.posX, 0.5f) else next.posX
+        this.bounce = Bounce(fromPos.posX, fromPos.posY, fromPos.posZ, nextX, if (fellOff != null) -32f else next.posY, next.posZ,
                 100f * beatsPerBounce + 8f,
                 startBeat, endBeat, from, next)
     }
@@ -99,11 +100,18 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                 val newFrom = bounce.toBouncer
                 val intAlpha = alpha.toInt()
                 val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + intAlpha)
-                if (next == null || fellOff) {
+                val fellOff = this.fellOff
+                if (next == null || fellOff != null) {
                     this.bounce = null
                     this.kill = true
-                    if (fellOff) {
+                    if (fellOff != null) {
                         AssetRegistry.get<BeadsSound>("sfx_splash").play()
+                        if (engine.requiresPlayerInput) {
+                            val inputSecs = engine.seconds
+                            println("fell off")
+                            engine.inputResults += InputResult((fellOff.bouncer as? PlayerBouncer)?.inputType ?: InputType.A,
+                                    inputSecs - fellOff.perfectSeconds, ((inputSecs - fellOff.perfectSeconds) / Engine.MAX_OFFSET_SEC).coerceIn(-1f, 1f))
+                        }
                     }
                 } else if (newFrom != null) {
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
@@ -137,7 +145,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                             val currentSeconds = engine.seconds
                             if (currentSeconds > fo.maxSeconds) {
                                 // Fall off
-                                fellOff = true
+                                this.fellOff = fo
                                 this.fallOff = null
                                 bouncesSoFar += intAlpha
                                 newFrom.playSound(semitone = 0)
@@ -159,7 +167,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                 // Set the fall off time
                 val expectedBeat = sentOutAt + (bouncesSoFar + 1) * beatsPerBounce
                 val expectedSeconds = engine.tempos.beatsToSeconds(expectedBeat)
-                this.fallOff = FallOff(expectedSeconds - Engine.MAX_OFFSET_SEC, expectedSeconds + Engine.MAX_OFFSET_SEC, next)
+                this.fallOff = FallOff(expectedSeconds, expectedSeconds - Engine.MAX_OFFSET_SEC, expectedSeconds + Engine.MAX_OFFSET_SEC, next)
             }
         }
     }
@@ -168,8 +176,11 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
         val fo = this.fallOff
         if (fo != null && fo.bouncer is PlayerBouncer) {
             // Pending input
-            if (fo.bouncer.inputType == inputType && engine.seconds in fo.minSeconds..fo.maxSeconds) {
-                // TODO tell engine an input was received at a certain time for recording
+            val inputSecs = engine.seconds
+            if (fo.bouncer.inputType == inputType && inputSecs in fo.minSeconds..fo.maxSeconds) {
+                val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.MAX_OFFSET_SEC)
+                engine.inputResults += inputResult
+                println("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
                 bouncesSoFar++
                 fo.bouncer.playSound()
                 this.fallOff = null

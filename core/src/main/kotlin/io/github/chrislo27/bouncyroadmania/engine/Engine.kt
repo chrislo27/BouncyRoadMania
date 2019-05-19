@@ -11,6 +11,7 @@ import io.github.chrislo27.bouncyroadmania.engine.entity.*
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.engine.event.PlaybackCompletion
+import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
@@ -31,7 +32,7 @@ class Engine : Clock(), Disposable {
     companion object {
         private val TMP_MATRIX = Matrix4()
 
-        val MAX_OFFSET_SEC: Float = 4.5f / 60
+        val MAX_OFFSET_SEC: Float = 5f / 60
         val ACE_OFFSET: Float = 1f / 60
         val GOOD_OFFSET: Float = 3f / 60
         val BARELY_OFFSET: Float = 4f / 60
@@ -67,8 +68,6 @@ class Engine : Clock(), Disposable {
                     BeadsSoundSystem.stop()
                     entities.clear()
                     addBouncers()
-                    gradientCurrentStart.set(gradientStart)
-                    gradientCurrentEnd.set(gradientEnd)
                 }
                 PlayState.PAUSED -> {
                     AssetRegistry.pauseAllSounds()
@@ -81,6 +80,7 @@ class Engine : Clock(), Disposable {
                     AssetRegistry.resumeAllSounds()
                     if (old == PlayState.STOPPED) {
                         recomputeCachedData()
+                        inputResults.clear()
                         seconds = tempos.beatsToSeconds(playbackStart)
                         events.forEach {
                             if (it.getUpperUpdateableBound() < beat) {
@@ -96,6 +96,8 @@ class Engine : Clock(), Disposable {
                                 it.playbackCompletion = PlaybackCompletion.WAITING
                             }
                         }
+                        gradientCurrentStart.set(gradientStart)
+                        gradientCurrentEnd.set(gradientEnd)
 
                         lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
                         lastMetronomeMeasurePart = -1
@@ -150,6 +152,7 @@ class Engine : Clock(), Disposable {
         private set
     
     val events: List<Event> = mutableListOf()
+    val inputResults: MutableList<InputResult> = mutableListOf()
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
@@ -253,6 +256,10 @@ class Engine : Clock(), Disposable {
         if (this.events.size != oldSize) {
             recomputeCachedData()
         }
+    }
+    
+    fun computeScore(): Float {
+        return (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / inputResults.size.coerceAtLeast(1) * 100).toFloat()
     }
 
     private fun setMusicVolume() {

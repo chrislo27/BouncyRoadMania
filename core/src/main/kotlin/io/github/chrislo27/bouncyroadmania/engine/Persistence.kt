@@ -69,7 +69,7 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
             node.put("measure", it.measure)
         }
     }
-
+    
     return root
 }
 
@@ -118,6 +118,8 @@ fun Engine.fromEngineJson(root: ObjectNode) {
             timeSignatures.add(TimeSignature(timeSignatures, it["beat"].asDouble().toFloat(), it["divisions"].asInt(4), it["beatUnit"]?.asInt(4) ?: 4))
         }
     }
+    
+    this.recomputeCachedData()
 }
 
 fun Engine.pack(stream: ZipOutputStream, isAutosave: Boolean) {
@@ -165,6 +167,8 @@ fun Engine.unpack(zip: ZipFile) {
 
         this.music = MusicData(fh, this)
     }
+    
+    this.recomputeCachedData()
 
     return result
 }
