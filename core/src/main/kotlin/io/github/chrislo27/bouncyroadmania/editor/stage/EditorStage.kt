@@ -152,6 +152,7 @@ class EditorStage(val editor: Editor)
         pickerStage.visible = editor.editMode == EditMode.EVENTS
         toolbarStage.tapalongButton.enabled = editor.editMode == EditMode.EVENTS
         initialParamsStage.visible = editor.editMode == EditMode.PARAMETERS
+        messageBarStage.visible = editor.editMode != EditMode.ENGINE
     }
 
 }
