@@ -3,6 +3,7 @@ package io.github.chrislo27.bouncyroadmania.editor.stage
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.StreamUtils
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.editor.Editor
@@ -52,11 +53,11 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                         val filter = TinyFDWrapper.Filter(listOf("*.${BRMania.FILE_EXTENSION}"), Localization["save.fileFilter"] + " (.${BRMania.FILE_EXTENSION})")
                         val file = initialFile ?: TinyFDWrapper.openFile(Localization["load.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath?.plus("/"), false, filter)
                         if (file != null && file.exists()) {
+                            val zipFile = ZipFile(file)
                             try {
                                 Gdx.app.postRunnable {
                                     label.text = Localization["load.loading"]
                                 }
-                                val zipFile = ZipFile(file)
                                 val newEngine = Engine()
                                 newEngine.unpack(zipFile)
                                 editor.engine = newEngine
@@ -87,6 +88,8 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                     }
                                     this@overlay.updatePositions()
                                 }
+                            } finally {
+                                StreamUtils.closeQuietly(zipFile)
                             }
                         } else {
                             Gdx.app.postRunnable {
