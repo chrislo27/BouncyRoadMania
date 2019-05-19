@@ -60,6 +60,7 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
     }
 
     override fun dispose() {
+        editor.engine.dispose()
     }
 
 }
