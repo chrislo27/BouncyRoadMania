@@ -24,6 +24,6 @@ sealed class PresenceState(open val state: String = "", open val smallIcon: Stri
         : PresenceState("Playing")
     
     object GameSelect
-        : PresenceState("Deciding what to play...")
+        : PresenceState("Selecting a game")
 
 }
