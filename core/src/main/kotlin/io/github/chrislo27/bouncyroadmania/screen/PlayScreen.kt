@@ -127,6 +127,10 @@ class PlayScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, PlayScreen>(main
                 Gdx.net.openURI("https://incompetech.com")
             }
         }
+        stage.elements += ColourPane(stage, stage).apply {
+            this.colour.set(palette.backColor)
+            this.location.set(screenX = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -4f, pixelWidth = 4f, pixelHeight = 16f * 3)
+        }
 
         label = TextLabel(palette.copy(), stage, stage).apply {
             this.isLocalizationKey = false
