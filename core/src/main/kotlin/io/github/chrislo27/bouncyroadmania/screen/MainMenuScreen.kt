@@ -634,7 +634,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 (versionButton.labels.first() as TextLabel).textColor = if (main.preferences.getInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE, 0) >= 3) Color.RED else Color.ORANGE
             }
         }
-        inactiveTime += Gdx.graphics.deltaTime
+        if (menuIndex !in 0 until currentMenu.size) {
+            inactiveTime += Gdx.graphics.deltaTime
+        }
     }
 
     override fun resize(width: Int, height: Int) {
