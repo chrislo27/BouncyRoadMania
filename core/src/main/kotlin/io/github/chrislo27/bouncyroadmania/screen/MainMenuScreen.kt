@@ -629,7 +629,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
         val ghv = main.githubVersion
         if (ghv != lastGhVersion) {
-            if (!ghv.isUnknown) {
+            if (!ghv.isUnknown && ghv > BRMania.VERSION) {
                 versionButton.tooltipText = "mainMenu.checkForUpdates.new"
                 (versionButton.labels.first() as TextLabel).textColor = if (main.preferences.getInteger(PreferenceKeys.TIMES_SKIPPED_UPDATE, 0) >= 3) Color.RED else Color.ORANGE
             }
