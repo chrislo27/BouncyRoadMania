@@ -108,7 +108,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                         AssetRegistry.get<BeadsSound>("sfx_splash").play()
                         if (engine.requiresPlayerInput) {
                             val inputSecs = engine.seconds
-                            println("fell off")
                             engine.inputResults += InputResult((fellOff.bouncer as? PlayerBouncer)?.inputType ?: InputType.A,
                                     inputSecs - fellOff.perfectSeconds, ((inputSecs - fellOff.perfectSeconds) / Engine.MAX_OFFSET_SEC).coerceIn(-1f, 1f))
                         }
@@ -180,7 +179,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
             if (fo.bouncer.inputType == inputType && inputSecs in fo.minSeconds..fo.maxSeconds) {
                 val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.MAX_OFFSET_SEC)
                 engine.inputResults += inputResult
-                println("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
+//                println("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
                 bouncesSoFar++
                 fo.bouncer.playSound()
                 this.fallOff = null
@@ -189,25 +188,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                 return true
             }
         }
-//        val next = nextBouncerInput
-//        if (next != null && next.inputType == inputType) {
-//            val bouncer = engine.getBouncerForInput(inputType)
-//            val currentSeconds = engine.clock.seconds
-//            val diff = currentSeconds - next.seconds
-//            val absDiff = diff.absoluteValue
-//            if (absDiff <= Engine.MAX_OFFSET_SEC) {
-//                if (absDiff > Engine.BARELY_OFFSET) {
-//                    // Miss
-//                    next.succeeded = 0
-//                } else {
-//                    bouncer.playSound()
-//                    next.succeeded = 1
-//                    // FIXME
-//                    println("Bouncer for $inputType - $diff sec")
-//                    return true
-//                }
-//            }
-//        }
         return false // TODO
     }
 }

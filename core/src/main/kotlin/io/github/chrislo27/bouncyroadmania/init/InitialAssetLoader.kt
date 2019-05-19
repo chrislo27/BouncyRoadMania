@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
@@ -74,7 +75,9 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<BeadsSound>("sfx_dud_right", "sounds/dudR.wav")
         AssetRegistry.loadAsset<BeadsSound>("sfx_splash", "sounds/splash.wav")
         AssetRegistry.loadAsset<BeadsSound>("sfx_cowbell", "sounds/cowbell.ogg")
-        AssetRegistry.loadAsset<Music>("music_br", "sounds/Bouncy Road.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_robot_on", "sounds/robot_on.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_robot_off", "sounds/robot_off.ogg")
+//        AssetRegistry.loadAsset<Music>("music_br", "sounds/Bouncy Road.ogg")
 
         AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")
         AssetRegistry.loadAsset<Music>("music_play_screen", "music/Faster_Does_It.ogg")
