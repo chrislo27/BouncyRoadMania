@@ -307,11 +307,11 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
             }
             if (engine.playState == PlayState.STOPPED && clickOccupation == ClickOccupation.None) {
                 if (control && !alt && !shift) {
-                    if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.N) && stage.elements.none { it is MenuOverlay }) {
                         stage.toolbarStage.newButton.onLeftClick(0f, 0f)
-                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.O) && stage.elements.none { it is MenuOverlay }) {
                         stage.toolbarStage.loadButton.onLeftClick(0f, 0f)
-                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.S) && stage.elements.none { it is MenuOverlay }) {
                         stage.toolbarStage.saveButton.onLeftClick(0f, 0f)
                     } else if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
                         // Select following
