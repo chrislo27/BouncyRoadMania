@@ -402,7 +402,7 @@ class Engine : Clock(), Disposable {
         bouncer.bounceAnimation()
         if (!any) {
             // play dud sound
-            AssetRegistry.get<BeadsSound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play()
+            AssetRegistry.get<BeadsSound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play(volume = 0.75f)
         }
     }
 
