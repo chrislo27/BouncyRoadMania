@@ -20,7 +20,6 @@ import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
-import io.github.chrislo27.bouncyroadmania.stage.GenericStage
 import io.github.chrislo27.bouncyroadmania.util.*
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
@@ -29,7 +28,10 @@ import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.transition.TransitionScreen
-import io.github.chrislo27.toolboks.ui.*
+import io.github.chrislo27.toolboks.ui.Button
+import io.github.chrislo27.toolboks.ui.ImageLabel
+import io.github.chrislo27.toolboks.ui.Stage
+import io.github.chrislo27.toolboks.ui.TextLabel
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
 import io.github.chrislo27.toolboks.version.Version
@@ -134,34 +136,6 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     data class MenuAnimation(val key: String, val speed: Float = 0.35f, var progress: Float = 0f, var reversed: Boolean = false)
 
-    private inner class PlayOverlay(parent: Stage<MainMenuScreen>, palette: UIPalette)
-        : Stage<MainMenuScreen>(parent, parent.camera, parent.pixelsWidth, parent.pixelsHeight) {
-
-        val genericStage: GenericStage<MainMenuScreen>
-        
-        init {
-            elements += ColourPane(this, this).apply {
-                this.colour.set(1f, 1f, 1f, 0.5f)
-                this.location.set(0f, 0f, 1f, 1f)
-            }
-            elements += InputSponge(this, this).apply {
-                this.location.set(0f, 0f, 1f, 1f)
-            }
-            genericStage = GenericStage(palette, this, this.camera).apply {
-                this.backButton.visible = true
-                this.onBackButtonClick = {
-                    removeSelf() // FIXME handle when waiting for file or loading
-                }
-            }
-            elements += genericStage
-        }
-
-        fun removeSelf() {
-            (parent as Stage).removeChild(this)
-        }
-
-    }
-
     val engine: Engine = Engine()
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
@@ -261,10 +235,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 main.preferences.putBoolean(PreferenceKeys.MUTE_MUSIC, !old).flush()
                 music.volume = if (!old) 0f else 1f
                 label.image = if (!old) this@apply.muted else unmuted
-                this.tooltipText = "mainMenu.tooltip.${if (!old) "mute" else "unmute"}Music"
+                this.tooltipText = "mainMenu.tooltip.${if (old) "mute" else "unmute"}Music"
             }
             this.tooltipTextIsLocalizationKey = true
-            this.tooltipText = "mainMenu.tooltip.${if (muted) "mute" else "unmute"}Music"
+            this.tooltipText = "mainMenu.tooltip.${if (!muted) "mute" else "unmute"}Music"
         }
         stage.elements += fullscreenButton
         stage.elements += Button(main.uiPalette, stage, stage).apply {
