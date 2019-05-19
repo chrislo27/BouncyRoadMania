@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
+import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
@@ -174,6 +176,9 @@ class BRManiaApp(logger: Logger, logToFile: File?)
                 this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             }
         }
+
+        DiscordHelper.init()
+        DiscordHelper.updatePresence(PresenceState.Loading)
 
         // screens
         run {

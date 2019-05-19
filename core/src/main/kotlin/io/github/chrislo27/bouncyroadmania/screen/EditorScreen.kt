@@ -5,6 +5,8 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
+import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
@@ -43,6 +45,7 @@ class EditorScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, EditorScreen>(
         val window = (Gdx.graphics as Lwjgl3Graphics).window
         lastWindowListener = window.windowListener
         window.windowListener = editor
+        DiscordHelper.updatePresence(PresenceState.Editing)
     }
 
     override fun hide() {

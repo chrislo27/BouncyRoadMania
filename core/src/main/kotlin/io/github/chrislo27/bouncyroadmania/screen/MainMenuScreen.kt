@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
+import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
+import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
@@ -672,6 +674,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         inactiveTime = 0f
         return super.touchDown(screenX, screenY, pointer, button)
+    }
+
+    override fun show() {
+        super.show()
+        DiscordHelper.updatePresence(PresenceState.MainMenu)
     }
 
     override fun hide() {

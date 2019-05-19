@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.StreamUtils
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
+import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
+import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.unpack
 import io.github.chrislo27.bouncyroadmania.util.*
@@ -130,6 +132,16 @@ class PlayScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, PlayScreen>(main
         stage.elements += ColourPane(stage, stage).apply {
             this.colour.set(palette.backColor)
             this.location.set(screenX = 1f, screenWidth = 0f, screenHeight = 0f, pixelX = -4f, pixelWidth = 4f, pixelHeight = 16f * 3)
+        }
+        
+        stage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), stage, stage).apply {
+            this.location.set(screenX = 0f, screenWidth = 0f, screenHeight = 0f, pixelX = 0f, pixelWidth = 220f, pixelHeight = 70f)
+            this.isLocalizationKey = false
+            this.text = " Game Controls:\n [YELLOW]\uE0E0[] - J\n [RED]\uE110[] - D"
+            this.textAlign = Align.left
+            this.textWrapping = false
+            this.fontScaleMultiplier = 0.85f
+            this.background = true
         }
 
         label = TextLabel(palette.copy(), stage, stage).apply {
@@ -307,6 +319,7 @@ class PlayScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, PlayScreen>(main
         val window = (Gdx.graphics as Lwjgl3Graphics).window
         lastWindowListener = window.windowListener
         window.windowListener = this
+        DiscordHelper.updatePresence(PresenceState.GameSelect)
     }
 
     override fun hide() {
