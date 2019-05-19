@@ -317,6 +317,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 },
                 mainDebugItem,
                 MenuItem("mainMenu.quit") {
+                    currentMenuKey = "seeYouLater"
                     Gdx.app.exit()
                     thread(isDaemon = true) {
                         Thread.sleep(500L)
@@ -339,6 +340,12 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 },
                 MenuItem("mainMenu.back") {
                     currentMenuKey = "main"
+                }
+        )
+        
+        menus["seeYouLater"] = listOf(
+                MenuItem("mainMenu.seeYouLater"){}.apply {
+                    this.enabled = false
                 }
         )
 
