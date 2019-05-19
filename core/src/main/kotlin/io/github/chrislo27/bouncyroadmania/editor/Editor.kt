@@ -952,7 +952,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         }
 
         if (clickOccupation == ClickOccupation.None && stage.elements.none { it is MenuOverlay }) {
-            val path = files.firstOrNull { it.toLowerCase(Locale.ROOT).endsWith(BRMania.FILE_EXTENSION.toLowerCase(Locale.ROOT)) }
+            val path = files.firstOrNull { it.toLowerCase(Locale.ROOT).endsWith("." + BRMania.FILE_EXTENSION.toLowerCase(Locale.ROOT)) }
             if (path != null) {
                 val file = File(path)
                 if (file.exists()) {
