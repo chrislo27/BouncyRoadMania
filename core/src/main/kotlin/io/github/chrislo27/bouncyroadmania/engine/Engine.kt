@@ -381,6 +381,7 @@ class Engine : Clock(), Disposable {
     override fun dispose() {
         listeners.clear()
         music?.dispose()
+        BeadsSoundSystem.stop() // Ensures that the GC can collect the music data
     }
 
 }
