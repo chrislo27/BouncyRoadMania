@@ -107,11 +107,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                     this.kill = true
                     if (fellOff != null) {
                         AssetRegistry.get<BeadsSound>("sfx_splash").play()
-                        if (engine.requiresPlayerInput) {
-                            val inputSecs = engine.seconds
-                            engine.inputResults += InputResult((fellOff.bouncer as? PlayerBouncer)?.inputType ?: InputType.A,
-                                    inputSecs - fellOff.perfectSeconds, ((inputSecs - fellOff.perfectSeconds) / Engine.MAX_OFFSET_SEC).coerceIn(-1f, 1f))
-                        }
                     }
                 } else if (newFrom != null) {
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
