@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import java.util.zip.ZipFile
+import kotlin.math.roundToInt
 
 
 class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
@@ -252,10 +253,14 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
                 val zipFile = ZipFile(file)
                 try {
                     Gdx.app.postRunnable {
-                        label.text = Localization["load.loading"]
+                        label.text = Localization["load.loading", "0"]
                     }
                     val newEngine = Engine()
-                    newEngine.unpack(zipFile)
+                    newEngine.unpack(zipFile) {
+                        Gdx.app.postRunnable {
+                            label.text = Localization["load.loading", (it * 100).roundToInt()]
+                        }
+                    }
                     persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, file.parentFile)
                     System.gc()
                     if (newEngine.duration.isInfinite()) {

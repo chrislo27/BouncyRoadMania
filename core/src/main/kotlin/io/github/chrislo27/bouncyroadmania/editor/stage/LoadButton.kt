@@ -22,6 +22,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.zip.ZipFile
+import kotlin.math.roundToInt
 
 
 class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScreen>, val editorStage: EditorStage)
@@ -56,10 +57,14 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                             val zipFile = ZipFile(file)
                             try {
                                 Gdx.app.postRunnable {
-                                    label.text = Localization["load.loading"]
+                                    label.text = Localization["load.loading", "0"]
                                 }
                                 val newEngine = Engine()
-                                newEngine.unpack(zipFile)
+                                newEngine.unpack(zipFile) {
+                                    Gdx.app.postRunnable {
+                                        label.text = Localization["load.loading", (it * 100).roundToInt()]
+                                    }
+                                }
                                 Gdx.app.postRunnable {
                                     editor.engine = newEngine
                                     editor.setFileHandles(FileHandle(file))

@@ -212,7 +212,7 @@ fun Engine.saveTo(file: File, isAutosave: Boolean) {
     stream.close()
 }
 
-fun Engine.unpack(zip: ZipFile) {
+fun Engine.unpack(zip: ZipFile, progressListener: (Float) -> Unit = {}) {
     val jsonStream = zip.getInputStream(zip.getEntry("data.json"))
     val objectNode: ObjectNode = JsonHandler.OBJECT_MAPPER.readTree(jsonStream) as ObjectNode
     jsonStream.close()
@@ -229,7 +229,7 @@ fun Engine.unpack(zip: ZipFile) {
         fh.write(musicStream, false)
         musicStream.close()
 
-        this.music = MusicData(fh, this)
+        this.music = MusicData(fh, this, progressListener)
     }
     
     val texs = objectNode["textures"] as? ArrayNode?
