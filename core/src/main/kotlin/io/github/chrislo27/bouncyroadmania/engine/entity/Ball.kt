@@ -9,6 +9,7 @@ import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
+import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
@@ -175,7 +176,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
             if (fo.bouncer.inputType == inputType && inputSecs in fo.minSeconds..fo.maxSeconds) {
                 val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.MAX_OFFSET_SEC)
                 engine.inputResults += inputResult
-//                println("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
+                Toolboks.LOGGER.debug("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
                 bouncesSoFar++
                 fo.bouncer.playSound()
                 this.fallOff = null
@@ -184,6 +185,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                 return true
             }
         }
-        return false // TODO
+        return false
     }
 }
