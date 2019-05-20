@@ -22,6 +22,7 @@ import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
 import java.lang.ref.WeakReference
+import kotlin.properties.Delegates
 
 
 class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
@@ -35,10 +36,21 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
 
     var firstBounceHasSound: Boolean = false
     val color: Color = Color(1f, 1f, 1f, 1f)
-    var semitoneOffset: Int = 0
+    var semitoneOffset: Int by Delegates.observable(0) { _, _, _ ->
+        onParamsChange()
+    }
+
+    override val renderText: String
+        get() = renderTextBacking
+    private var renderTextBacking: String = ""
 
     init {
         this.bounds.width = 0.5f
+        onParamsChange()
+    }
+
+    private fun onParamsChange() {
+        renderTextBacking = (if (firstBounceHasSound) "*" else "") + super.renderText + (if (color.toFloatBits() != Color.WHITE_FLOAT_BITS) " ([#$color]█[])" else "") + (if (semitoneOffset > 0) " (+$semitoneOffset)" else if (semitoneOffset < 0) " ($semitoneOffset)" else "")
     }
 
     override fun getRenderColor(editor: Editor, theme: EditorTheme): Color {
@@ -88,6 +100,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         firstBounceHasSound = node["firstBounceHasSound"]?.asBoolean(false) ?: false
         color.fromJsonString(node["color"]?.asText())
         semitoneOffset = node["semitone"]?.asInt(0) ?: 0
+        onParamsChange()
     }
 
     override fun toJson(node: ObjectNode) {
@@ -127,11 +140,13 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                         override fun redo(context: Editor) {
                             event.firstBounceHasSound = value
                             checkbox.get()?.checked = value
+                            onParamsChange()
                         }
 
                         override fun undo(context: Editor) {
                             event.firstBounceHasSound = !value
                             checkbox.get()?.checked = !value
+                            onParamsChange()
                         }
                     })
                 }
@@ -153,6 +168,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                 this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size * 3, pixelY = -(size * 5))
                 this.onColourChange = { c ->
                     color.set(c)
+                    onParamsChange()
                 }
             }
 
