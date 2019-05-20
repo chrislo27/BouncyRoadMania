@@ -32,12 +32,18 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         val OK_COLOUR = "00CD00"
         val SUPERB_COLOUR = "FD0304"
     }
-    
-    final override val stage: Stage<PlayingScreen> = Stage(null, main.defaultCamera, 1280f, 720f)
-    private val robotModeButton: Button<PlayingScreen>
 
-    private var robotEnabled: Boolean = false
-    
+    data class PauseState(val lastPlayState: PlayState)
+
+    final override val stage: Stage<PlayingScreen> = Stage(null, main.defaultCamera, 1280f, 720f)
+    protected val robotModeButton: Button<PlayingScreen>
+    protected val resumeButton: Button<PlayingScreen>
+    protected val restartButton: Button<PlayingScreen>
+    protected val quitButton: Button<PlayingScreen>
+
+    protected var robotEnabled: Boolean = false
+    protected var paused: PauseState? = null
+
     init {
         val palette = main.uiPalette
         stage.visible = false
@@ -56,7 +62,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.fontScaleMultiplier = 0.75f
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 500f, pixelHeight = 96f)
         }
-        stage.elements += Button(palette, stage, stage).apply {
+        resumeButton = Button(palette, stage, stage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 400f, pixelHeight = 64f, screenX = 0.35f, screenWidth = 0.3f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
@@ -64,10 +70,11 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 this.text = "playing.pauseMenu.resume"
             })
             this.leftClickAction = { _, _ ->
-                engine.playState = PlayState.PLAYING
+                pauseUnpause()
             }
         }
-        stage.elements += Button(palette, stage, stage).apply {
+        stage.elements += resumeButton
+        restartButton = Button(palette, stage, stage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 300f, pixelHeight = 64f, screenX = 0.35f, screenWidth = 0.3f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
@@ -79,7 +86,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 reset()
             }
         }
-        stage.elements += Button(palette, stage, stage).apply {
+        stage.elements += restartButton
+        quitButton = Button(palette, stage, stage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 200f, pixelHeight = 64f, screenX = 0.35f, screenWidth = 0.3f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
@@ -92,6 +100,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 onQuit()
             }
         }
+        stage.elements += quitButton
         robotModeButton = Button(palette, stage, stage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 50f, pixelHeight = 64f, screenX = 0.35f, screenWidth = 0.3f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -109,7 +118,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             }
         }
         stage.elements += robotModeButton
-        
+
         stage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), stage, stage).apply {
             this.location.set(screenX = 0f, screenWidth = 0f, screenHeight = 0f, pixelX = 0f, pixelWidth = 220f, pixelHeight = 96f)
             this.isLocalizationKey = false
@@ -122,7 +131,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
 
         stage.updatePositions()
     }
-    
+
     init {
         reset()
     }
@@ -132,22 +141,23 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
 
         engine.render(batch)
 
-        stage.visible = engine.playState == PlayState.PAUSED
+        stage.visible = paused != null
         super.render(delta)
     }
-    
+
     private fun reset() {
         robotEnabled = false
         engine.requiresPlayerInput = true
+        paused = null
         (robotModeButton.labels.first() as TextLabel).text = "playing.robot.off"
         engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - 1f)
         engine.playState = PlayState.PLAYING
     }
-    
+
     protected open fun onQuit() {
         main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
     }
-    
+
     protected open fun onEnd() {
         // Transition away to proper results TODO
         val scoreInt = engine.computeScore().roundToInt()
@@ -162,38 +172,41 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
 //            main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
     }
 
+    fun pauseUnpause() {
+        val paused = this.paused
+        if (paused == null) {
+            this.paused = PauseState(engine.playState)
+            engine.playState = PlayState.PAUSED
+        } else {
+            this.paused = null
+            engine.playState = paused.lastPlayState
+        }
+    }
+
     override fun renderUpdate() {
         super.renderUpdate()
         val delta = Gdx.graphics.deltaTime
 
-        engine.update(delta)
-
-        if (engine.playState == PlayState.STOPPED) {
-            onEnd()
-        }
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            when (engine.playState) {
-                PlayState.STOPPED -> {
-                    // ignored
-                }
-                PlayState.PLAYING -> {
-                    engine.playState = PlayState.PAUSED
-                }
-                PlayState.PAUSED -> {
-                    engine.playState = PlayState.PLAYING
+            pauseUnpause()
+        }
+
+        if (paused == null) {
+            engine.update(delta)
+
+            if (engine.playState == PlayState.STOPPED) {
+                onEnd()
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+                if (engine.requiresPlayerInput) {
+                    engine.fireInput(InputType.DPAD)
                 }
             }
-        }
-        
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            if (engine.playState == PlayState.PLAYING && engine.requiresPlayerInput) {
-                engine.fireInput(InputType.DPAD)
-            }
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-            if (engine.playState == PlayState.PLAYING && engine.requiresPlayerInput) {
-                engine.fireInput(InputType.A)
+            if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+                if (engine.requiresPlayerInput) {
+                    engine.fireInput(InputType.A)
+                }
             }
         }
     }
@@ -212,5 +225,9 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     override fun hide() {
         super.hide()
         engine.dispose()
+    }
+
+    override fun getDebugString(): String? {
+        return engine.getDebugString()
     }
 }

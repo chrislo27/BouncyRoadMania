@@ -1,13 +1,16 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.bouncyroadmania.BRMania
+import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.entity.*
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
@@ -20,9 +23,12 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolum
 import io.github.chrislo27.bouncyroadmania.renderer.PaperProjection
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSoundSystem
+import io.github.chrislo27.bouncyroadmania.util.scaleFont
+import io.github.chrislo27.bouncyroadmania.util.unscaleFont
+import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
-import io.github.chrislo27.toolboks.util.gdxutils.maxX
+import io.github.chrislo27.toolboks.util.MathHelper
+import io.github.chrislo27.toolboks.util.gdxutils.*
 import io.github.chrislo27.toolboks.version.Version
 import java.util.*
 import kotlin.properties.Delegates
@@ -177,6 +183,10 @@ class Engine : Clock(), Disposable {
     val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f)
     val aBouncerTint: Color = Color(1f, 1f, 1f, 1f)
     val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f)
+
+    // Practice related
+    var currentTextBox: TextBox? = null
+    var xMoreTimes: Int = 0
 
     fun addBouncers() {
         entities.removeAll(bouncers)
@@ -389,6 +399,66 @@ class Engine : Clock(), Disposable {
             batch.drawQuad(0f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentEnd, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, 0f, camera.viewportHeight, gradientCurrentStart)
         }
         projector.render(batch, entities)
+
+        val textBox = currentTextBox
+        if (textBox != null) {
+            val font = BRManiaApp.instance.defaultFontLarge
+            font.scaleFont(camera)
+            font.scaleMul(0.5f)
+            font.setColor(0f, 0f, 0f, 1f)
+            // Render text box
+            val backing = AssetRegistry.get<Texture>("ui_textbox")
+            val texW = backing.width
+            val texH = backing.height
+            val sectionX = texW / 3
+            val sectionY = texH / 3
+            val screenW = camera.viewportWidth
+            val screenH = camera.viewportHeight
+            val x = screenW * 0.1f
+            val y = screenH * 0.75f
+            val w = screenW * 0.8f
+            val h = screenH / 5f
+            // Corners
+            batch.draw(backing, x, y, sectionX * 1f, sectionY * 1f, 0f, 1f, 1 / 3f, 2 / 3f)
+            batch.draw(backing, x, y + h - sectionY, sectionX * 1f, sectionY * 1f, 0f, 2 / 3f, 1 / 3f, 1f)
+            batch.draw(backing, x + w - sectionX, y, sectionX * 1f, sectionY * 1f, 2 / 3f, 1f, 1f, 2 / 3f)
+            batch.draw(backing, x + w - sectionX, y + h - sectionY, sectionX * 1f, sectionY * 1f, 2 / 3f, 2 / 3f, 1f, 1f)
+
+            // Sides
+            batch.draw(backing, x, y + sectionY, sectionX * 1f, h - sectionY * 2, 0f, 2 / 3f, 1 / 3f, 1 / 3f)
+            batch.draw(backing, x + w - sectionX, y + sectionY, sectionX * 1f, h - sectionY * 2, 2 / 3f, 2 / 3f, 1f, 1 / 3f)
+            batch.draw(backing, x + sectionX, y, w - sectionX * 2, sectionY * 1f, 1 / 3f, 0f, 2 / 3f, 1 / 3f)
+            batch.draw(backing, x + sectionX, y + h - sectionY, w - sectionX * 2, sectionY * 1f, 1 / 3f, 2 / 3f, 2 / 3f, 1f)
+
+            // Centre
+            batch.draw(backing, x + sectionX, y + sectionY, w - sectionX * 2, h - sectionY * 2, 1 / 3f, 1 / 3f, 2 / 3f, 2 / 3f)
+
+            // Render text
+            val textWidth = font.getTextWidth(textBox.text, w - sectionX * 2, false)
+            val textHeight = font.getTextHeight(textBox.text)
+            font.drawCompressed(batch, textBox.text, x + w / 2f - textWidth / 2f, y + h / 2f + textHeight / 2,
+                    w - sectionX * 2, Align.left)
+            
+            if (textBox.requiresInput) {
+                if (textBox.secsBeforeCanInput > 0f) 
+                    textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
+                val bordered = MathHelper.getSawtoothWave(1.75f) >= 0.5f
+                font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
+            }
+            font.scaleMul(1f / 0.5f)
+            font.unscaleFont()
+        }
+        
+        if (xMoreTimes > 0) {
+            val font = BRManiaApp.instance.defaultBorderedFontLarge
+            font.scaleFont(camera)
+            font.scaleMul(0.65f)
+            font.setColor(1f, 1f, 1f, 1f)
+            font.drawCompressed(batch, Localization["practice.moreTimes", xMoreTimes], 64f, 64f + font.capHeight, camera.viewportWidth - 128f, Align.right)
+            font.scaleMul(1f / 0.65f)
+            font.unscaleFont()
+        }
+
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
     }
@@ -401,15 +471,27 @@ class Engine : Clock(), Disposable {
     }
 
     fun fireInput(inputType: InputType) {
-        val bouncer = getBouncerForInput(inputType)
-        val any = entities.filterIsInstance<Ball>().fold(false) { acc, it ->
-            it.onInput(inputType) || acc
+        val textBox = this.currentTextBox
+        if (textBox != null) {
+            if (textBox.requiresInput && textBox.secsBeforeCanInput <= 0f) {
+                this.currentTextBox = null
+                playState = PlayState.PLAYING
+            }
+        } else if (playState == PlayState.PLAYING) {
+            val bouncer = getBouncerForInput(inputType)
+            val any = entities.filterIsInstance<Ball>().fold(false) { acc, it ->
+                it.onInput(inputType) || acc
+            }
+            bouncer.bounceAnimation()
+            if (!any) {
+                // play dud sound
+                AssetRegistry.get<BeadsSound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play(volume = 0.75f)
+            }
         }
-        bouncer.bounceAnimation()
-        if (!any) {
-            // play dud sound
-            AssetRegistry.get<BeadsSound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play(volume = 0.75f)
-        }
+    }
+
+    fun getDebugString(): String {
+        return "beat: $beat\nseconds: $seconds\nevents: ${events.size}\nplayState: $playState"
     }
 
     override fun dispose() {

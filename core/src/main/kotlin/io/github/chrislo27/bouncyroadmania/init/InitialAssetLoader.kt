@@ -59,6 +59,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_swap", "images/ui/icon/swap.png")
         AssetRegistry.loadAsset<Texture>("ui_daytime", "images/ui/icon/daytime.png")
         AssetRegistry.loadAsset<Texture>("ui_nighttime", "images/ui/icon/nighttime.png")
+        AssetRegistry.loadAsset<Texture>("ui_textbox", "images/ui/textbox.png")
 
         AssetRegistry.loadAsset<Texture>("tool_selection", "images/tool/selection.png")
         AssetRegistry.loadAsset<Texture>("tool_tempo_change", "images/tool/tempo_change.png")
