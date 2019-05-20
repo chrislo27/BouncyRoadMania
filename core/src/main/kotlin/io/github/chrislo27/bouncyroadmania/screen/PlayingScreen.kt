@@ -25,7 +25,7 @@ import io.github.chrislo27.toolboks.ui.TextLabel
 import kotlin.math.roundToInt
 
 
-class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRManiaApp, PlayingScreen>(main) {
+open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRManiaApp, PlayingScreen>(main) {
 
     companion object {
         val TRY_AGAIN_COLOUR = "01BDFD"
@@ -33,7 +33,7 @@ class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRMan
         val SUPERB_COLOUR = "FD0304"
     }
     
-    override val stage: Stage<PlayingScreen> = Stage(null, main.defaultCamera, 1280f, 720f)
+    final override val stage: Stage<PlayingScreen> = Stage(null, main.defaultCamera, 1280f, 720f)
     private val robotModeButton: Button<PlayingScreen>
 
     private var robotEnabled: Boolean = false
@@ -89,7 +89,7 @@ class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRMan
             this.leftClickAction = { _, _ ->
                 engine.playState = PlayState.STOPPED
                 engine.playState = PlayState.PAUSED
-                main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                onQuit()
             }
         }
         robotModeButton = Button(palette, stage, stage).apply {
@@ -143,6 +143,24 @@ class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRMan
         engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - 1f)
         engine.playState = PlayState.PLAYING
     }
+    
+    protected open fun onQuit() {
+        main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+    }
+    
+    protected open fun onEnd() {
+        // Transition away to proper results TODO
+        val scoreInt = engine.computeScore().roundToInt()
+        val score = "[#${when (scoreInt) {
+            in 0 until 60 -> TRY_AGAIN_COLOUR
+            in 60 until 80 -> OK_COLOUR
+            else -> SUPERB_COLOUR
+        }}]$scoreInt[]"
+        main.screen = TransitionScreen(main, main.screen,
+                GameSelectScreen(main, if (robotEnabled) null else Localization["playing.tmpResults", score, Localization["gameSelect.select"]]),
+                FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
+//            main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
+    }
 
     override fun renderUpdate() {
         super.renderUpdate()
@@ -151,17 +169,7 @@ class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRMan
         engine.update(delta)
 
         if (engine.playState == PlayState.STOPPED) {
-            // Transition away to proper results TODO
-            val scoreInt = engine.computeScore().roundToInt()
-            val score = "[#${when (scoreInt) {
-                in 0 until 60 -> TRY_AGAIN_COLOUR
-                in 60 until 80 -> OK_COLOUR
-                else -> SUPERB_COLOUR
-            }}]$scoreInt[]"
-            main.screen = TransitionScreen(main, main.screen,
-                    GameSelectScreen(main, if (robotEnabled) null else Localization["playing.tmpResults", score, Localization["gameSelect.select"]]),
-                    FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
-//            main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
+            onEnd()
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

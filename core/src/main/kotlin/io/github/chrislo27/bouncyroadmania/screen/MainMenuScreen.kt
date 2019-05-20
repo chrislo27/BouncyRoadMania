@@ -308,6 +308,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 MenuItem("mainMenu.play") {
                     main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
+                MenuItem("mainMenu.practice") {
+                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main), WipeTo(Color.BLACK, 0.35f), null)
+                },
                 MenuItem("mainMenu.edit") {
                     val editor = EditorScreen(main) // ScreenRegistry.getNonNull("editor")
                     main.screen = TransitionScreen(main, main.screen, editor, WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
