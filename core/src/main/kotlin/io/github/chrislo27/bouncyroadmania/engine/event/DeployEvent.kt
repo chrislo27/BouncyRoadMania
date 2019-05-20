@@ -16,6 +16,7 @@ import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
 import io.github.chrislo27.bouncyroadmania.util.TrueCheckbox
 import io.github.chrislo27.bouncyroadmania.util.fromJsonString
 import io.github.chrislo27.bouncyroadmania.util.toJsonString
+import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.TextLabel
 import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
@@ -25,10 +26,16 @@ import java.lang.ref.WeakReference
 
 class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
 
+    companion object {
+        val SEMITONE_RANGE = -12..12
+    }
+
     override val isStretchable: Boolean = true
     override val hasEditableParams: Boolean = true
+
     var firstBounceHasSound: Boolean = false
     val color: Color = Color(1f, 1f, 1f, 1f)
+    var semitoneOffset: Int = 0
 
     init {
         this.bounds.width = 0.5f
@@ -71,7 +78,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
     }
 
     override fun onStart() {
-        engine.entities += Ball(engine, this.bounds.width, this.bounds.x, firstBounceHasSound, Color(color)).apply {
+        engine.entities += Ball(engine, this.bounds.width, this.bounds.x, firstBounceHasSound, Color(color), semitoneOffset).apply {
             startOff()
         }
     }
@@ -80,6 +87,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         super.fromJson(node)
         firstBounceHasSound = node["firstBounceHasSound"]?.asBoolean(false) ?: false
         color.fromJsonString(node["color"]?.asText())
+        semitoneOffset = node["semitone"]?.asInt(0) ?: 0
     }
 
     override fun toJson(node: ObjectNode) {
@@ -90,6 +98,9 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         if (color != Color.WHITE) {
             node.put("color", color.toJsonString())
         }
+        if (semitoneOffset != 0) {
+            node.put("semitone", semitoneOffset)
+        }
     }
 
     override fun copy(): DeployEvent {
@@ -97,6 +108,8 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
             it.bounds.set(this.bounds)
             it.updateInterpolation(true)
             it.firstBounceHasSound = this.firstBounceHasSound
+            it.color.set(this.color)
+            it.semitoneOffset = this.semitoneOffset
         }
     }
 
@@ -141,6 +154,66 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                 this.onColourChange = { c ->
                     color.set(c)
                 }
+            }
+
+            contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
+                this.isLocalizationKey = true
+                this.text = "deployEvent.semitone"
+                this.location.set(screenY = 1f, screenHeight = 0f, screenWidth = 0.5f, pixelHeight = size, pixelY = -(size * 6))
+            }
+            contentStage.elements += object : TextLabel<EditorScreen>(palette, contentStage, contentStage) {
+                override fun getRealText(): String {
+                    return this@DeployEvent.semitoneOffset.toString()
+                }
+            }.apply {
+                this.background = true
+                this.isLocalizationKey = false
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.7f, screenWidth = 0.1f, pixelHeight = size, pixelY = -(size * 6f))
+            }
+            val buttonPalette = palette.copy(fontScale = 0.85f)
+            contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
+                this.addLabel(TextLabel(palette, this, this.stage).apply {
+                    this.isLocalizationKey = false
+                    this.text = "-5"
+                })
+                this.leftClickAction = { _, _ ->
+                    this@DeployEvent.semitoneOffset -= 5
+                    this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
+                }
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.5f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+            }
+            contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
+                this.addLabel(TextLabel(palette, this, this.stage).apply {
+                    this.isLocalizationKey = false
+                    this.text = "-1"
+                })
+                this.leftClickAction = { _, _ ->
+                    this@DeployEvent.semitoneOffset -= 1
+                    this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
+                }
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.6f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+            }
+            contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
+                this.addLabel(TextLabel(palette, this, this.stage).apply {
+                    this.isLocalizationKey = false
+                    this.text = "+1"
+                })
+                this.leftClickAction = { _, _ ->
+                    this@DeployEvent.semitoneOffset += 1
+                    this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
+                }
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.8f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+            }
+            contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
+                this.addLabel(TextLabel(palette, this, this.stage).apply {
+                    this.isLocalizationKey = false
+                    this.text = "+5"
+                })
+                this.leftClickAction = { _, _ ->
+                    this@DeployEvent.semitoneOffset += 5
+                    this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
+                }
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.9f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
             }
         }
     }

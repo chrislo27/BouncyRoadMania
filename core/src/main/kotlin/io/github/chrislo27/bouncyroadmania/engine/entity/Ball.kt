@@ -13,7 +13,7 @@ import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firstHasSound: Boolean = false, val color: Color = Color(1f, 1f, 1f, 1f))
+class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firstHasSound: Boolean = false, val color: Color = Color(1f, 1f, 1f, 1f), val semitoneOffset: Int = 0)
     : Entity(engine) {
 
     data class Bounce(val fromX: Float, val fromY: Float, val fromZ: Float, val toX: Float, val toY: Float, val toZ: Float, val arcHeight: Float,
@@ -78,7 +78,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                 if (from != null) {
                     if (!MathUtils.isEqual(engine.lastBounceTinkSound[from.soundHandle] ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
                         engine.lastBounceTinkSound[from.soundHandle] = engine.seconds
-                        from.playSound(forcePlay = true)
+                        from.playSound(forcePlay = true, semitoneAdd = semitoneOffset)
                     }
                 }
             }
@@ -134,13 +134,13 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                         }
                         bounce(newFrom, next, false)
                         if (newFrom.isPlayer) {
-                            newFrom.playSound()
+                            newFrom.playSound(semitoneAdd = semitoneOffset)
                         } else if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
                                         ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
                             if (!newFrom.isSilent) {
                                 engine.lastBounceTinkSound[newFrom.soundHandle] = engine.seconds
                             }
-                            newFrom.playSound()
+                            newFrom.playSound(semitoneAdd = semitoneOffset)
                         }
 //                        if (newFrom.soundHandle == "sfx_tink") {
 //                            if (!MathUtils.isEqual(engine.lastBounceTinkSound, engine.seconds, 0.05f)) {
@@ -161,7 +161,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                                 this.fellOff = fo
                                 this.fallOff = null
                                 bouncesSoFar += intAlpha
-                                newFrom.playSound(semitone = 0)
+                                newFrom.playSound(semitone = 0, semitoneAdd = semitoneOffset)
                                 bounce(newFrom, next, true)
                             }
                         }

@@ -79,10 +79,10 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         bounceAmt = 1f
     }
 
-    fun playSound(semitone: Int = this.semitone, volume: Float = 1f, forcePlay: Boolean = false) {
+    fun playSound(semitone: Int = this.semitone, volume: Float = 1f, forcePlay: Boolean = false, semitoneAdd: Int = 0) {
         if (!isSilent || forcePlay) {
             val width = engine.camera.viewportWidth
-            AssetRegistry.get<BeadsSound>(soundHandle).play(loop = false, volume = (1f - posZ).coerceIn(0.75f, 1f) * volume, pitch = Semitones.getALPitch(semitone)/*, position = ((posX - (width / 2f)) / (width * 1.25)).coerceIn(-1.0, 1.0)*/)
+            AssetRegistry.get<BeadsSound>(soundHandle).play(loop = false, volume = (1f - posZ).coerceIn(0.75f, 1f) * volume, pitch = Semitones.getALPitch(semitone + semitoneAdd)/*, position = ((posX - (width / 2f)) / (width * 1.25)).coerceIn(-1.0, 1.0)*/)
         }
     }
 
