@@ -71,6 +71,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
 
         if (!started) {
             started = true
+            engine.expectedNumInputs += 2
             if (firstHasSound) {
                 val from = bounce?.fromBouncer
                 if (from != null) {

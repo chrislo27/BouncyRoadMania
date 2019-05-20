@@ -153,6 +153,7 @@ class Engine : Clock(), Disposable {
     
     val events: List<Event> = mutableListOf()
     val inputResults: MutableList<InputResult> = mutableListOf()
+    var expectedNumInputs: Int = 0
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
@@ -259,7 +260,7 @@ class Engine : Clock(), Disposable {
     }
     
     fun computeScore(): Float {
-        return (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / inputResults.size.coerceAtLeast(1) * 100).toFloat()
+        return (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / expectedNumInputs.coerceAtLeast(1) * 100).toFloat()
     }
 
     private fun setMusicVolume() {
