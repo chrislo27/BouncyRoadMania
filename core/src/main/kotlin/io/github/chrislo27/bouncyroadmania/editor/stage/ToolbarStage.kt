@@ -181,6 +181,11 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
             this.location.set(0f, 0f, 1f, 0f, pixelHeight = 1f)
         }
 
+        // Themes button
+        this.elements += NightModeButton(editor, palette, this, parent).apply {
+            this.location.set(1f, 1f, 0f, 0f, pixelX = -buttonSize * 2 - buttonPadding * 2,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
+        }
         // Exit button
         this.elements += ExitButton(editor, palette, this, parent).apply {
             this.addLabel(ImageLabel(palette, this, this.stage).apply {
