@@ -1,5 +1,10 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.PixmapIO
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.BRMania
@@ -10,9 +15,12 @@ import io.github.chrislo27.bouncyroadmania.util.JsonHandler
 import io.github.chrislo27.bouncyroadmania.util.fromJsonString
 import io.github.chrislo27.bouncyroadmania.util.toJsonString
 import io.github.chrislo27.toolboks.Toolboks
+import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.version.Version
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -26,11 +34,11 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     root.put("musicStartSec", musicStartSec)
     root.put("trackCount", trackCount)
     root.put("isAutosave", isAutosave)
-    
+
     root.put("gradientFirst", gradientStart.toJsonString())
     root.put("gradientLast", gradientEnd.toJsonString())
     root.put("gradientDirection", gradientDirection.name)
-    
+
     // bouncers
     run {
         val obj = root.putObject("bouncers")
@@ -38,6 +46,11 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
         tint.put("normal", normalBouncerTint.toJsonString())
         tint.put("a", aBouncerTint.toJsonString())
         tint.put("dpad", dpadBouncerTint.toJsonString())
+    }
+
+    // textures
+    root.putArray("textures").also { ar ->
+        textures.forEach { ar.add(it.key) }
     }
 
     // music
@@ -79,7 +92,7 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
             node.put("measure", it.measure)
         }
     }
-    
+
     return root
 }
 
@@ -88,11 +101,11 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     playbackStart = root["playbackStart"].floatValue()
     musicStartSec = root["musicStartSec"].floatValue()
     trackCount = root["trackCount"].intValue()
-    
+
     gradientStart.fromJsonString(root["gradientFirst"]?.asText())
     gradientEnd.fromJsonString(root["gradientLast"]?.asText())
     gradientDirection = GradientDirection.VALUES.find { it.name == root["gradientDirection"]?.asText() } ?: gradientDirection
-    
+
     // bouncers
     val bouncersObj = root["bouncers"] as? ObjectNode
     if (bouncersObj != null) {
@@ -140,7 +153,7 @@ fun Engine.fromEngineJson(root: ObjectNode) {
             timeSignatures.add(TimeSignature(timeSignatures, it["beat"].asDouble().toFloat(), it["divisions"].asInt(4), it["beatUnit"]?.asInt(4) ?: 4))
         }
     }
-    
+
     this.recomputeCachedData()
 }
 
@@ -157,6 +170,35 @@ fun Engine.pack(stream: ZipOutputStream, isAutosave: Boolean) {
         val buf = this.music!!.handle.read(2048)
         buf.copyTo(stream)
         buf.close()
+        stream.closeEntry()
+    }
+
+    fun writeTexture(stream: OutputStream, tex: Texture) {
+        if (!tex.textureData.isPrepared) {
+            tex.textureData.prepare()
+        }
+        val pixmap: Pixmap = tex.textureData.consumePixmap()
+
+        try {
+            val writer = PixmapIO.PNG((pixmap.width.toFloat() * pixmap.height.toFloat() * 1.5f).toInt()) // Guess at deflated size.
+            try {
+                writer.setFlipY(false)
+                writer.write(stream, pixmap)
+            } finally {
+                writer.dispose()
+            }
+        } catch (ex: IOException) {
+            throw GdxRuntimeException("Error writing PNG", ex)
+        } finally {
+            if (tex.textureData.disposePixmap()) {
+                pixmap.dispose()
+            }
+        }
+    }
+    
+    textures.forEach { (key, tex) -> 
+        stream.putNextEntry(ZipEntry("textures/$key.png"))
+        writeTexture(stream, tex)
         stream.closeEntry()
     }
 }
@@ -190,6 +232,30 @@ fun Engine.unpack(zip: ZipFile) {
         this.music = MusicData(fh, this)
     }
     
+    val texs = objectNode["textures"] as? ArrayNode?
+    if (texs != null) {
+        textures as MutableMap
+        texs.forEach { node ->
+            val name = node.asText()
+            textures[name] = AssetRegistry.missingTexture
+            Gdx.app.postRunnable {
+                try {
+                    val entry = zip.getEntry("textures/$name.png")
+                    val bytes = zip.getInputStream(entry).let { stream ->
+                        val b = stream.readBytes()
+                        stream.close()
+                        b
+                    }
+                    val texture = Texture(Pixmap(bytes, 0, bytes.size))
+                    textures[name] = texture
+                } catch (t: Throwable) {
+                    Toolboks.LOGGER.warn("Failed to load texture with key $name")
+                    t.printStackTrace()
+                }
+            }
+        }
+    }
+
     this.recomputeCachedData()
 
     return result

@@ -2,6 +2,7 @@ package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
@@ -167,6 +168,7 @@ class Engine : Clock(), Disposable {
     val listeners: WeakHashMap<EngineEventListener, Unit> = WeakHashMap()
 
     // Visuals
+    val textures: Map<String, Texture> = mutableMapOf()
     val gradientEnd: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
     val gradientStart: Color = Color(0f, 0f, 0f, 1f)
     val gradientCurrentEnd: Color = Color(1f, 1f, 1f, 1f).set(gradientEnd)
@@ -414,6 +416,10 @@ class Engine : Clock(), Disposable {
         listeners.clear()
         music?.dispose()
         BeadsSoundSystem.stop() // Ensures that the GC can collect the music data
+        val texs = textures.values.toList()
+        textures as MutableMap
+        textures.clear()
+        texs.filter { it !== AssetRegistry.missingTexture }.forEach { it.dispose() }
     }
 
 }
