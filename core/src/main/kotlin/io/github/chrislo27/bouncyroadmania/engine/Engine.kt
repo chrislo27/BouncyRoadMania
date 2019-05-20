@@ -82,8 +82,7 @@ class Engine : Clock(), Disposable {
                     BeadsSoundSystem.pause()
                 }
                 PlayState.PLAYING -> {
-                    lastMusicPosition = -1f
-                    scheduleMusicPlaying = true
+                    resetMusic()
                     AssetRegistry.resumeAllSounds()
                     if (old == PlayState.STOPPED) {
                         recomputeCachedData()
@@ -286,7 +285,7 @@ class Engine : Clock(), Disposable {
         }
     }
 
-    private fun seekMusic() {
+    fun seekMusic() {
         val music = music ?: return
         musicSeeking = true
         val loops = music.music.isLooping()
@@ -299,6 +298,11 @@ class Engine : Clock(), Disposable {
             music.music.setPosition(s - musicStartSec)
         }
         musicSeeking = false
+    }
+
+    fun resetMusic() {
+        lastMusicPosition = 0f
+        scheduleMusicPlaying = true
     }
 
     fun recomputeCachedData() {
@@ -438,19 +442,19 @@ class Engine : Clock(), Disposable {
             val textHeight = font.getTextHeight(textBox.text)
             font.drawCompressed(batch, textBox.text, x + w / 2f - textWidth / 2f, y + h / 2f + textHeight / 2,
                     w - sectionX * 2, Align.left)
-            
+
             if (textBox.requiresInput) {
-                if (textBox.secsBeforeCanInput > 0f) 
+                if (textBox.secsBeforeCanInput > 0f)
                     textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
                 if (textBox.secsBeforeCanInput <= 0f) {
-                    val bordered = MathHelper.getSawtoothWave(1.75f) >= 0.5f
+                    val bordered = MathHelper.getSawtoothWave(1.25f) >= 0.25f
                     font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
                 }
             }
             font.scaleMul(1f / 0.5f)
             font.unscaleFont()
         }
-        
+
         if (xMoreTimes > 0) {
             val font = BRManiaApp.instance.defaultBorderedFontLarge
             font.scaleFont(camera)
@@ -493,7 +497,7 @@ class Engine : Clock(), Disposable {
     }
 
     fun getDebugString(): String {
-        return "beat: $beat\nseconds: $seconds\nevents: ${events.size}\nplayState: $playState"
+        return "beat: $beat\nseconds: $seconds\ntempo: ${tempos.tempoAtSeconds(seconds)}\nevents: ${events.size}\nplayState: $playState"
     }
 
     override fun dispose() {

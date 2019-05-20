@@ -5,10 +5,17 @@ import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.MusicData
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.TextBox
+import io.github.chrislo27.bouncyroadmania.engine.event.DeployEvent
+import io.github.chrislo27.bouncyroadmania.engine.event.Event
+import io.github.chrislo27.bouncyroadmania.engine.event.SimpleEvent
+import io.github.chrislo27.bouncyroadmania.engine.event.practice.PracticeGroupEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.practice.SpawnTextBoxEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.practice.XMoreTimesEvent
+import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumeChange
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
+import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.bouncyroadmania.util.Swing
 import io.github.chrislo27.bouncyroadmania.util.transition.FadeOut
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
@@ -16,6 +23,7 @@ import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.transition.TransitionScreen
+import io.github.chrislo27.toolboks.util.gdxutils.maxX
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -28,7 +36,7 @@ class PracticeScreen(main: BRManiaApp, engine: Engine) : PlayingScreen(main, eng
         restartButton.enabled = false
         robotModeButton.visible = false
     }
-    
+
     override fun onQuit() {
         main.screen = TransitionScreen(main, main.screen, MainMenuScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
     }
@@ -36,7 +44,7 @@ class PracticeScreen(main: BRManiaApp, engine: Engine) : PlayingScreen(main, eng
     override fun onEnd() {
         main.screen = TransitionScreen(main, main.screen, MainMenuScreen(main), FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
     }
-    
+
 }
 
 /**
@@ -49,7 +57,7 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
         engine.music = MusicData(Gdx.files.internal("music/practice.ogg"), engine).apply {
             this.music.setLooping(true)
         }
-        
+
         /*
         Order of events:
         Don't let the bouncing\nballs fall!
@@ -64,7 +72,7 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
         Amazing!
         You've got the skills.\nReady for the real thing?
          */
-        
+
         // Populate
         with(engine) {
             playbackStart = 0f
@@ -78,18 +86,127 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 this.bounds.x = 0.5f
                 this.bounds.width = 0.5f
             })
-            addEvent(XMoreTimesEvent(this, 2).apply {
-                this.bounds.x = 1.5f
-                this.bounds.width = 0.5f
-            })
             tempos.add(TempoChange(tempos, 1.5f, 154f, Swing.STRAIGHT, 0f))
+            addEvent(XMoreTimesEvent(engine, 2).apply {
+                this.bounds.x = 1.5f
+            })
+            val firstPractice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
+                listOf(
+                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                            this.bounds.width = 1f
+                            this.bounds.x = offset - this.bounds.width
+                        }
+                )
+            }
+            val secondPractice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
+                listOf(
+                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                            this.bounds.width = 1f
+                            this.bounds.x = offset - this.bounds.width
+                        },
+                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                            this.bounds.width = 1f
+                            this.bounds.x = offset - this.bounds.width + 2f
+                        })
+            }
+            val thirdPractice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
+                listOf(
+                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                            this.bounds.width = 0.5f
+                            this.bounds.x = offset - this.bounds.width
+                        }
+                )
+            }
+            val thirdPracticeEnd: PracticeGroupEvent.(Engine) -> Unit = {
+                // Add music fade
+                val origin = bounds.maxX + 2f
+                musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-1"], true)).apply {
+                    this.bounds.x = origin + 1f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-2"], true)).apply {
+                    this.bounds.x = origin + 2f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SimpleEvent(engine, {
+                    engine.playState = PlayState.STOPPED
+                }).apply {
+                    this.bounds.x = origin + 4f
+                })
+            }
+            val secondPracticeEnd: PracticeGroupEvent.(Engine) -> Unit = {
+                // Add music fade
+                val origin = bounds.maxX + 2f
+                musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-1"], true)).apply {
+                    this.bounds.x = origin + 1f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-2"], true)).apply {
+                    this.bounds.x = origin + 2f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(XMoreTimesEvent(engine, 2).apply {
+                    this.bounds.x = origin + 4f
+                })
+                addEvent(SimpleEvent(engine, {
+                    resetMusic()
+                    musicStartSec = tempos.beatsToSeconds(origin + 4f)
+                    seekMusic()
+                }).apply {
+                    this.bounds.x = origin + 4f
+                })
+                // Practice group 3
+                addEvent(PracticeGroupEvent(engine, thirdPractice, thirdPracticeEnd, 8f - 7f).apply {
+                    this.bounds.x = origin + 4f
+                    this.bounds.width = 7f
+                })
+            }
+            val firstPracticeEnd: PracticeGroupEvent.(Engine) -> Unit = {
+                // Add music fade
+                val origin = bounds.maxX + 2f
+                musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-1"], true)).apply {
+                    this.bounds.x = origin + 1f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-2"], true)).apply {
+                    this.bounds.x = origin + 2f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(XMoreTimesEvent(engine, 2).apply {
+                    this.bounds.x = origin + 4f
+                })
+                addEvent(SimpleEvent(engine, {
+                    resetMusic()
+                    musicStartSec = tempos.beatsToSeconds(origin + 4f)
+                    seekMusic()
+                }).apply {
+                    this.bounds.x = origin + 4f
+                })
+                // Practice group 2
+                addEvent(PracticeGroupEvent(engine, secondPractice, secondPracticeEnd, 0f).apply {
+                    this.bounds.x = origin + 4f
+                    this.bounds.width = 16f
+                })
+            }
+
+            // Practice group 1
+            addEvent(PracticeGroupEvent(engine, firstPractice, firstPracticeEnd, 2f).apply {
+                this.bounds.x = 1.5f
+                this.bounds.width = 14f
+            })
         }
-        
+
         return engine
     }
-    
+
     private val task: Deferred<Engine> = GlobalScope.async { createPracticeEngine() }
-    
+
     override fun render(delta: Float) {
         super.render(delta)
     }
