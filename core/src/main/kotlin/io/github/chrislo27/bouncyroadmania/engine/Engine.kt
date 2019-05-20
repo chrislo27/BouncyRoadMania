@@ -150,7 +150,7 @@ class Engine : Clock(), Disposable {
     var musicSeeking = false
     var loopIndex: Int = 0
         private set
-    
+
     val events: List<Event> = mutableListOf()
     val inputResults: MutableList<InputResult> = mutableListOf()
     var expectedNumInputs: Int = 0
@@ -172,6 +172,9 @@ class Engine : Clock(), Disposable {
     val gradientCurrentEnd: Color = Color(1f, 1f, 1f, 1f).set(gradientEnd)
     val gradientCurrentStart: Color = Color(0f, 0f, 0f, 1f).set(gradientStart)
     var gradientDirection: GradientDirection = GradientDirection.VERTICAL
+    val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f)
+    val aBouncerTint: Color = Color(1f, 1f, 1f, 1f)
+    val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f)
 
     fun addBouncers() {
         entities.removeAll(bouncers)
@@ -258,7 +261,7 @@ class Engine : Clock(), Disposable {
             recomputeCachedData()
         }
     }
-    
+
     fun computeScore(): Float {
         return (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / expectedNumInputs.coerceAtLeast(1) * 100).toFloat()
     }

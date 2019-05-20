@@ -26,9 +26,19 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     root.put("musicStartSec", musicStartSec)
     root.put("trackCount", trackCount)
     root.put("isAutosave", isAutosave)
+    
     root.put("gradientFirst", gradientStart.toJsonString())
     root.put("gradientLast", gradientEnd.toJsonString())
     root.put("gradientDirection", gradientDirection.name)
+    
+    // bouncers
+    run {
+        val obj = root.putObject("bouncers")
+        val tint = obj.putObject("tint")
+        tint.put("normal", normalBouncerTint.toJsonString())
+        tint.put("a", aBouncerTint.toJsonString())
+        tint.put("dpad", dpadBouncerTint.toJsonString())
+    }
 
     // music
     run {
@@ -82,6 +92,18 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     gradientStart.fromJsonString(root["gradientFirst"]?.asText())
     gradientEnd.fromJsonString(root["gradientLast"]?.asText())
     gradientDirection = GradientDirection.VALUES.find { it.name == root["gradientDirection"]?.asText() } ?: gradientDirection
+    
+    // bouncers
+    val bouncersObj = root["bouncers"] as? ObjectNode
+    if (bouncersObj != null) {
+        // tints
+        val tintObj = bouncersObj["tint"] as? ObjectNode
+        if (tintObj != null) {
+            normalBouncerTint.fromJsonString(tintObj["normal"]?.asText())
+            aBouncerTint.fromJsonString(tintObj["a"]?.asText())
+            dpadBouncerTint.fromJsonString(tintObj["dpad"]?.asText())
+        }
+    }
 
     removeAllEvents(events.toList())
     entities.clear()

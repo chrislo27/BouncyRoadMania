@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.engine.entity
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -25,6 +26,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
     protected open val texture: Texture
         get() = AssetRegistry["tex_bouncer_blue"]
     protected open val topPart: Int = 40
+    protected open val tint: Color get() = engine.normalBouncerTint
     protected val topTexture: TextureRegion by lazy {
         val tex = texture
         TextureRegion(tex, 0, 0, tex.width, topPart)
@@ -44,6 +46,8 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         val bounceTop: Float = MathUtils.lerp(0f, 8f, bounceAmt)
         val bounceBottom: Float = MathUtils.lerp(0f, topTexture.regionHeight * scale, bounceAmt)
 
+        batch.color = tint
+        
         // Render bottom first
         batch.draw(bottomTexture, posX - origin.x, posY - (origin.y + bottomTexture.regionHeight * scale) + bounceBottom,
                 origin.x, origin.y,
@@ -54,6 +58,8 @@ open class Bouncer(engine: Engine) : Entity(engine) {
                 origin.x, origin.y,
                 topTexture.regionWidth.toFloat(), topTexture.regionHeight.toFloat(),
                 scale, scale, 0f)
+        
+        batch.setColor(1f, 1f, 1f, 1f)
 
 //        batch.setColor(0f, 1f, 0f, 1f)
 //        batch.fillRect(posX - 2f, posY - 2f, 4f, 4f)
@@ -90,6 +96,8 @@ class RedBouncer(engine: Engine) : PlayerBouncer(engine, InputType.DPAD) {
     override val texture: Texture
         get() = AssetRegistry["tex_bouncer_red"]
     override val semitone: Int = 3
+    override val tint: Color
+        get() = engine.dpadBouncerTint
 
     init {
         origin.x = 24f
@@ -100,6 +108,8 @@ class YellowBouncer(engine: Engine) : PlayerBouncer(engine, InputType.A) {
     override val texture: Texture
         get() = AssetRegistry["tex_bouncer_yellow"]
     override val semitone: Int = -4
+    override val tint: Color
+        get() = engine.aBouncerTint
 
     init {
         origin.x = 11f

@@ -20,13 +20,21 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
     val gradientFirst: ColourPicker<EditorScreen>
     val gradientLast: ColourPicker<EditorScreen>
     val gradientDir: Button<EditorScreen>
+    val normalBouncerTint: ColourPicker<EditorScreen>
+    val aBouncerTint: ColourPicker<EditorScreen>
+    val dpadBouncerTint: ColourPicker<EditorScreen>
+    val normalBouncerImg: ImageLabel<EditorScreen>
+    val aBouncerImg: ImageLabel<EditorScreen>
+    val dpadBouncerImg: ImageLabel<EditorScreen>
 
     init {
         val gradientPalette = palette.copy(fontScale = 0.75f)
+        // Gradient settings
         elements += TextLabel(palette, this, this).apply {
             this.textWrapping = false
             this.isLocalizationKey = true
             this.text = "initialParams.gradientFirst"
+            this.fontScaleMultiplier = 0.85f
             this.background = true
             this.location.set(screenX = 0.05f, screenY = 0.95f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
@@ -41,6 +49,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.textWrapping = false
             this.isLocalizationKey = true
             this.text = "initialParams.gradientLast"
+            this.fontScaleMultiplier = 0.85f
             this.background = true
             this.location.set(screenX = 0.05f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
@@ -74,7 +83,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_arrow_up"))
                 this.rotation = 270f
             }
-                    
+
             fun updateDir() {
                 removeLabel(verticalLabel)
                 removeLabel(horizontalLabel)
@@ -95,12 +104,119 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         }
         elements += gradientDir
 
+        // Bouncer tints
+        elements += TextLabel(palette, this, this).apply {
+            this.textWrapping = false
+            this.isLocalizationKey = true
+            this.fontScaleMultiplier = 0.85f
+            this.text = "initialParams.normalBouncerTint"
+            this.background = true
+            this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0.2f, screenHeight = 0.05f)
+        }
+        normalBouncerImg = ImageLabel(palette, this, this).apply {
+            this.image = TextureRegion(AssetRegistry.get<Texture>("tex_bouncer_blue"))
+            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+            this.location.set(screenX = 0.3f + 0.2f, screenY = 0.75f + 0.05f, screenWidth = 0.025f, screenHeight = 0.2f / 2f)
+        }
+        elements += normalBouncerImg
+        normalBouncerTint = ColourPicker(gradientPalette, this, this).apply {
+            this.location.set(screenX = 0.3f, screenY = 0.75f, screenWidth = 0.2f, screenHeight = 0.2f)
+            this.onColourChange = { c ->
+                engine.normalBouncerTint.set(c)
+                normalBouncerImg.tint.set(c)
+            }
+        }
+        elements += normalBouncerTint
+        elements += Button(palette, this, this).apply {
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_back"))
+            })
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "initialParams.reset"
+            this.leftClickAction = { _, _ ->
+                normalBouncerTint.setColor(Color.WHITE)
+            }
+            this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
+        }
+        elements += TextLabel(palette, this, this).apply {
+            this.textWrapping = false
+            this.isLocalizationKey = true
+            this.fontScaleMultiplier = 0.85f
+            this.text = "initialParams.aBouncerTint"
+            this.background = true
+            this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.05f)
+        }
+        aBouncerImg = ImageLabel(palette, this, this).apply {
+            this.image = TextureRegion(AssetRegistry.get<Texture>("tex_bouncer_yellow"))
+            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+            this.location.set(screenX = 0.3f + 0.2f, screenY = 0.5f, screenWidth = 0.025f, screenHeight = 0.2f)
+        }
+        elements += aBouncerImg
+        aBouncerTint = ColourPicker(gradientPalette, this, this).apply {
+            this.location.set(screenX = 0.3f, screenY = 0.5f, screenWidth = 0.2f, screenHeight = 0.2f)
+            this.onColourChange = { c ->
+                engine.aBouncerTint.set(c)
+                aBouncerImg.tint.set(c)
+            }
+        }
+        elements += aBouncerTint
+        elements += Button(palette, this, this).apply {
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_back"))
+            })
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "initialParams.reset"
+            this.leftClickAction = { _, _ ->
+                aBouncerTint.setColor(Color.WHITE)
+            }
+            this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
+        }
+        elements += TextLabel(palette, this, this).apply {
+            this.textWrapping = false
+            this.isLocalizationKey = true
+            this.fontScaleMultiplier = 0.85f
+            this.text = "initialParams.dpadBouncerTint"
+            this.background = true
+            this.location.set(screenX = 0.3f, screenY = 0.45f, screenWidth = 0.2f, screenHeight = 0.05f)
+        }
+        dpadBouncerImg = ImageLabel(palette, this, this).apply {
+            this.image = TextureRegion(AssetRegistry.get<Texture>("tex_bouncer_red"))
+            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+            this.location.set(screenX = 0.3f + 0.2f, screenY = 0.25f, screenWidth = 0.025f, screenHeight = 0.2f)
+        }
+        elements += dpadBouncerImg
+        dpadBouncerTint = ColourPicker(gradientPalette, this, this).apply {
+            this.location.set(screenX = 0.3f, screenY = 0.25f, screenWidth = 0.2f, screenHeight = 0.2f)
+            this.onColourChange = { c ->
+                engine.dpadBouncerTint.set(c)
+                dpadBouncerImg.tint.set(c)
+            }
+        }
+        elements += dpadBouncerTint
+        elements += Button(palette, this, this).apply {
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_back"))
+            })
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "initialParams.reset"
+            this.leftClickAction = { _, _ ->
+                dpadBouncerTint.setColor(Color.WHITE)
+            }
+            this.location.set(screenX = 0.3f, screenY = 0.45f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
+        }
+
         updateColours()
     }
 
     fun updateColours(engine: Engine = this.engine) {
         gradientFirst.setColor(engine.gradientStart)
         gradientLast.setColor(engine.gradientEnd)
+        normalBouncerTint.setColor(engine.normalBouncerTint)
+        aBouncerTint.setColor(engine.aBouncerTint)
+        dpadBouncerTint.setColor(engine.dpadBouncerTint)
+        normalBouncerImg.tint.set(normalBouncerTint.currentColour)
+        aBouncerImg.tint.set(aBouncerTint.currentColour)
+        dpadBouncerImg.tint.set(dpadBouncerTint.currentColour)
     }
 
     fun onEngineChange(engine: Engine) {
