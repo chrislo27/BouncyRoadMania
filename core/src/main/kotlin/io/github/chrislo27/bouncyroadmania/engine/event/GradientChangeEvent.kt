@@ -52,7 +52,7 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
     }
 
     override fun whilePlaying() {
-        val a = ((engine.beat - bounds.x) / bounds.height).coerceIn(0f, 1f)
+        val a = ((engine.beat - bounds.x) / bounds.width).coerceIn(0f, 1f)
         gradientTarget.set(startColor).lerp(color, a)
     }
 
