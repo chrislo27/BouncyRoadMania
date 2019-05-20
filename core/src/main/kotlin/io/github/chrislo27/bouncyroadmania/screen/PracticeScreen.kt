@@ -154,14 +154,14 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 })
                 addEvent(SimpleEvent(engine, {
                     resetMusic()
-                    musicStartSec = tempos.beatsToSeconds(origin + 4f)
+                    musicStartSec = tempos.beatsToSeconds(origin + 6f)
                     seekMusic()
                 }).apply {
-                    this.bounds.x = origin + 4f
+                    this.bounds.x = origin + 6f
                 })
                 // Practice group 3
                 addEvent(PracticeGroupEvent(engine, thirdPractice, thirdPracticeEnd, 8f - 7f).apply {
-                    this.bounds.x = origin + 4f
+                    this.bounds.x = origin + 6f
                     this.bounds.width = 7f
                 })
             }
@@ -183,21 +183,21 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 })
                 addEvent(SimpleEvent(engine, {
                     resetMusic()
-                    musicStartSec = tempos.beatsToSeconds(origin + 4f)
+                    musicStartSec = tempos.beatsToSeconds(origin + 6f)
                     seekMusic()
                 }).apply {
-                    this.bounds.x = origin + 4f
+                    this.bounds.x = origin + 6f
                 })
                 // Practice group 2
                 addEvent(PracticeGroupEvent(engine, secondPractice, secondPracticeEnd, 0f).apply {
-                    this.bounds.x = origin + 4f
+                    this.bounds.x = origin + 6f
                     this.bounds.width = 16f
                 })
             }
 
             // Practice group 1
             addEvent(PracticeGroupEvent(engine, firstPractice, firstPracticeEnd, 2f).apply {
-                this.bounds.x = 1.5f
+                this.bounds.x = 3.5f
                 this.bounds.width = 14f
             })
         }
