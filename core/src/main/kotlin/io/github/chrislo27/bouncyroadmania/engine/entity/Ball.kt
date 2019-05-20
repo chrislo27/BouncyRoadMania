@@ -101,7 +101,23 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
             if (alpha >= 1f) {
                 val newFrom = bounce.toBouncer
                 val intAlpha = alpha.toInt()
-                val next = engine.bouncers.getOrNull((newFrom?.index ?: -2) + intAlpha)
+                val next = if (engine.requiresPlayerInput) {
+                    // Find the first player bouncer so we don't skip over it
+                    var result: Bouncer? = null
+                    for (i in ((newFrom?.index ?: -2) + 1)..((newFrom?.index ?: -2) + intAlpha)) {
+                        val b = engine.bouncers.getOrNull(i)
+                        result = b
+                        if (b != null && b.isPlayer) {
+                            break
+                        } else if (b == null) {
+                            break
+                        }
+                    }
+                    result
+                } else {
+                    // Skip ahead no problem
+                    engine.bouncers.getOrNull((newFrom?.index ?: -2) + intAlpha)
+                }
                 val fellOff = this.fellOff
                 if (next == null || fellOff != null) {
                     this.bounce = null
@@ -111,6 +127,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                     }
                 } else if (newFrom != null) {
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
+                        
                         bouncesSoFar += intAlpha
                         if (fallOff == null) {
                             prepareFallOff(intAlpha)
