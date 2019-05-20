@@ -17,7 +17,6 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
         manager.setLoader(BeadsSound::class.java, BeadsSoundLoader(InternalFileHandleResolver()))
         
-        AssetRegistry.loadAsset<Texture>("tex_gradient", "images/game/gradient.png")
         AssetRegistry.loadAsset<Texture>("tex_ball", "images/game/ball.png")
         AssetRegistry.loadAsset<Texture>("tex_bouncer_blue", "images/game/blue.png")
         AssetRegistry.loadAsset<Texture>("tex_bouncer_red", "images/game/red.png")
