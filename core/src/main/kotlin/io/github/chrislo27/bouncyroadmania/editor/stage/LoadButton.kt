@@ -60,14 +60,16 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                                 }
                                 val newEngine = Engine()
                                 newEngine.unpack(zipFile)
-                                editor.engine = newEngine
-                                editor.setFileHandles(FileHandle(file))
                                 Gdx.app.postRunnable {
-                                    this@overlay.removeSelf()
-                                    isOpen = false
+                                    editor.engine = newEngine
+                                    editor.setFileHandles(FileHandle(file))
+                                    Gdx.app.postRunnable {
+                                        this@overlay.removeSelf()
+                                        isOpen = false
+                                    }
+                                    persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, file.parentFile)
+                                    System.gc()
                                 }
-                                persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, file.parentFile)
-                                System.gc()
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Gdx.app.postRunnable {
