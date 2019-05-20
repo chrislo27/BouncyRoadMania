@@ -442,8 +442,10 @@ class Engine : Clock(), Disposable {
             if (textBox.requiresInput) {
                 if (textBox.secsBeforeCanInput > 0f) 
                     textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
-                val bordered = MathHelper.getSawtoothWave(1.75f) >= 0.5f
-                font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
+                if (textBox.secsBeforeCanInput <= 0f) {
+                    val bordered = MathHelper.getSawtoothWave(1.75f) >= 0.5f
+                    font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
+                }
             }
             font.scaleMul(1f / 0.5f)
             font.unscaleFont()
