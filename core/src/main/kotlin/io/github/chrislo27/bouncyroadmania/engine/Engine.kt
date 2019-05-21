@@ -415,6 +415,34 @@ class Engine : Clock(), Disposable {
         } else {
             batch.drawQuad(-400f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentEnd, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, -400f, camera.viewportHeight, gradientCurrentStart)
         }
+
+        if (playState != PlayState.STOPPED) {
+            events.sortedBy { it.bounds.x }.forEach { evt ->
+                if (evt is BgImageEvent) {
+                    val tex = textures[evt.textureHash]
+                    val alpha = evt.getImageAlpha()
+                    if (tex != null && alpha > 0f) {
+                        val aspectWidth = camera.viewportWidth / tex.width
+                        val aspectHeight = camera.viewportHeight / tex.height
+                        val aspectRatio = Math.min(aspectWidth, aspectHeight)
+                        val x: Float
+                        val y: Float
+                        val w: Float
+                        val h: Float
+
+                        w = tex.width * aspectRatio
+                        h = tex.height * aspectRatio
+                        x = camera.viewportWidth / 2 - (w / 2)
+                        y = camera.viewportHeight / 2 - (h / 2)
+
+                        batch.setColor(1f, 1f, 1f, alpha)
+                        batch.draw(tex, x, y, w, h)
+                        batch.setColor(1f, 1f, 1f, 1f)
+                    }
+                }
+            }
+        }
+
         projector.render(batch, entities)
 
         val textBox = currentTextBox
@@ -507,6 +535,11 @@ class Engine : Clock(), Disposable {
                 AssetRegistry.get<BeadsSound>("sfx_dud_${if (inputType == InputType.A) "right" else "left"}").play(volume = 0.75f)
             }
         }
+    }
+    
+    fun resetInputs() {
+        inputResults.clear()
+        expectedNumInputs = 0
     }
 
     fun getDebugString(): String {

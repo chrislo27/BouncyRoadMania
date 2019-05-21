@@ -53,8 +53,7 @@ class PracticeGroupEvent(engine: Engine,
         if (satisfied && engine.xMoreTimes > 0) {
             engine.xMoreTimes--
         }
-        engine.inputResults.clear()
-        engine.expectedNumInputs = 0
+        engine.resetInputs()
 
         if (engine.xMoreTimes > 0) {
             // Copy self

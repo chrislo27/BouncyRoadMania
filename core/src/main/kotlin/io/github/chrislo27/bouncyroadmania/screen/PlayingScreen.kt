@@ -150,6 +150,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         engine.requiresPlayerInput = true
         paused = null
         (robotModeButton.labels.first() as TextLabel).text = "playing.robot.off"
+        engine.resetInputs()
         engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - 1f)
         engine.playState = PlayState.PLAYING
     }
