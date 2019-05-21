@@ -398,9 +398,9 @@ class Engine : Clock(), Disposable {
         batch.begin()
         // gradient
         if (gradientDirection == GradientDirection.VERTICAL) {
-            batch.drawQuad(0f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentStart, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, 0f, camera.viewportHeight, gradientCurrentEnd)
+            batch.drawQuad(-400f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentStart, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, -400f, camera.viewportHeight, gradientCurrentEnd)
         } else {
-            batch.drawQuad(0f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentEnd, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, 0f, camera.viewportHeight, gradientCurrentStart)
+            batch.drawQuad(-400f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentEnd, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, -400f, camera.viewportHeight, gradientCurrentStart)
         }
         projector.render(batch, entities)
 

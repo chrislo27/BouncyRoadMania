@@ -23,9 +23,6 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
     val normalBouncerTint: ColourPicker<EditorScreen>
     val aBouncerTint: ColourPicker<EditorScreen>
     val dpadBouncerTint: ColourPicker<EditorScreen>
-    val normalBouncerImg: ImageLabel<EditorScreen>
-    val aBouncerImg: ImageLabel<EditorScreen>
-    val dpadBouncerImg: ImageLabel<EditorScreen>
 
     init {
         val gradientPalette = palette.copy(fontScale = 0.75f)
@@ -113,17 +110,10 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
-        normalBouncerImg = ImageLabel(palette, this, this).apply {
-            this.image = TextureRegion(AssetRegistry.get<Texture>("tex_bouncer_blue"))
-            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
-            this.location.set(screenX = 0.3f + 0.2f, screenY = 0.75f + 0.05f, screenWidth = 0.025f, screenHeight = 0.2f / 2f)
-        }
-        elements += normalBouncerImg
         normalBouncerTint = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.3f, screenY = 0.75f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
                 engine.normalBouncerTint.set(c)
-                normalBouncerImg.tint.set(c)
             }
         }
         elements += normalBouncerTint
@@ -146,17 +136,10 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
-        aBouncerImg = ImageLabel(palette, this, this).apply {
-            this.image = TextureRegion(AssetRegistry.get<Texture>("tex_bouncer_yellow"))
-            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
-            this.location.set(screenX = 0.3f + 0.2f, screenY = 0.5f, screenWidth = 0.025f, screenHeight = 0.2f)
-        }
-        elements += aBouncerImg
         aBouncerTint = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.3f, screenY = 0.5f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
                 engine.aBouncerTint.set(c)
-                aBouncerImg.tint.set(c)
             }
         }
         elements += aBouncerTint
@@ -179,17 +162,10 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.45f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
-        dpadBouncerImg = ImageLabel(palette, this, this).apply {
-            this.image = TextureRegion(AssetRegistry.get<Texture>("tex_bouncer_red"))
-            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
-            this.location.set(screenX = 0.3f + 0.2f, screenY = 0.25f, screenWidth = 0.025f, screenHeight = 0.2f)
-        }
-        elements += dpadBouncerImg
         dpadBouncerTint = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.3f, screenY = 0.25f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
                 engine.dpadBouncerTint.set(c)
-                dpadBouncerImg.tint.set(c)
             }
         }
         elements += dpadBouncerTint
@@ -214,9 +190,6 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         normalBouncerTint.setColor(engine.normalBouncerTint)
         aBouncerTint.setColor(engine.aBouncerTint)
         dpadBouncerTint.setColor(engine.dpadBouncerTint)
-        normalBouncerImg.tint.set(normalBouncerTint.currentColour)
-        aBouncerImg.tint.set(aBouncerTint.currentColour)
-        dpadBouncerImg.tint.set(dpadBouncerTint.currentColour)
     }
 
     fun onEngineChange(engine: Engine) {

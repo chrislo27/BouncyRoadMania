@@ -9,11 +9,9 @@ import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.*
 import io.github.chrislo27.bouncyroadmania.engine.Engine
-import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
 import io.github.chrislo27.bouncyroadmania.util.RectanglePool
 import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.unscaleFont
-import io.github.chrislo27.toolboks.util.gdxutils.drawQuad
 import io.github.chrislo27.toolboks.util.gdxutils.drawRect
 import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
@@ -177,18 +175,24 @@ class EditorRenderer(val editor: Editor) {
     }
 
     private fun renderParams(batch: SpriteBatch, beatRange: IntRange) {
-        TMP_MATRIX.set(batch.projectionMatrix)
-        batch.projectionMatrix = staticCamera.combined
-        batch.begin()
-        with(engine) {
-            if (gradientDirection == GradientDirection.VERTICAL) {
-                batch.drawQuad(0f, 0f, gradientStart, staticCamera.viewportWidth, 0f, gradientStart, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientEnd, 0f, staticCamera.viewportHeight, gradientEnd)
-            } else {
-                batch.drawQuad(0f, 0f, gradientStart, staticCamera.viewportWidth, 0f, gradientEnd, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientEnd, 0f, staticCamera.viewportHeight, gradientStart)
-            }
-        }
-        batch.end()
-        batch.projectionMatrix = TMP_MATRIX
+//        TMP_MATRIX.set(batch.projectionMatrix)
+//        batch.projectionMatrix = staticCamera.combined
+//        batch.begin()
+//        with(engine) {
+//            if (gradientDirection == GradientDirection.VERTICAL) {
+//                batch.drawQuad(0f, 0f, gradientStart, staticCamera.viewportWidth, 0f, gradientStart, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientEnd, 0f, staticCamera.viewportHeight, gradientEnd)
+//            } else {
+//                batch.drawQuad(0f, 0f, gradientStart, staticCamera.viewportWidth, 0f, gradientEnd, staticCamera.viewportWidth, staticCamera.viewportHeight, gradientEnd, 0f, staticCamera.viewportHeight, gradientStart)
+//            }
+//        }
+//        batch.end()
+//        batch.projectionMatrix = TMP_MATRIX
+        val lastX = engine.camera.position.x
+        engine.camera.position.x -= 400f
+        engine.camera.update()
+        engine.render(batch)
+        engine.camera.position.x = lastX
+        engine.camera.up
     }
 
     fun getDebugString(): String {
