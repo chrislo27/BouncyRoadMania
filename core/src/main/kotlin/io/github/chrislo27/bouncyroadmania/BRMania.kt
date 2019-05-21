@@ -8,6 +8,7 @@ import io.github.chrislo27.toolboks.version.Version
 object BRMania {
 
     const val TITLE = "Bouncy Road Mania"
+    const val GITHUB = "https://github.com/chrislo27/BouncyRoadMania"
     val VERSION: Version = Version(0, 3, 0, "DEVELOPMENT")
     const val WIDTH = 1280
     const val HEIGHT = 720
