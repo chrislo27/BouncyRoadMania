@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.entity.*
+import io.github.chrislo27.bouncyroadmania.engine.event.BgImageEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.engine.event.PlaybackCompletion
@@ -47,7 +48,7 @@ class Engine : Clock(), Disposable {
         val MIN_TRACK_COUNT: Int = 4
         val MAX_TRACK_COUNT: Int = 4
         val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
-        
+
         val DEFAULT_GRADIENT: Color = Color.valueOf("0296FFFF")
         val DEFAULT_NORMAL_BOUNCER: Color = Color.valueOf("08BDFFFF")
         val DEFAULT_A_BOUNCER: Color = Color.valueOf("FFFF00FF")
@@ -313,6 +314,13 @@ class Engine : Clock(), Disposable {
     fun recomputeCachedData() {
         lastPoint = events.firstOrNull { it is EndEvent }?.bounds?.x ?: events.maxBy { it.bounds.maxX }?.bounds?.maxX ?: 0f
         duration = events.firstOrNull { it is EndEvent }?.bounds?.x ?: Float.POSITIVE_INFINITY
+        Gdx.app.postRunnable {
+            textures as MutableMap
+            textures.keys.toList().filter { key -> events.none { it is BgImageEvent && it.textureHash == key } }.forEach { key ->
+                textures.getValue(key).dispose()
+                textures.remove(key)
+            }
+        }
     }
 
     fun eventUpdate(event: Event) {

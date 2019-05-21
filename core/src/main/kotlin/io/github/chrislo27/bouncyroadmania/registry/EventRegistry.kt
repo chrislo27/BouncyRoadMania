@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.registry
 
+import io.github.chrislo27.bouncyroadmania.engine.event.BgImageEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.DeployEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.GradientChangeEvent
@@ -37,6 +38,9 @@ object EventRegistry {
                 this.color.set(engine.gradientEnd)
                 this.onColorChange()
             }
+        })
+        add(Instantiator("background_image", listOf(), "instantiator.background_image.name", true, "instantiator.background_image.summary", true, "instantiator.background_image.desc", true) { engine ->
+            BgImageEvent(engine, this)
         })
 
         map = tempMap
