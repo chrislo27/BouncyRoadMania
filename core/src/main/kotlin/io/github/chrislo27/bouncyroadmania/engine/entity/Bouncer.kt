@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
@@ -15,6 +17,10 @@ import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 open class Bouncer(engine: Engine) : Entity(engine) {
 
+    companion object {
+        protected val TMP_ARRAY: FloatArray = FloatArray(3)
+    }
+    
     var bounceAmt: Float = 0f
         protected set
     open val isPlayer: Boolean = false
@@ -39,14 +45,23 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         val tex = texture
         Vector2(tex.width * 0.5f, topTexture.regionHeight * 1f)
     }
-    
+
     override fun render(batch: SpriteBatch, scale: Float) {
         // Position is based on centre, top
 
         val bounceTop: Float = MathUtils.lerp(0f, 8f, bounceAmt)
         val bounceBottom: Float = MathUtils.lerp(0f, topTexture.regionHeight * scale, bounceAmt)
 
-        batch.color = tint
+//        batch.color = tint
+        batch.setColor(1f, 1f, 1f, 1f)
+        
+        // FIXME optimize shaders
+        val currentShader = batch.shader
+        val hsvShader = BRManiaApp.instance.hsvShader
+        batch.shader = hsvShader
+        
+        tint.toHsv(TMP_ARRAY)
+        hsvShader.setUniformf("v_hsv", TMP_ARRAY[0], TMP_ARRAY[1], TMP_ARRAY[2])
         
         // Render bottom first
         batch.draw(bottomTexture, posX - origin.x, posY - (origin.y + bottomTexture.regionHeight * scale) + bounceBottom,
@@ -58,8 +73,10 @@ open class Bouncer(engine: Engine) : Entity(engine) {
                 origin.x, origin.y,
                 topTexture.regionWidth.toFloat(), topTexture.regionHeight.toFloat(),
                 scale, scale, 0f)
-        
+
         batch.setColor(1f, 1f, 1f, 1f)
+        
+        batch.shader = currentShader
 
 //        batch.setColor(0f, 1f, 0f, 1f)
 //        batch.fillRect(posX - 2f, posY - 2f, 4f, 4f)
@@ -68,7 +85,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
 
     override fun renderUpdate(delta: Float) {
         super.renderUpdate(delta)
-        if (bounceAmt > 0f){
+        if (bounceAmt > 0f) {
             bounceAmt -= delta * 8f
             if (bounceAmt < 0f)
                 bounceAmt = 0f
@@ -114,4 +131,58 @@ class YellowBouncer(engine: Engine) : PlayerBouncer(engine, InputType.A) {
     init {
         origin.x = 11f
     }
+}
+
+object BouncerShaders {
+    val vertex = """
+attribute vec4 ${ShaderProgram.POSITION_ATTRIBUTE};
+attribute vec4 ${ShaderProgram.COLOR_ATTRIBUTE};
+attribute vec2 ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
+uniform mat4 u_projTrans;
+varying vec4 v_color;
+varying vec2 v_texCoords;
+
+void main()
+{
+   v_color = ${ShaderProgram.COLOR_ATTRIBUTE};
+   v_color.a = v_color.a * (255.0/254.0);
+   v_texCoords = ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
+   gl_Position =  u_projTrans * ${ShaderProgram.POSITION_ATTRIBUTE};
+}
+"""
+    val frag = """
+
+varying vec4 v_color;
+varying vec2 v_texCoords;
+uniform vec3 v_hsv;
+uniform sampler2D u_texture;
+uniform mat4 u_projTrans;
+
+vec3 rgb2hsv(vec3 c) {
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+void main() {
+    vec4 textureColor = texture2D(u_texture, v_texCoords);
+    vec3 fragRGB = textureColor.rgb;
+    vec3 fragHSV = rgb2hsv(fragRGB).xyz;
+    fragHSV.x = v_hsv.x / 360.0;
+    fragHSV.yz *= v_hsv.yz;
+    fragHSV.xyz = mod(fragHSV.xyz, 1.0);
+    fragRGB = hsv2rgb(fragHSV);
+    gl_FragColor = vec4(fragRGB, textureColor.w);
+} 
+"""
 }

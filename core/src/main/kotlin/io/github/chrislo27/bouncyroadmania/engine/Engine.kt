@@ -179,9 +179,9 @@ class Engine : Clock(), Disposable {
     val gradientCurrentEnd: Color = Color(1f, 1f, 1f, 1f).set(gradientEnd)
     val gradientCurrentStart: Color = Color(0f, 0f, 0f, 1f).set(gradientStart)
     var gradientDirection: GradientDirection = GradientDirection.VERTICAL
-    val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f)
-    val aBouncerTint: Color = Color(1f, 1f, 1f, 1f)
-    val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f)
+    val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("08BDFFFF"))
+    val aBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("FFFF00FF"))
+    val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("FF0200FF"))
 
     // Practice related
     var currentTextBox: TextBox? = null

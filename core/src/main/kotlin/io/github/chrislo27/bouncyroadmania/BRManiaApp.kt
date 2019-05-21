@@ -11,9 +11,11 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
 import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
+import io.github.chrislo27.bouncyroadmania.engine.entity.BouncerShaders
 import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
@@ -112,6 +114,7 @@ class BRManiaApp(logger: Logger, logToFile: File?)
     private var lastWindowed: Pair<Int, Int> = BRMania.WIDTH to BRMania.HEIGHT
     lateinit var hueBar: Texture
         private set
+    lateinit var hsvShader: ShaderProgram
     
     @Volatile
     var githubVersion: Version = Version.RETRIEVING
@@ -176,6 +179,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
                 this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             }
         }
+        
+        hsvShader = ShaderProgram(BouncerShaders.vertex, BouncerShaders.frag)
 
         DiscordHelper.init()
         DiscordHelper.updatePresence(PresenceState.Loading)
