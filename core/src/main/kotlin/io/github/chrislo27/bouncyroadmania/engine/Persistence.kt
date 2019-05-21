@@ -238,14 +238,14 @@ fun Engine.unpack(zip: ZipFile, progressListener: (Float) -> Unit = {}) {
         texs.forEach { node ->
             val name = node.asText()
             textures[name] = AssetRegistry.missingTexture
+            val entry = zip.getEntry("textures/$name.png")
+            val bytes = zip.getInputStream(entry).let { stream ->
+                val b = stream.readBytes()
+                stream.close()
+                b
+            }
             Gdx.app.postRunnable {
                 try {
-                    val entry = zip.getEntry("textures/$name.png")
-                    val bytes = zip.getInputStream(entry).let { stream ->
-                        val b = stream.readBytes()
-                        stream.close()
-                        b
-                    }
                     val texture = Texture(Pixmap(bytes, 0, bytes.size))
                     textures[name] = texture
                 } catch (t: Throwable) {
