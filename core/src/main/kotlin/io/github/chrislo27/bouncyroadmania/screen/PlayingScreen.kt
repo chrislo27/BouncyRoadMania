@@ -198,18 +198,47 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             if (engine.playState == PlayState.STOPPED) {
                 onEnd()
             }
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-                if (engine.requiresPlayerInput) {
-                    engine.fireInput(InputType.DPAD)
-                }
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-                if (engine.requiresPlayerInput) {
-                    engine.fireInput(InputType.A)
-                }
-            }
         }
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        if (paused == null) {
+            var inputted = false
+            if (keycode == Input.Keys.D) {
+                if (engine.requiresPlayerInput) {
+                    engine.fireInput(InputType.DPAD, false)
+                    inputted = true
+                }
+            }
+            if (keycode == Input.Keys.J) {
+                if (engine.requiresPlayerInput) {
+                    engine.fireInput(InputType.A, false)
+                    inputted = true
+                }
+            }
+            return inputted
+        }
+        return super.keyUp(keycode)
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        if (paused == null) {
+            var inputted = false
+            if (keycode == Input.Keys.D) {
+                if (engine.requiresPlayerInput) {
+                    engine.fireInput(InputType.DPAD, true)
+                    inputted = true
+                }
+            }
+            if (keycode == Input.Keys.J) {
+                if (engine.requiresPlayerInput) {
+                    engine.fireInput(InputType.A, true)
+                    inputted = true
+                }
+            }
+            return inputted
+        }
+        return super.keyDown(keycode)
     }
 
     override fun tickUpdate() {

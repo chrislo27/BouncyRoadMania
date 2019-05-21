@@ -1,6 +1,7 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -495,7 +496,7 @@ class Engine : Clock(), Disposable {
                 if (textBox.secsBeforeCanInput > 0f)
                     textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
                 if (textBox.secsBeforeCanInput <= 0f) {
-                    val bordered = MathHelper.getSawtoothWave(1.25f) >= 0.25f
+                    val bordered = MathHelper.getSawtoothWave(1.25f) >= 0.25f && lastInputMap[InputType.A] != true
                     font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
                 }
             }
@@ -523,15 +524,23 @@ class Engine : Clock(), Disposable {
             InputType.DPAD -> redBouncer
         }
     }
+    
+    private val lastInputMap: MutableMap<InputType, Boolean> = mutableMapOf()
 
-    fun fireInput(inputType: InputType) {
+    fun fireInput(inputType: InputType, down: Boolean) {
+        lastInputMap[inputType] = down
         val textBox = this.currentTextBox
-        if (textBox != null) {
+        if (textBox != null && inputType == InputType.A) {
             if (textBox.requiresInput && textBox.secsBeforeCanInput <= 0f) {
-                this.currentTextBox = null
-                playState = PlayState.PLAYING
+                if (down) {
+                    AssetRegistry.get<Sound>("sfx_text_advance_1").play()
+                } else {
+                    AssetRegistry.get<Sound>("sfx_text_advance_2").play()
+                    this.currentTextBox = null
+                    playState = PlayState.PLAYING
+                }
             }
-        } else if (playState == PlayState.PLAYING) {
+        } else if (playState == PlayState.PLAYING && down) {
             val bouncer = getBouncerForInput(inputType)
             val any = entities.filterIsInstance<Ball>().fold(false) { acc, it ->
                 it.onInput(inputType) || acc
@@ -547,6 +556,7 @@ class Engine : Clock(), Disposable {
     fun resetInputs() {
         inputResults.clear()
         expectedNumInputs = 0
+        lastInputMap.clear()
     }
 
     fun getDebugString(): String {

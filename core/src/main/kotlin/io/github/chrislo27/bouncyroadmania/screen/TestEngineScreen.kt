@@ -77,7 +77,7 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             val font = main.defaultBorderedFont
             font.scaleFont(engine.camera)
             font.scaleMul(0.75f)
-            font.drawCompressed(batch, "W/A/S/D - \uE110\n" +
+            font.drawCompressed(batch, "D - \uE110\n" +
                     "J - \uE0E0\nE - Deploy ball (0.5 ♩)\nSHIFT+E - Deploy (1 ♩)\nESC - Main Menu\nR - Stop\nM - Bouncy Road 1\nSHIFT+M - Bouncy Road 2\nF1 - Toggle UI",
                     engine.camera.viewportWidth - 600f - 8f, font.lineHeight * 9f, 600f, Align.right)
             font.scaleMul(1f / 0.75f)
@@ -269,21 +269,47 @@ class TestEngineScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, TestEngine
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.S) || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            if (engine.playState == PlayState.PLAYING) {
-                engine.fireInput(InputType.DPAD)
-            }
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-            if (engine.playState == PlayState.PLAYING) {
-                engine.fireInput(InputType.A)
-            }
-        }
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             reload()
             main.screen = TransitionScreen(main, main.screen, MainMenuScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
         }
+    }
+
+
+    override fun keyUp(keycode: Int): Boolean {
+        var inputted = false
+        if (keycode == Input.Keys.D) {
+            if (engine.requiresPlayerInput) {
+                engine.fireInput(InputType.DPAD, false)
+                inputted = true
+            }
+        }
+        if (keycode == Input.Keys.J) {
+            if (engine.requiresPlayerInput) {
+                engine.fireInput(InputType.A, false)
+                inputted = true
+            }
+        }
+
+        return inputted || super.keyUp(keycode)
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        var inputted = false
+        if (keycode == Input.Keys.D) {
+            if (engine.requiresPlayerInput) {
+                engine.fireInput(InputType.DPAD, true)
+                inputted = true
+            }
+        }
+        if (keycode == Input.Keys.J) {
+            if (engine.requiresPlayerInput) {
+                engine.fireInput(InputType.A, true)
+                inputted = true
+            }
+        }
+
+        return inputted || super.keyDown(keycode)
     }
 
     override fun getDebugString(): String? {
