@@ -124,7 +124,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "initialParams.reset"
             this.leftClickAction = { _, _ ->
-                normalBouncerTint.setColor(Color.WHITE)
+                normalBouncerTint.setColor(Engine.DEFAULT_NORMAL_BOUNCER)
             }
             this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
@@ -150,7 +150,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "initialParams.reset"
             this.leftClickAction = { _, _ ->
-                aBouncerTint.setColor(Color.WHITE)
+                aBouncerTint.setColor(Engine.DEFAULT_A_BOUNCER)
             }
             this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
@@ -176,7 +176,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "initialParams.reset"
             this.leftClickAction = { _, _ ->
-                dpadBouncerTint.setColor(Color.WHITE)
+                dpadBouncerTint.setColor(Engine.DEFAULT_DPAD_BOUNCER)
             }
             this.location.set(screenX = 0.3f, screenY = 0.45f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }

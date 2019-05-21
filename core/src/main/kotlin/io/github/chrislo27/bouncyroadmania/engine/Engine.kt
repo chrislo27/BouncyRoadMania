@@ -47,6 +47,11 @@ class Engine : Clock(), Disposable {
         val MIN_TRACK_COUNT: Int = 4
         val MAX_TRACK_COUNT: Int = 4
         val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
+        
+        val DEFAULT_GRADIENT: Color = Color.valueOf("0296FFFF")
+        val DEFAULT_NORMAL_BOUNCER: Color = Color.valueOf("08BDFFFF")
+        val DEFAULT_A_BOUNCER: Color = Color.valueOf("FFFF00FF")
+        val DEFAULT_DPAD_BOUNCER: Color = Color.valueOf("FF0200FF")
     }
 
     var version: Version = BRMania.VERSION.copy()
@@ -174,14 +179,14 @@ class Engine : Clock(), Disposable {
 
     // Visuals
     val textures: Map<String, Texture> = mutableMapOf()
-    val gradientEnd: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("0296FFFF"))
+    val gradientEnd: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_GRADIENT)
     val gradientStart: Color = Color(0f, 0f, 0f, 1f)
     val gradientCurrentEnd: Color = Color(1f, 1f, 1f, 1f).set(gradientEnd)
     val gradientCurrentStart: Color = Color(0f, 0f, 0f, 1f).set(gradientStart)
     var gradientDirection: GradientDirection = GradientDirection.VERTICAL
-    val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("08BDFFFF"))
-    val aBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("FFFF00FF"))
-    val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(Color.valueOf("FF0200FF"))
+    val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_NORMAL_BOUNCER)
+    val aBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_A_BOUNCER)
+    val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_DPAD_BOUNCER)
 
     // Practice related
     var currentTextBox: TextBox? = null
