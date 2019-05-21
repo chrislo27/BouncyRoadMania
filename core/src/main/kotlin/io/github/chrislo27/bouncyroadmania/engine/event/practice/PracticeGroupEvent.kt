@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.event.DeployEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
+import io.github.chrislo27.bouncyroadmania.engine.input.InputScore
 import io.github.chrislo27.toolboks.util.gdxutils.maxX
 
 
@@ -12,7 +13,7 @@ import io.github.chrislo27.toolboks.util.gdxutils.maxX
  * All events it generates through [groupFactory] are managed, and will be deleted along with this event
  * at the end of the bounds.
  */
-class PracticeGroupEvent(engine: Engine, 
+class PracticeGroupEvent(engine: Engine,
                          val groupFactory: PracticeGroupEvent.(offset: Float) -> List<Event>,
                          val onEnd: PracticeGroupEvent.(Engine) -> Unit,
                          val copyOffset: Float = 0f)
@@ -27,10 +28,10 @@ class PracticeGroupEvent(engine: Engine,
             it.bounds.width = this.bounds.width
         }
     }
-    
+
     private fun checkSatisfaction() {
         // Check satisfaction for xMoreTimes
-        if (!satisfied && engine.xMoreTimes > 0 && engine.inputResults.size >= managedEvents.count { it is DeployEvent } * 2 && engine.inputResults.size > 0) {
+        if (!satisfied && engine.xMoreTimes > 0 && engine.inputResults.count { it.inputScore != InputScore.MISS } >= managedEvents.count { it is DeployEvent } * 2 && engine.inputResults.size > 0) {
             satisfied = true
         }
     }
