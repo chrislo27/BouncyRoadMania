@@ -140,7 +140,7 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 // Add music fade
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
-                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 6f, 0f, 100))
                 addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-1"], true)).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
@@ -169,7 +169,7 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 // Add music fade
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
-                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 6f, 0f, 100))
                 addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-1"], true)).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
@@ -197,7 +197,7 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
 
             // Practice group 1
             addEvent(PracticeGroupEvent(engine, firstPractice, firstPracticeEnd, 2f).apply {
-                this.bounds.x = 3.5f
+                this.bounds.x = 1.5f
                 this.bounds.width = 14f
             })
         }
