@@ -419,24 +419,31 @@ class Engine : Clock(), Disposable {
         if (playState != PlayState.STOPPED) {
             events.sortedBy { it.bounds.x }.forEach { evt ->
                 if (evt is BgImageEvent) {
-                    val tex = textures[evt.textureHash]
+                    val image = textures[evt.textureHash]
                     val alpha = evt.getImageAlpha()
-                    if (tex != null && alpha > 0f) {
-                        val aspectWidth = camera.viewportWidth / tex.width
-                        val aspectHeight = camera.viewportHeight / tex.height
-                        val aspectRatio = Math.min(aspectWidth, aspectHeight)
-                        val x: Float
-                        val y: Float
-                        val w: Float
-                        val h: Float
-
-                        w = tex.width * aspectRatio
-                        h = tex.height * aspectRatio
-                        x = camera.viewportWidth / 2 - (w / 2)
-                        y = camera.viewportHeight / 2 - (h / 2)
-
+                    if (image != null && alpha > 0f) {
                         batch.setColor(1f, 1f, 1f, alpha)
-                        batch.draw(tex, x, y, w, h)
+                        when (val rType = evt.renderType) {
+                            BgImageEvent.RenderType.FILL -> {
+                                batch.draw(image, 0f, 0f, camera.viewportWidth, camera.viewportHeight)
+                            }
+                            else -> {
+                                val aspectWidth = camera.viewportWidth / image.width
+                                val aspectHeight = camera.viewportHeight / image.height
+                                val aspectRatio = if (rType == BgImageEvent.RenderType.SCALE_TO_FIT) Math.min(aspectWidth, aspectHeight) else Math.max(aspectWidth, aspectHeight)
+                                val x: Float
+                                val y: Float
+                                val w: Float
+                                val h: Float
+
+                                w = image.width * aspectRatio
+                                h = image.height * aspectRatio
+                                x = camera.viewportWidth / 2 - (w / 2)
+                                y = camera.viewportHeight / 2 - (h / 2)
+
+                                batch.draw(image, x, y, w, h)
+                            }
+                        }
                         batch.setColor(1f, 1f, 1f, 1f)
                     }
                 }
@@ -536,7 +543,7 @@ class Engine : Clock(), Disposable {
             }
         }
     }
-    
+
     fun resetInputs() {
         inputResults.clear()
         expectedNumInputs = 0

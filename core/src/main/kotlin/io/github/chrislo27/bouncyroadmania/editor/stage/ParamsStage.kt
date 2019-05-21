@@ -87,5 +87,6 @@ open class EventParamsStage<E : Event>(parent: EditorStage, val event: E) : Para
             this.tooltipText = "editor.params.find"
         }
         elements += findButton
+        updatePositions()
     }
 }

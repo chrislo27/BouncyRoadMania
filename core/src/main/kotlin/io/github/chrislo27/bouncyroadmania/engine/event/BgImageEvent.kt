@@ -28,12 +28,27 @@ import java.security.MessageDigest
 
 class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
 
+    enum class RenderType(val localization: String, val equivalent: ImageLabel.ImageRendering) {
+        FILL("bgImageEvent.renderType.fill", ImageLabel.ImageRendering.RENDER_FULL),
+        SCALE_TO_FIT("bgImageEvent.renderType.scaleToFit", ImageLabel.ImageRendering.ASPECT_RATIO),
+        EXPAND_TO_FIT("bgImageEvent.renderType.expandToFit", ImageLabel.ImageRendering.IMAGE_ASPECT_RATIO);
+
+        companion object {
+            val VALUES = values().toList()
+        }
+    }
+
     override val canBeCopied: Boolean = true
     override val isStretchable: Boolean = true
     override val hasEditableParams: Boolean = true
     override val shouldAlwaysBeSimulated: Boolean = true
 
     var textureHash: String? = null
+    var renderType: RenderType = RenderType.SCALE_TO_FIT
+
+    init {
+        bounds.width = 1f
+    }
 
     override fun copy(): BgImageEvent {
         return BgImageEvent(engine, instantiator).also {
@@ -43,6 +58,17 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
         }
     }
 
+    fun getImageAlpha(): Float {
+        var transitionDur = 1f
+        if (bounds.width < transitionDur * 2) {
+            transitionDur = bounds.width / 2f
+        }
+        val t = transitionDur / bounds.width
+
+        val progress = (engine.beat - bounds.x) / bounds.width
+        return if (progress !in 0f..1f) 0f else if (progress < t) (progress / t) else if (progress > 1f - t) (1f - (progress - (1f - t)) / t) else 1f
+    }
+
     override fun createParamsStage(editor: Editor, stage: EditorStage): BgImageEventParamsStage {
         return BgImageEventParamsStage(stage)
     }
@@ -50,6 +76,10 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
     override fun fromJson(node: ObjectNode) {
         super.fromJson(node)
         textureHash = node["textureHash"]?.asText()
+        val renderTypeStr = node["renderType"]?.asText()
+        if (renderTypeStr != null) {
+            renderType = RenderType.VALUES.find { it.name == renderTypeStr } ?: RenderType.SCALE_TO_FIT
+        }
     }
 
     override fun toJson(node: ObjectNode) {
@@ -57,22 +87,26 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
         if (textureHash != null) {
             node.put("textureHash", textureHash)
         }
+        node.put("renderType", renderType.name)
     }
 
     inner class BgImageEventParamsStage(parent: EditorStage) : EventParamsStage<BgImageEvent>(parent, this@BgImageEvent) {
         val img = ImageLabel(palette, contentStage, contentStage).apply {
             val tex = engine.textures[textureHash]
             this.image = if (tex != null) TextureRegion(tex) else null
-            this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
-            this.location.set(screenY = 0.1f, screenHeight = 0.8f)
+            this.renderType = this@BgImageEvent.renderType.equivalent
+            this.location.set(screenHeight = 0.623077f)
+            this.location.set(screenY = 0.9f - this.location.screenHeight)
         }
         val label = TextLabel(palette, contentStage, contentStage).apply {
             this.isLocalizationKey = false
             this.textWrapping = false
-            this.location.set(screenY = 0f, screenHeight = 0.1f)
+            this.location.set(img.location)
         }
 
         init {
+            contentStage.elements += img
+            contentStage.elements += label
             contentStage.elements += Button(palette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
                     this.text = "bgImageEvent.select"
@@ -116,6 +150,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
                                     Gdx.app.postRunnable {
                                         img.image = TextureRegion(texture)
                                         label.text = ""
+                                        label.background = false
                                         menu.removeSelf()
                                         persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_TEX, file.parentFile)
                                         engine.recomputeCachedData()
@@ -124,6 +159,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
                                     e.printStackTrace()
                                     Gdx.app.postRunnable {
                                         label.text = Localization["bgImageEvent.failedToLoad"]
+                                        label.background = true
                                         menu.removeSelf()
                                     }
                                 }
@@ -131,14 +167,48 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
                         } else {
                             Gdx.app.postRunnable {
                                 label.text = ""
+                                label.background = false
                                 menu.removeSelf()
                             }
                         }
                     }
                 }
             }
-            contentStage.elements += img
-            contentStage.elements += label
+            contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
+                this.location.set(screenHeight = 0.1f, screenWidth = 0.5f, pixelWidth = -4f)
+                this.isLocalizationKey = true
+                this.textWrapping = false
+                this.text = "bgImageEvent.renderType"
+            }
+            contentStage.elements += Button(palette, contentStage, contentStage).apply {
+                this.location.set(screenHeight = 0.1f, screenX = 0.5f, screenWidth = 0.5f)
+                this.addLabel(TextLabel(palette, this, this.stage).apply {
+                    this.isLocalizationKey = true
+                    this.textWrapping = false
+                    this.text = renderType.localization
+                    this.fontScaleMultiplier = 0.9f
+                })
+                this.tooltipTextIsLocalizationKey = true
+                this.tooltipText = renderType.localization + ".tooltip"
+                fun cycle(dir: Int) {
+                    val current = renderType
+                    val values = RenderType.VALUES
+                    val nextIndex = values.indexOf(current) + dir.coerceIn(-1, 1)
+                    val next: RenderType = if (nextIndex < 0) values.last() else if (nextIndex >= values.size) values.first() else values[nextIndex]
+                    renderType = next
+                    img.renderType = next.equivalent
+                    this.tooltipText = next.localization + ".tooltip"
+                    (labels.first() as TextLabel).text = next.localization
+                }
+                this.leftClickAction = { _, _ ->
+                    cycle(1)
+                }
+                this.rightClickAction = { _, _ ->
+                    cycle(-1)
+                }
+            }
+            
+            this.updatePositions()
         }
     }
 
