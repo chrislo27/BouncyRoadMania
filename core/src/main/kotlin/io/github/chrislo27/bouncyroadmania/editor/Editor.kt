@@ -365,7 +365,7 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
         run stretchCursor@{
             val clickOccupation = clickOccupation
             val mouseVector = mouseVector
-            val shouldStretch = engine.playState == PlayState.STOPPED && currentTool == Tool.SELECTION &&
+            val shouldStretch = engine.playState == PlayState.STOPPED && editMode == EditMode.EVENTS && currentTool == Tool.SELECTION &&
                     ((clickOccupation is ClickOccupation.SelectionDrag && clickOccupation.isStretching) ||
                             (clickOccupation == ClickOccupation.None && this.selection.isNotEmpty() && this.selection.all { it.isStretchable } && engine.events.any {
                                 canStretchEvent(mouseVector, it)
