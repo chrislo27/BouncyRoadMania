@@ -44,8 +44,7 @@ class Engine : Clock(), Disposable {
 
         val MAX_OFFSET_SEC: Float = 5f / 60
         val ACE_OFFSET: Float = 1f / 60
-        val GOOD_OFFSET: Float = 3f / 60
-        val BARELY_OFFSET: Float = 4f / 60
+        val GOOD_OFFSET: Float = 3.5f / 60
 
         val MIN_TRACK_COUNT: Int = 4
         val MAX_TRACK_COUNT: Int = 4

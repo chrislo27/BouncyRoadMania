@@ -10,8 +10,7 @@ data class InputResult(val type: InputType, val accuracySec: Float, val accuracy
         when {
             p <= Engine.ACE_OFFSET -> InputScore.ACE
             p <= Engine.GOOD_OFFSET -> InputScore.GOOD
-            p <= Engine.BARELY_OFFSET -> InputScore.BARELY
-            else -> InputScore.MISS
+            else -> InputScore.BARELY
         }
     }
 }
