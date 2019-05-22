@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
+import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
+import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.i18n.Localization
+import io.github.chrislo27.toolboks.transition.TransitionScreen
 import io.github.chrislo27.toolboks.ui.*
 
 
@@ -33,7 +36,7 @@ class ExitButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
                     this.leftClickAction = { _, _ ->
                         Gdx.app.postRunnable {
                             this@overlay.removeSelf()
-                            editor.main.screen = MainMenuScreen(editor.main)
+                            editor.main.screen = TransitionScreen(editor.main, editor.main.screen, MainMenuScreen(editor.main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                         }
                     }
                     this.location.set(screenX = 0.55f, screenWidth = 0.35f, screenY = 0.05f, screenHeight = 0.15f)
