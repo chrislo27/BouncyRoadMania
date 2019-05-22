@@ -83,6 +83,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             })
             this.leftClickAction = { _, _ ->
                 engine.playState = PlayState.STOPPED
+                playSelectSfx()
                 reset()
             }
         }
@@ -97,6 +98,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.leftClickAction = { _, _ ->
                 engine.playState = PlayState.STOPPED
                 engine.playState = PlayState.PAUSED
+                playSelectSfx()
                 onQuit()
             }
         }
@@ -154,6 +156,10 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - 1f)
         engine.playState = PlayState.PLAYING
     }
+    
+    protected open fun playSelectSfx() {
+        AssetRegistry.get<Sound>("sfx_select").play()
+    }
 
     protected open fun onQuit() {
         main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
@@ -178,9 +184,11 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         if (paused == null) {
             this.paused = PauseState(engine.playState)
             engine.playState = PlayState.PAUSED
+            AssetRegistry.get<Sound>("sfx_pause_enter").play()
         } else {
             this.paused = null
             engine.playState = paused.lastPlayState
+            AssetRegistry.get<Sound>("sfx_pause_exit").play()
         }
     }
 

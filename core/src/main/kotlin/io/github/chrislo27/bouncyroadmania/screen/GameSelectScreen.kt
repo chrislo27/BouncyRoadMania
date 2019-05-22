@@ -3,6 +3,7 @@ package io.github.chrislo27.bouncyroadmania.screen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
@@ -166,6 +167,7 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
                 if (loadState is LoadState.Loaded) {
                     val nextScreen = PlayingScreen(main, loadState.engine)
                     main.screen = TransitionScreen(main, main.screen, nextScreen, WipeTo(Color.BLACK, 0.35f), FadeIn(0.45f, Color.BLACK))
+                    AssetRegistry.get<Sound>("sfx_enter_game").play()
                 }
             }
             this.location.set(screenX = 0.3f, screenWidth = 0.4f, screenY = 0.1f, screenHeight = 0.1f)
