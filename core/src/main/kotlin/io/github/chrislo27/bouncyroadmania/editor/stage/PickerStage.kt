@@ -53,6 +53,11 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
             this.leftClickAction = { _, _ ->
                 if (display.index > 0) display.index--
             }
+            this.rightClickAction = { _, _ ->
+                if (display.index > 0) {
+                    display.index = (display.index - 5).coerceAtLeast(0)
+                }
+            }
         }
         elements += displayScrollUp
         displayScrollDown = Button(arrowPalette, this, this).apply {
@@ -64,6 +69,11 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
             this.background = false
             this.leftClickAction = { _, _ ->
                 if (display.index < EventRegistry.list.size - 1) display.index++
+            }
+            this.rightClickAction = { _, _ ->
+                if (display.index < EventRegistry.list.size - 1) {
+                    display.index = (display.index + 5).coerceAtMost(EventRegistry.list.size - 1)
+                }
             }
         }
         elements += displayScrollDown
