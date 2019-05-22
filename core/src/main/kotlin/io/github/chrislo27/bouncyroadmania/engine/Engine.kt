@@ -1,7 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -403,6 +402,17 @@ class Engine : Clock(), Disposable {
                 AssetRegistry.get<BeadsSound>("sfx_cowbell").play(loop = false, volume = 1.25f, pitch = if (isStartOfMeasure) 1.5f else 1.1f)
             }
         }
+        
+        val textBox = currentTextBox
+        if (textBox != null && textBox.requiresInput) {
+            if (textBox.secsBeforeCanInput > 0f) {
+                textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
+                if (!requiresPlayerInput) {
+                    this.currentTextBox = null
+                    playState = PlayState.PLAYING
+                }
+            }
+        }
 
         if (playState != PlayState.STOPPED && beat >= duration) {
             playState = PlayState.STOPPED
@@ -497,13 +507,6 @@ class Engine : Clock(), Disposable {
                     w - sectionX * 2, Align.left)
 
             if (textBox.requiresInput) {
-                if (textBox.secsBeforeCanInput > 0f) {
-                    textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
-                    if (!requiresPlayerInput) {
-                        this.currentTextBox = null
-                        playState = PlayState.PLAYING
-                    }
-                }
                 if (textBox.secsBeforeCanInput <= 0f) {
                     val bordered = MathHelper.getSawtoothWave(1.25f) >= 0.25f && lastInputMap[InputType.A] != true
                     font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
@@ -554,7 +557,7 @@ class Engine : Clock(), Disposable {
                 }
                 else -> 0f
             }
-            
+
             val font = BRManiaApp.instance.kurokaneBorderedFont
             font.scaleFont(camera)
             font.scaleMul(scale)
