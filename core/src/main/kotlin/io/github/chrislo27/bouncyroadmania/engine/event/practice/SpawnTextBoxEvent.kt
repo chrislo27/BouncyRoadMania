@@ -108,7 +108,14 @@ class SpawnTextBoxEvent(engine: Engine, var textBox: TextBox, instantiator: Inst
                 this.canInputNewlines = true
                 this.canPaste = true
                 this.textAlign = Align.left
+                this.text = textBox.text
                 this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 3))
+            }
+            contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
+                this.isLocalizationKey = true
+                this.text = "textBoxEvent.pressEnter"
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 3.75f))
+                this.fontScaleMultiplier = 0.75f
             }
         }
     }
