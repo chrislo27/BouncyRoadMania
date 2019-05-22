@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
+import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
 import io.github.chrislo27.toolboks.registry.AssetRegistry
@@ -39,6 +40,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
                 engine.gradientStart.set(c)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.gradientCurrentStart.set(c)
+                }
             }
         }
         elements += gradientFirst
@@ -54,6 +58,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.location.set(screenX = 0.05f, screenY = 0.5f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
                 engine.gradientEnd.set(c)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.gradientCurrentEnd.set(c)
+                }
             }
         }
         elements += gradientLast
