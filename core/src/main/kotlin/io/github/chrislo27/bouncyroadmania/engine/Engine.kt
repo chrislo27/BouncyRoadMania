@@ -1,12 +1,14 @@
 package io.github.chrislo27.bouncyroadmania.engine
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
@@ -194,6 +196,7 @@ class Engine : Clock(), Disposable {
     // Practice related
     var currentTextBox: TextBox? = null
     var xMoreTimes: Int = 0
+    var clearText: Float = 0f
 
     fun addBouncers() {
         entities.removeAll(bouncers)
@@ -519,6 +522,47 @@ class Engine : Clock(), Disposable {
             font.scaleMul(1f / 0.65f)
             font.unscaleFont()
         }
+        if (clearText > 0f) {
+            clearText -= Gdx.graphics.deltaTime / 1.5f
+            if (clearText < 0f)
+                clearText = 0f
+
+            val normalScale = 0.65f
+            val transitionEnd = 0.15f
+            val transitionStart = 0.2f
+            val scale: Float = when (val progress = 1f - clearText) {
+                in 0f..transitionStart -> {
+                    Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
+                }
+                in (1f - transitionEnd)..1f -> {
+                    Interpolation.exp10Out.apply(normalScale, normalScale * 1.5f, (progress - (1f - transitionEnd)) / transitionEnd)
+                }
+                else -> normalScale
+            }
+            val alpha: Float = when (val progress = 1f - clearText) {
+                in 0f..transitionStart -> {
+                    Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
+                }
+                in (1f - transitionEnd)..1f -> {
+                    Interpolation.exp10Out.apply(1f, 0f, (progress - (1f - transitionEnd)) / transitionEnd)
+                }
+                else -> 1f
+            }
+            val white: Float = when (val progress = 1f - clearText) {
+                in 0f..transitionStart * 0.75f -> {
+                    Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
+                }
+                else -> 0f
+            }
+            
+            val font = BRManiaApp.instance.kurokaneBorderedFont
+            font.scaleFont(camera)
+            font.scaleMul(scale)
+            font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
+            font.drawCompressed(batch, Localization["practice.clear"], 0f, camera.viewportHeight / 2f + font.capHeight / 2, camera.viewportWidth, Align.center)
+            font.scaleMul(1f / scale)
+            font.unscaleFont()
+        }
 
         batch.end()
         batch.projectionMatrix = TMP_MATRIX
@@ -530,7 +574,7 @@ class Engine : Clock(), Disposable {
             InputType.DPAD -> redBouncer
         }
     }
-    
+
     private val lastInputMap: MutableMap<InputType, Boolean> = mutableMapOf()
 
     fun fireInput(inputType: InputType, down: Boolean) {

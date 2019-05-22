@@ -53,6 +53,9 @@ class PracticeGroupEvent(engine: Engine,
         checkSatisfaction()
         if (satisfied && engine.xMoreTimes > 0) {
             engine.xMoreTimes--
+            if (engine.xMoreTimes == 0) {
+                engine.clearText = 1f
+            }
         }
         engine.resetInputs()
 
