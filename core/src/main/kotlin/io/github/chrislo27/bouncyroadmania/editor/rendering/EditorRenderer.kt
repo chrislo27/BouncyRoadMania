@@ -188,7 +188,7 @@ class EditorRenderer(val editor: Editor) {
 //        batch.end()
 //        batch.projectionMatrix = TMP_MATRIX
         val lastX = engine.camera.position.x
-        engine.camera.position.x -= 400f
+        engine.camera.position.x -= 55f
         engine.camera.update()
         engine.render(batch)
         engine.camera.position.x = lastX

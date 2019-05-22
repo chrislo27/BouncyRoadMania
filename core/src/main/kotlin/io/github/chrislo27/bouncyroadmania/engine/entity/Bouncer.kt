@@ -61,7 +61,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
         batch.shader = hsvShader
         
         tint.toHsv(TMP_ARRAY)
-        hsvShader.setUniformf("v_hsv", TMP_ARRAY[0], TMP_ARRAY[1], TMP_ARRAY[2])
+        hsvShader.setUniformf("v_hsva", TMP_ARRAY[0], TMP_ARRAY[1], TMP_ARRAY[2], tint.a)
         
         // Render bottom first
         batch.draw(bottomTexture, posX - origin.x, posY - (origin.y + bottomTexture.regionHeight * scale) + bounceBottom,
@@ -145,7 +145,7 @@ varying vec2 v_texCoords;
 void main()
 {
    v_color = ${ShaderProgram.COLOR_ATTRIBUTE};
-   v_color.a = v_color.a * (255.0/254.0);
+   // v_color.a = v_color.a * (255.0/254.0);
    v_texCoords = ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
    gl_Position =  u_projTrans * ${ShaderProgram.POSITION_ATTRIBUTE};
 }
@@ -154,7 +154,7 @@ void main()
 
 varying vec4 v_color;
 varying vec2 v_texCoords;
-uniform vec3 v_hsv;
+uniform vec4 v_hsva;
 uniform sampler2D u_texture;
 uniform mat4 u_projTrans;
 
@@ -176,13 +176,14 @@ vec3 hsv2rgb(vec3 c) {
 
 void main() {
     vec4 textureColor = texture2D(u_texture, v_texCoords);
-    vec3 fragRGB = textureColor.rgb;
+    vec4 fragRGBA = textureColor.rgba;
+    vec3 fragRGB = vec3(fragRGBA.xyz);
     vec3 fragHSV = rgb2hsv(fragRGB).xyz;
-    fragHSV.x = v_hsv.x / 360.0;
-    fragHSV.yz *= v_hsv.yz;
+    fragHSV.x = v_hsva.x / 360.0;
+    fragHSV.yz *= v_hsva.yz;
     fragHSV.xyz = mod(fragHSV.xyz, 1.0);
     fragRGB = hsv2rgb(fragHSV);
-    gl_FragColor = vec4(fragRGB, textureColor.w);
+    gl_FragColor = vec4(fragRGB, textureColor.w * v_hsva.w);
 } 
 """
 }

@@ -110,8 +110,8 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
-        normalBouncerTint = ColourPicker(gradientPalette, this, this).apply {
-            this.location.set(screenX = 0.3f, screenY = 0.75f, screenWidth = 0.2f, screenHeight = 0.2f)
+        normalBouncerTint = ColourPicker(gradientPalette, this, this, true).apply {
+            this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
                 engine.normalBouncerTint.set(c)
             }
@@ -134,10 +134,10 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.fontScaleMultiplier = 0.85f
             this.text = "initialParams.aBouncerTint"
             this.background = true
-            this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.05f)
+            this.location.set(screenX = 0.3f, screenY = 0.65f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
-        aBouncerTint = ColourPicker(gradientPalette, this, this).apply {
-            this.location.set(screenX = 0.3f, screenY = 0.5f, screenWidth = 0.2f, screenHeight = 0.2f)
+        aBouncerTint = ColourPicker(gradientPalette, this, this, true).apply {
+            this.location.set(screenX = 0.3f, screenY = 0.4f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
                 engine.aBouncerTint.set(c)
             }
@@ -152,7 +152,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.leftClickAction = { _, _ ->
                 aBouncerTint.setColor(Engine.DEFAULT_A_BOUNCER)
             }
-            this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
+            this.location.set(screenX = 0.3f, screenY = 0.6f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
         elements += TextLabel(palette, this, this).apply {
             this.textWrapping = false
@@ -160,10 +160,10 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.fontScaleMultiplier = 0.85f
             this.text = "initialParams.dpadBouncerTint"
             this.background = true
-            this.location.set(screenX = 0.3f, screenY = 0.45f, screenWidth = 0.2f, screenHeight = 0.05f)
+            this.location.set(screenX = 0.3f, screenY = 0.35f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
-        dpadBouncerTint = ColourPicker(gradientPalette, this, this).apply {
-            this.location.set(screenX = 0.3f, screenY = 0.25f, screenWidth = 0.2f, screenHeight = 0.2f)
+        dpadBouncerTint = ColourPicker(gradientPalette, this, this, true).apply {
+            this.location.set(screenX = 0.3f, screenY = 0.1f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
                 engine.dpadBouncerTint.set(c)
             }
@@ -178,7 +178,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.leftClickAction = { _, _ ->
                 dpadBouncerTint.setColor(Engine.DEFAULT_DPAD_BOUNCER)
             }
-            this.location.set(screenX = 0.3f, screenY = 0.45f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
+            this.location.set(screenX = 0.3f, screenY = 0.35f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
 
         updateColours()

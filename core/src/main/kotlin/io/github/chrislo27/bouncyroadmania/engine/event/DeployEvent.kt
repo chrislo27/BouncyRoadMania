@@ -163,9 +163,9 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                 this.text = "deployEvent.ballColour"
                 this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 2))
             }
-            contentStage.elements += ColourPicker(palette, contentStage, contentStage).apply {
+            contentStage.elements += ColourPicker(palette, contentStage, contentStage, true).apply {
                 this.setColor(color)
-                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size * 3, pixelY = -(size * 5))
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size * 4, pixelY = -(size * 6))
                 this.onColourChange = { c ->
                     color.set(c)
                     onParamsChange()
@@ -175,7 +175,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
             contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
                 this.isLocalizationKey = true
                 this.text = "deployEvent.semitone"
-                this.location.set(screenY = 1f, screenHeight = 0f, screenWidth = 0.5f, pixelHeight = size, pixelY = -(size * 6))
+                this.location.set(screenY = 1f, screenHeight = 0f, screenWidth = 0.5f, pixelHeight = size, pixelY = -(size * 7))
             }
             contentStage.elements += object : TextLabel<EditorScreen>(palette, contentStage, contentStage) {
                 override fun getRealText(): String {
@@ -184,7 +184,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
             }.apply {
                 this.background = true
                 this.isLocalizationKey = false
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.7f, screenWidth = 0.1f, pixelHeight = size, pixelY = -(size * 6f))
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.7f, screenWidth = 0.1f, pixelHeight = size, pixelY = -(size * 7f))
             }
             val buttonPalette = palette.copy(fontScale = 0.85f)
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
@@ -196,7 +196,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset -= 5
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.5f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.5f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
             }
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -207,7 +207,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset -= 1
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.6f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.6f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
             }
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -218,7 +218,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset += 1
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.8f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.8f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
             }
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -229,7 +229,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset += 5
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.9f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 6f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.9f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
             }
         }
     }
