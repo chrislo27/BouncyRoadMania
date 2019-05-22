@@ -344,6 +344,20 @@ class Engine : Clock(), Disposable {
     }
 
     override fun update(delta: Float) {
+        val textBox = currentTextBox
+        if (textBox != null && textBox.requiresInput) {
+            if (textBox.secsBeforeCanInput > 0f) {
+                textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime // Don't use delta
+            }
+            if (textBox.secsBeforeCanInput <= 0f) {
+                if (!requiresPlayerInput) {
+                    // Robot mode
+                    this.currentTextBox = null
+                    playState = PlayState.PLAYING
+                }
+            }
+        }
+        
         // No super update
         if (playState != PlayState.PLAYING)
             return
@@ -399,16 +413,6 @@ class Engine : Clock(), Disposable {
             if (metronome) {
                 val isStartOfMeasure = measurePart == 0
                 AssetRegistry.get<BeadsSound>("sfx_cowbell").play(loop = false, volume = 1.25f, pitch = if (isStartOfMeasure) 1.5f else 1.1f)
-            }
-        }
-        
-        val textBox = currentTextBox
-        if (textBox != null && textBox.requiresInput) {
-            if (textBox.secsBeforeCanInput > 0f) {
-                if (!requiresPlayerInput) {
-                    this.currentTextBox = null
-                    playState = PlayState.PLAYING
-                }
             }
         }
 
@@ -505,9 +509,6 @@ class Engine : Clock(), Disposable {
                     w - sectionX * 2, Align.left)
 
             if (textBox.requiresInput) {
-                if (textBox.secsBeforeCanInput > 0f) {
-                    textBox.secsBeforeCanInput -= Gdx.graphics.deltaTime
-                }
                 if (textBox.secsBeforeCanInput <= 0f) {
                     val bordered = MathHelper.getSawtoothWave(1.25f) >= 0.25f && lastInputMap[InputType.A] != true
                     font.draw(batch, if (bordered) "\uE0A0" else "\uE0E0", x + w - sectionX * 0.75f, y + font.capHeight + sectionY * 0.35f, 0f, Align.center, false)
