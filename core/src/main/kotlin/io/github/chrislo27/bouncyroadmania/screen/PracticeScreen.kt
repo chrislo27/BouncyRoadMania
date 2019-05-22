@@ -72,17 +72,19 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
         Amazing!
         You've got the skills.\nReady for the real thing?
          */
+        
+        val textBoxInst = EventRegistry.map.getValue("text_box")
 
         // Populate
         with(engine) {
             playbackStart = 0f
             musicStartSec = 1.5f
             tempos.add(TempoChange(tempos, 0f, 60f, Swing.STRAIGHT, 0f))
-            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.stage1-1"], true)).apply {
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.stage1-1"], true), textBoxInst).apply {
                 this.bounds.x = 0f
                 this.bounds.width = 0.5f
             })
-            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.stage1-2"], true)).apply {
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.stage1-2"], true), textBoxInst).apply {
                 this.bounds.x = 0.5f
                 this.bounds.width = 0.5f
             })
@@ -122,11 +124,11 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
                 musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-1"], true)).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-1"], true), textBoxInst).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
                 })
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-2"], true)).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-2"], true), textBoxInst).apply {
                     this.bounds.x = origin + 2f
                     this.bounds.width = 0.5f
                 })
@@ -141,11 +143,11 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
                 musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 6f, 0f, 100))
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-1"], true)).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-1"], true), textBoxInst).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
                 })
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-2"], true)).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-2"], true), textBoxInst).apply {
                     this.bounds.x = origin + 2f
                     this.bounds.width = 0.5f
                 })
@@ -170,11 +172,11 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
                 musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 6f, 0f, 100))
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-1"], true)).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-1"], true), textBoxInst).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
                 })
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-2"], true)).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-2"], true), textBoxInst).apply {
                     this.bounds.x = origin + 2f
                     this.bounds.width = 0.5f
                 })

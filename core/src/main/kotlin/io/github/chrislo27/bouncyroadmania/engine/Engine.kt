@@ -82,6 +82,7 @@ class Engine : Clock(), Disposable {
                     BeadsSoundSystem.stop()
                     entities.clear()
                     addBouncers()
+                    currentTextBox = null
                 }
                 PlayState.PAUSED -> {
                     AssetRegistry.pauseAllSounds()

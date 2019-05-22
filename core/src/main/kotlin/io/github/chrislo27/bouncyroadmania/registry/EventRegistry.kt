@@ -1,9 +1,11 @@
 package io.github.chrislo27.bouncyroadmania.registry
 
+import io.github.chrislo27.bouncyroadmania.engine.TextBox
 import io.github.chrislo27.bouncyroadmania.engine.event.BgImageEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.DeployEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.GradientChangeEvent
+import io.github.chrislo27.bouncyroadmania.engine.event.practice.SpawnTextBoxEvent
 
 
 object EventRegistry {
@@ -41,6 +43,9 @@ object EventRegistry {
         })
         add(Instantiator("background_image", listOf(), "instantiator.background_image.name", true, "instantiator.background_image.summary", true, "instantiator.background_image.desc", true) { engine ->
             BgImageEvent(engine, this)
+        })
+        add(Instantiator("text_box", listOf(), "instantiator.text_box.name", true, "instantiator.text_box.summary", true, "instantiator.text_box.desc", true) { engine ->
+            SpawnTextBoxEvent(engine, TextBox("", false), this)
         })
 
         map = tempMap
