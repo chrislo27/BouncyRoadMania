@@ -181,7 +181,9 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         }
         
         hsvShader = ShaderProgram(BouncerShaders.vertex, BouncerShaders.frag)
-        println(hsvShader.log)
+        if (!hsvShader.isCompiled) {
+            Toolboks.LOGGER.warn("hsvShader failed to compile:\n${hsvShader.log}")
+        }
         AssetRegistry.missingTexture // Generate it beforehand
 
         DiscordHelper.init()
