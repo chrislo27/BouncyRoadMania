@@ -192,7 +192,7 @@ class EditorRenderer(val editor: Editor) {
         engine.camera.update()
         engine.render(batch)
         engine.camera.position.x = lastX
-        engine.camera.up
+        engine.camera.update()
     }
 
     fun getDebugString(): String {
