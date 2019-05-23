@@ -30,10 +30,10 @@ abstract class Event(val engine: Engine) {
     val bounds: Rectangle = Rectangle(0f, 0f, 0f, 1f)
     val lerpDifference: Rectangle = Rectangle()
     open val isRendered: Boolean = true
-    open val canBeCopied: Boolean = true
     open val isStretchable: Boolean = false
     open val hasEditableParams: Boolean = false
     open val shouldAlwaysBeSimulated: Boolean = false
+    open val canBeCopied: Boolean = true
     open val renderText: String = ""
     var needsNameTooltip: Boolean = false
         protected set

@@ -3,8 +3,8 @@ package io.github.chrislo27.bouncyroadmania.editor
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
-import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
+import io.github.chrislo27.bouncyroadmania.engine.event.InstantiatedEvent
 import io.github.chrislo27.bouncyroadmania.engine.tracker.Tracker
 import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.getInputX
@@ -205,9 +205,15 @@ sealed class ClickOccupation {
             if (top > editor.engine.trackCount)
                 return false
 
-            // EXCEPTIONS for the end event
-            if (selection.any { it is EndEvent } && editor.engine.events.filter { it is EndEvent }.size > 1)
-                return false
+            // EXCEPTIONS for unique events
+            for (event in selection) {
+                if (event is InstantiatedEvent && event.isUnique) {
+                    // Check for other same-instantiator unique events
+                    val instantiator = event.instantiator
+                    if (editor.engine.events.any { it !== event && it is InstantiatedEvent && it.instantiator == instantiator})
+                        return false
+                }
+            }
 
             return editor.engine.events.all {
                 it in selection || selection.all { sel ->

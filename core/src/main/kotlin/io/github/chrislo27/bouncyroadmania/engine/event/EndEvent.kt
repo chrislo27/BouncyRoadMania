@@ -9,7 +9,7 @@ import io.github.chrislo27.toolboks.util.gdxutils.fillRect
 
 class EndEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
 
-    override val canBeCopied: Boolean = false
+    override val isUnique: Boolean = true
 
     init {
         this.bounds.width = 0.125f

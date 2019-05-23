@@ -8,6 +8,8 @@ import io.github.chrislo27.bouncyroadmania.registry.Instantiator
 abstract class InstantiatedEvent(engine: Engine, val instantiator: Instantiator) : Event(engine) {
 
     override val renderText: String get() = instantiator.displayName
+    open val isUnique: Boolean = false
+    override val canBeCopied: Boolean get() = super.canBeCopied && !isUnique
 
     open fun fromJson(node: ObjectNode) {
         bounds.set(node["x"]?.floatValue() ?: 0f, node["y"]?.floatValue() ?: 0f, node["w"]?.floatValue() ?: 1f, node["h"]?.floatValue()?.coerceAtLeast(1f) ?: 1f)
