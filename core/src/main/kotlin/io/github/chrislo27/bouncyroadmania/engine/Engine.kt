@@ -505,7 +505,7 @@ class Engine : Clock(), Disposable {
             // Render text
             val textWidth = font.getTextWidth(textBox.text, w - sectionX * 2, false)
             val textHeight = font.getTextHeight(textBox.text)
-            font.drawCompressed(batch, textBox.text, x + w / 2f - textWidth / 2f, y + h / 2f + textHeight / 2,
+            font.drawCompressed(batch, textBox.text, (x + w / 2f - textWidth / 2f).coerceAtLeast(x + sectionX), y + h / 2f + textHeight / 2,
                     w - sectionX * 2, Align.left)
 
             if (textBox.requiresInput) {
