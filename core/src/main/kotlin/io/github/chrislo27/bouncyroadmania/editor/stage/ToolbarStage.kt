@@ -105,6 +105,11 @@ class ToolbarStage(parent: EditorStage, palette: UIPalette)
                     pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
         }
         this.elements += tapalongButton
+        
+        this.elements += TrackChangeButton(editor, palette, this, this).apply {
+            this.location.set(0f, 1f, 0f, 0f, pixelX = 640f - buttonSize / 2f - buttonSize * 2 - buttonPadding * 2f,
+                    pixelWidth = buttonSize, pixelHeight = buttonSize, pixelY = -(4f + buttonSize))
+        }
 
         // Separator
         this.elements += ColourPane(this, this).apply {

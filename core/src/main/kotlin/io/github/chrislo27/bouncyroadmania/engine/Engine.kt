@@ -31,6 +31,7 @@ import io.github.chrislo27.toolboks.util.MathHelper
 import io.github.chrislo27.toolboks.util.gdxutils.*
 import io.github.chrislo27.toolboks.version.Version
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
 
@@ -44,7 +45,7 @@ class Engine : Clock(), Disposable {
         val GOOD_OFFSET: Float = 3.5f / 60
 
         val MIN_TRACK_COUNT: Int = 4
-        val MAX_TRACK_COUNT: Int = 4
+        val MAX_TRACK_COUNT: Int = 8
         val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
 
         val DEFAULT_GRADIENT: Color = Color.valueOf("0296FFFF")
@@ -145,6 +146,8 @@ class Engine : Clock(), Disposable {
     var duration: Float = Float.POSITIVE_INFINITY
         private set
     var lastPoint: Float = 0f
+        private set
+    var eventsTouchTrackTop: Boolean = false
         private set
 
     var playbackStart: Float = 0f
@@ -324,6 +327,7 @@ class Engine : Clock(), Disposable {
         lastPoint = events.firstOrNull { it is EndEvent }?.bounds?.x ?: events.maxBy { it.bounds.maxX }?.bounds?.maxX ?: 0f
         duration = events.firstOrNull { it is EndEvent }?.bounds?.x ?: Float.POSITIVE_INFINITY
         skillStarInput = events.filterIsInstance<SkillStarEvent>().firstOrNull()?.bounds?.x ?: Float.POSITIVE_INFINITY
+        eventsTouchTrackTop = events.filterNot { it is EndEvent }.firstOrNull { (it.bounds.y + it.bounds.height).toInt() >= trackCount } != null
         Gdx.app.postRunnable {
             textures as MutableMap
             textures.keys.toList().filter { key -> events.none { it is BgImageEvent && it.textureHash == key } }.forEach { key ->
@@ -364,7 +368,7 @@ class Engine : Clock(), Disposable {
                 }
             }
         }
-        
+
         // No super update
         if (playState != PlayState.PLAYING)
             return
@@ -614,7 +618,7 @@ class Engine : Clock(), Disposable {
             }
         }
     }
-    
+
     fun fireSkillStar() {
         if (gotSkillStar)
             return
@@ -628,6 +632,17 @@ class Engine : Clock(), Disposable {
         lastInputMap.clear()
         gotSkillStar = false
     }
+
+    fun wouldEventsFitNewTrackCount(newCount: Int): Boolean {
+        if (newCount < 1) {
+            return false
+        }
+
+        return events.filterNot { it is EndEvent }.firstOrNull { (it.bounds.y + it.bounds.height).roundToInt() >= trackCount } == null
+    }
+
+    fun canIncreaseTrackCount(): Boolean = trackCount < Engine.MAX_TRACK_COUNT
+    fun canDecreaseTrackCount(): Boolean = trackCount > Engine.MIN_TRACK_COUNT
 
     fun getDebugString(): String {
         return "beat: $beat\nseconds: $seconds\ntempo: ${tempos.tempoAtSeconds(seconds)}\nevents: ${events.size}\nplayState: $playState"

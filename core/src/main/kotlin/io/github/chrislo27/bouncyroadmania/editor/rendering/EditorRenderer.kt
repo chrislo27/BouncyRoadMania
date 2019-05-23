@@ -59,7 +59,7 @@ class EditorRenderer(val editor: Editor) {
                     (trackCamera.position.x + trackCamera.viewportWidth / 2 * trackCamera.zoom) / toScaleX(Editor.EVENT_WIDTH)) + 4)
 
 
-    private fun calculateNormalCameraY(): Float = 1f + (engine.trackCount - Engine.MIN_TRACK_COUNT) / 10f * 3.25f
+    private fun calculateNormalCameraY(): Float = 1f + (engine.trackCount - Engine.MIN_TRACK_COUNT) / 10f * 3.5f
 
     fun render(batch: SpriteBatch) {
         val beatRange = getBeatRange()

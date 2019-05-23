@@ -62,6 +62,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_textbox", "images/ui/textbox.png")
         AssetRegistry.loadAsset<Texture>("ui_transparent_checkerboard", "images/ui/transparent_checkerboard.png")
         AssetRegistry.loadAsset<Texture>("ui_copy", "images/ui/icon/copy.png")
+        AssetRegistry.loadAsset<Texture>("ui_track_change", "images/ui/icon/track_change.png")
 
         AssetRegistry.loadAsset<Texture>("tool_selection", "images/tool/selection.png")
         AssetRegistry.loadAsset<Texture>("tool_tempo_change", "images/tool/tempo_change.png")
