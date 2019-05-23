@@ -14,10 +14,7 @@ import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.bouncyroadmania.BRMania
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.engine.entity.*
-import io.github.chrislo27.bouncyroadmania.engine.event.BgImageEvent
-import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
-import io.github.chrislo27.bouncyroadmania.engine.event.Event
-import io.github.chrislo27.bouncyroadmania.engine.event.PlaybackCompletion
+import io.github.chrislo27.bouncyroadmania.engine.event.*
 import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
@@ -94,7 +91,7 @@ class Engine : Clock(), Disposable {
                     AssetRegistry.resumeAllSounds()
                     if (old == PlayState.STOPPED) {
                         recomputeCachedData()
-                        inputResults.clear()
+                        resetInputs()
                         seconds = tempos.beatsToSeconds(playbackStart)
                         events.forEach {
                             if (it.getUpperUpdateableBound() < beat) {
@@ -171,6 +168,9 @@ class Engine : Clock(), Disposable {
     val events: List<Event> = mutableListOf()
     val inputResults: MutableList<InputResult> = mutableListOf()
     var expectedNumInputs: Int = 0
+    var skillStarInput: Float = Float.POSITIVE_INFINITY
+        private set
+    var gotSkillStar: Boolean = false
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()
@@ -323,6 +323,7 @@ class Engine : Clock(), Disposable {
     fun recomputeCachedData() {
         lastPoint = events.firstOrNull { it is EndEvent }?.bounds?.x ?: events.maxBy { it.bounds.maxX }?.bounds?.maxX ?: 0f
         duration = events.firstOrNull { it is EndEvent }?.bounds?.x ?: Float.POSITIVE_INFINITY
+        skillStarInput = events.filterIsInstance<SkillStarEvent>().firstOrNull()?.bounds?.x ?: Float.POSITIVE_INFINITY
         Gdx.app.postRunnable {
             textures as MutableMap
             textures.keys.toList().filter { key -> events.none { it is BgImageEvent && it.textureHash == key } }.forEach { key ->
@@ -613,11 +614,19 @@ class Engine : Clock(), Disposable {
             }
         }
     }
+    
+    fun fireSkillStar() {
+        if (gotSkillStar)
+            return
+        gotSkillStar = true
+        AssetRegistry.get<BeadsSound>("sfx_skill_star").play()
+    }
 
     fun resetInputs() {
         inputResults.clear()
         expectedNumInputs = 0
         lastInputMap.clear()
+        gotSkillStar = false
     }
 
     fun getDebugString(): String {

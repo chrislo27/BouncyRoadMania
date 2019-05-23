@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
+import io.github.chrislo27.bouncyroadmania.engine.input.InputScore
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
 import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
@@ -127,7 +128,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                     }
                 } else if (newFrom != null) {
                     if (!newFrom.isPlayer || !engine.requiresPlayerInput) {
-                        
                         bouncesSoFar += intAlpha
                         if (fallOff == null) {
                             prepareFallOff(intAlpha)
@@ -135,6 +135,11 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                         bounce(newFrom, next, false)
                         if (newFrom.isPlayer) {
                             newFrom.playSound(semitoneAdd = semitoneOffset)
+                            if (!engine.skillStarInput.isInfinite() && !engine.gotSkillStar) {
+                                if (MathUtils.isEqual(engine.tempos.beatsToSeconds(engine.skillStarInput), engine.seconds, 0.075f)) {
+                                    engine.fireSkillStar()
+                                }
+                            }
                         } else if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
                                         ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
                             if (!newFrom.isSilent) {
@@ -193,6 +198,12 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
             if (fo.bouncer.inputType == inputType && inputSecs in fo.minSeconds..fo.maxSeconds) {
                 val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.MAX_OFFSET_SEC)
                 engine.inputResults += inputResult
+                // Check skill star
+                if (!engine.skillStarInput.isInfinite() && !engine.gotSkillStar && inputResult.inputScore == InputScore.ACE) {
+                    if (MathUtils.isEqual(engine.skillStarInput, engine.tempos.secondsToBeats(fo.perfectSeconds), 0.075f)) {
+                        engine.fireSkillStar()
+                    }
+                }
                 Toolboks.LOGGER.debug("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
                 bouncesSoFar++
                 fo.bouncer.playSound()

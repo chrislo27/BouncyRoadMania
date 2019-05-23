@@ -38,6 +38,7 @@ class EditorTheme {
 
         val generic: Color = Color(0.85f, 0.85f, 0.85f, 1f)
         val input: Color = Color(1f, 178f / 255f, 191f / 255f, 1f)
+        val skillStar: Color = Color(1f, 226f / 255f, 124f / 255f, 1f)
     }
 
     class SelectionGroup {
@@ -73,6 +74,7 @@ class EditorTheme {
         node.putObject("events").apply {
             put("generic", events.generic.toJsonString())
             put("input", events.input.toJsonString())
+            put("skillStar", events.skillStar.toJsonString())
             put("selectionTint", events.selectionTint.toJsonString())
             put("nameText", events.nameText.toJsonString())
         }
@@ -97,6 +99,7 @@ class EditorTheme {
         (node["events"] as? ObjectNode)?.also { n ->
             events.generic.fromJsonString(n["generic"]?.asText(""))
             events.input.fromJsonString(n["input"]?.asText(""))
+            events.skillStar.fromJsonString(n["skillStar"]?.asText(""))
             events.selectionTint.fromJsonString(n["selectionTint"]?.asText(""))
             events.nameText.fromJsonString(n["nameText"]?.asText(""))
         }

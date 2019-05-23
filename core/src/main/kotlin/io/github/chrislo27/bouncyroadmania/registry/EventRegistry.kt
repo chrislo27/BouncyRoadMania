@@ -23,6 +23,9 @@ object EventRegistry {
         add(Instantiator("deploy", listOf(), "instantiator.deploy.name", true, "instantiator.deploy.summary", true, "instantiator.deploy.desc", true) { engine ->
             DeployEvent(engine, this)
         })
+        add(Instantiator("skill_star", listOf(), "instantiator.skill_star.name", true, "instantiator.skill_star.summary", true, "instantiator.skill_star.desc", true) { engine ->
+            SkillStarEvent(engine, this)
+        })
         add(Instantiator("end", listOf(), "instantiator.end.name", true, "instantiator.end.summary", true, "instantiator.end.desc", true) { engine ->
             EndEvent(engine, this)
         })
