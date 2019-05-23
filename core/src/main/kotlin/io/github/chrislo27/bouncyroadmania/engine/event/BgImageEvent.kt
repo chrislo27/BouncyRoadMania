@@ -7,12 +7,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.editor.stage.MenuOverlay
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
+import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.util.TinyFDWrapper
+import io.github.chrislo27.bouncyroadmania.util.TrueCheckbox
 import io.github.chrislo27.bouncyroadmania.util.attemptRememberDirectory
 import io.github.chrislo27.bouncyroadmania.util.persistDirectory
 import io.github.chrislo27.toolboks.i18n.Localization
@@ -22,6 +25,7 @@ import io.github.chrislo27.toolboks.ui.ImageLabel
 import io.github.chrislo27.toolboks.ui.TextLabel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -45,6 +49,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
 
     var textureHash: String? = null
     var renderType: RenderType = RenderType.SCALE_TO_FIT
+    var fadeTransitions: Boolean = true
 
     init {
         bounds.width = 1f
@@ -55,6 +60,8 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
             it.bounds.set(this.bounds)
             it.updateInterpolation(true)
             it.textureHash = this.textureHash
+            it.renderType = this.renderType
+            it.fadeTransitions = this.fadeTransitions
         }
     }
 
@@ -66,6 +73,9 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
         val t = transitionDur / bounds.width
 
         val progress = (engine.beat - bounds.x) / bounds.width
+        if (!this.fadeTransitions) {
+            return if (progress in 0f..1f) 1f else 0f
+        }
         return if (progress !in 0f..1f) 0f else if (progress < t) (progress / t) else if (progress > 1f - t) (1f - (progress - (1f - t)) / t) else 1f
     }
 
@@ -80,6 +90,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
         if (renderTypeStr != null) {
             renderType = RenderType.VALUES.find { it.name == renderTypeStr } ?: RenderType.SCALE_TO_FIT
         }
+        fadeTransitions = node["fadeTransitions"]?.asBoolean(true) ?: true
     }
 
     override fun toJson(node: ObjectNode) {
@@ -88,6 +99,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
             node.put("textureHash", textureHash)
         }
         node.put("renderType", renderType.name)
+        node.put("fadeTransitions", fadeTransitions)
     }
 
     inner class BgImageEventParamsStage(parent: EditorStage) : EventParamsStage<BgImageEvent>(parent, this@BgImageEvent) {
@@ -206,6 +218,30 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
                 this.rightClickAction = { _, _ ->
                     cycle(-1)
                 }
+            }
+            contentStage.elements += object : TrueCheckbox<EditorScreen>(palette, contentStage, contentStage) {
+                private val thisCheckbox: TrueCheckbox<EditorScreen> = this
+                override fun onLeftClick(xPercent: Float, yPercent: Float) {
+                    super.onLeftClick(xPercent, yPercent)
+                    parent.editor.mutate(object : ReversibleAction<Editor> {
+                        val checkbox: WeakReference<TrueCheckbox<EditorScreen>> = WeakReference(thisCheckbox)
+                        val value = checked
+                        override fun redo(context: Editor) {
+                            event.fadeTransitions = value
+                            checkbox.get()?.checked = value
+                        }
+
+                        override fun undo(context: Editor) {
+                            event.fadeTransitions = !value
+                            checkbox.get()?.checked = !value
+                        }
+                    })
+                }
+            }.apply {
+                this.checked = event.fadeTransitions
+                this.textLabel.isLocalizationKey = true
+                this.textLabel.text = "bgImageEvent.fadeTransitions"
+                this.location.set(screenHeight = 0.1f, screenY = 0.125f)
             }
             
             this.updatePositions()
