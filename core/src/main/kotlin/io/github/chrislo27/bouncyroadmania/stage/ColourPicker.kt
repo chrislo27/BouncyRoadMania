@@ -44,6 +44,9 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
     val valueArrow: MovingArrow
     val alphaArrow: MovingArrow
 
+    val clearButton: Button<S>
+    val copyButton: Button<S>
+
     var onColourChange: (color: Color) -> Unit = {}
 
     init {
@@ -235,9 +238,37 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             this.location.set(screenX = labelWidth, screenWidth = 0.4f, screenHeight = labelHeight * 0.8f, screenY = 0.025f)
         }
         elements += hex
+        copyButton = Button(palette, this@ColourPicker, this@ColourPicker).apply {
+            this.location.set(screenX = hex.location.screenWidth + hex.location.screenX + 0.025f, screenWidth = labelWidth / 3,
+                    screenHeight = labelHeight * 0.8f, screenY = 0.025f)
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "colourPicker.copy"
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_copy"))
+            })
+            this.leftClickAction = { _, _ ->
+                Gdx.app.clipboard.contents = currentColour.toString().toUpperCase(Locale.ROOT)
+            }
+        }
+        elements += copyButton
+        clearButton = Button(palette, this@ColourPicker, this@ColourPicker).apply {
+            this.location.set(screenX = hex.location.screenWidth + hex.location.screenX + 0.025f * 2 + labelWidth / 3, screenWidth = labelWidth / 3,
+                    screenHeight = labelHeight * 0.8f, screenY = 0.025f)
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "colourPicker.clear"
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_x"))
+                this.tint.set(1f, 0.25f, 0.25f, 1f)
+            })
+            this.leftClickAction = { _, _ ->
+                hex.text = ""
+                hex.hasFocus = true
+            }
+        }
+        elements += clearButton
 
         display = ColourPane(this, this).apply {
-            this.location.set(screenX = 0.65f, screenWidth = 0.325f, screenHeight = labelHeight * 0.8f, screenY = 0.025f)
+            this.location.set(screenX = 0.725f, screenWidth = 0.25f, screenHeight = labelHeight * 0.8f, screenY = 0.025f)
         }
         elements += CheckerboardBacking(this).apply {
             this.location.set(display.location)
@@ -305,12 +336,13 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             tex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
             TextureRegion(tex, 0, 0, 16, 16)
         }
+
         override fun render(screen: S, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
             noAlpha.set(currentColour)
             noAlpha.a = 0f
             fullAlpha.set(currentColour)
             fullAlpha.a = 1f
-            
+
             batch.setColor(1f, 1f, 1f, 1f)
             texRegion.setRegion(0, 0, location.realWidth.toInt(), location.realHeight.toInt())
             batch.draw(texRegion, location.realX, location.realY, location.realWidth, location.realHeight)
@@ -326,6 +358,7 @@ class ColourPicker<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIEleme
             tex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
             TextureRegion(tex, 0, 0, 16, 16)
         }
+
         override fun render(screen: S, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
             batch.setColor(1f, 1f, 1f, 1f)
             texRegion.setRegion(0, 0, location.realWidth.toInt(), location.realHeight.toInt())

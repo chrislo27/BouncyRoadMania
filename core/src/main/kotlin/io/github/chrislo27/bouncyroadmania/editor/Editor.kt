@@ -266,16 +266,6 @@ class Editor(val main: BRManiaApp) : ActionHistory<Editor>(), InputProcessor, Lw
                 }
             }
 
-//            if (editMode == EditMode.ENGINE && engine.playState == PlayState.PLAYING) {
-//                if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.A) || Gdx.input.isKeyJustPressed(Input.Keys.S) || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-//                    engine.fireInput(InputType.DPAD)
-//                }
-//                if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-//                    engine.fireInput(InputType.A)
-//                }
-//            }
-
-
             if (editMode == EditMode.EVENTS && engine.playState == PlayState.STOPPED) {
                 if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && !alt && (control xor shift || (!control && !shift))) {
                     renderer.trackCamera.position.x -= renderer.toScaleX(Editor.EVENT_WIDTH * 5 * Gdx.graphics.deltaTime * if (shift xor control) 6f else 1f)
