@@ -9,7 +9,7 @@ Also check out the [Rhythm Heaven Remix Editor](https://github.com/chrislo27/Rhy
 [![GitHub license](https://img.shields.io/github/license/chrislo27/RhythmHeavenRemixEditor.svg)](https://github.com/chrislo27/BouncyRoadMania/blob/dev/LICENSE.txt)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VA45DPLCC4958)
 
-![editor screenshot](https://user-images.githubusercontent.com/6299069/58276456-59421400-7d4c-11e9-94d6-c222550f80ab.png)
+![editor screenshot](https://user-images.githubusercontent.com/6299069/58276568-a7571780-7d4c-11e9-8c4a-1383736cf698.png)
 
 ## Requirements
 * [Java 8 or newer](https://java.com/en/download/)
