@@ -147,14 +147,6 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                             }
                             newFrom.playSound(semitoneAdd = semitoneOffset)
                         }
-//                        if (newFrom.soundHandle == "sfx_tink") {
-//                            if (!MathUtils.isEqual(engine.lastBounceTinkSound, engine.seconds, 0.05f)) {
-//                                engine.lastBounceTinkSound = engine.seconds
-//                                newFrom.playSound()
-//                            }
-//                        } else {
-//                            newFrom.playSound()
-//                        }
                         newFrom.bounceAnimation()
                     } else {
                         val fo = fallOff
