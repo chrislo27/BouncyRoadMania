@@ -135,7 +135,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                         bounce(newFrom, next, false)
                         if (newFrom.isPlayer) {
                             newFrom.playSound(semitoneAdd = semitoneOffset)
-                            if (!engine.skillStarInput.isInfinite() && !engine.gotSkillStar) {
+                            if (engine.skillStarInput.isFinite() && !engine.gotSkillStar) {
                                 if (MathUtils.isEqual(engine.tempos.beatsToSeconds(engine.skillStarInput), engine.seconds, 0.075f)) {
                                     engine.fireSkillStar()
                                 }
@@ -199,7 +199,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                 val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.MAX_OFFSET_SEC)
                 engine.inputResults += inputResult
                 // Check skill star
-                if (!engine.skillStarInput.isInfinite() && !engine.gotSkillStar && inputResult.inputScore == InputScore.ACE) {
+                if (engine.skillStarInput.isFinite() && !engine.gotSkillStar && inputResult.inputScore == InputScore.ACE) {
                     if (MathUtils.isEqual(engine.skillStarInput, engine.tempos.secondsToBeats(fo.perfectSeconds), 0.075f)) {
                         engine.fireSkillStar()
                     }

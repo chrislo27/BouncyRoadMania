@@ -168,11 +168,14 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     protected open fun onEnd() {
         // Transition away to proper results TODO
         val scoreInt = engine.computeScore().roundToInt()
-        val score = "[#${when (scoreInt) {
+        var score = "[#${when (scoreInt) {
             in 0 until 60 -> TRY_AGAIN_COLOUR
             in 60 until 80 -> OK_COLOUR
             else -> SUPERB_COLOUR
         }}]$scoreInt[]"
+        if (engine.skillStarInput.isFinite()) {
+            score = "[${if (engine.gotSkillStar) "YELLOW" else "GRAY"}]★[] $score"
+        }
         main.screen = TransitionScreen(main, main.screen,
                 GameSelectScreen(main, if (robotEnabled) null else Localization["playing.tmpResults", score, Localization["gameSelect.select"]]),
                 FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
