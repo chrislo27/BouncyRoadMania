@@ -112,6 +112,9 @@ class Engine : Clock(), Disposable {
                         }
                         gradientCurrentStart.set(gradientStart)
                         gradientCurrentEnd.set(gradientEnd)
+                        normalBouncerCurrentTint.set(normalBouncerTint)
+                        aBouncerCurrentTint.set(aBouncerTint)
+                        dpadBouncerCurrentTint.set(dpadBouncerTint)
 
                         lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
                         lastMetronomeMeasurePart = -1
@@ -190,6 +193,9 @@ class Engine : Clock(), Disposable {
     val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_NORMAL_BOUNCER)
     val aBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_A_BOUNCER)
     val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_DPAD_BOUNCER)
+    val normalBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(normalBouncerTint)
+    val aBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(aBouncerTint)
+    val dpadBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(dpadBouncerTint)
 
     // Practice related
     var currentTextBox: TextBox? = null

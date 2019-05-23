@@ -1,10 +1,7 @@
 package io.github.chrislo27.bouncyroadmania.registry
 
 import io.github.chrislo27.bouncyroadmania.engine.TextBox
-import io.github.chrislo27.bouncyroadmania.engine.event.BgImageEvent
-import io.github.chrislo27.bouncyroadmania.engine.event.DeployEvent
-import io.github.chrislo27.bouncyroadmania.engine.event.EndEvent
-import io.github.chrislo27.bouncyroadmania.engine.event.GradientChangeEvent
+import io.github.chrislo27.bouncyroadmania.engine.event.*
 import io.github.chrislo27.bouncyroadmania.engine.event.practice.SpawnTextBoxEvent
 
 
@@ -38,6 +35,12 @@ object EventRegistry {
         add(Instantiator("gradient_end", listOf(), "instantiator.gradient_end.name", true, "instantiator.gradient_end.summary", true, "instantiator.gradient_end.desc", true) { engine ->
             GradientChangeEvent(engine, this, false).apply {
                 this.color.set(engine.gradientEnd)
+                this.onColorChange()
+            }
+        })
+        add(Instantiator("bouncer_colour", listOf(), "instantiator.bouncer_colour.name", true, "instantiator.bouncer_colour.summary", true, "instantiator.bouncer_colour.desc", true) { engine ->
+            BouncerColourEvent(engine, this).apply {
+                this.color.set(this.tintOrigin)
                 this.onColorChange()
             }
         })

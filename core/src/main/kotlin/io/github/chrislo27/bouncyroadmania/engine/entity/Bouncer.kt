@@ -32,7 +32,7 @@ open class Bouncer(engine: Engine) : Entity(engine) {
     protected open val texture: Texture
         get() = AssetRegistry["tex_bouncer_blue"]
     protected open val topPart: Int = 40
-    protected open val tint: Color get() = engine.normalBouncerTint
+    protected open val tint: Color get() = engine.normalBouncerCurrentTint
     protected val topTexture: TextureRegion by lazy {
         val tex = texture
         TextureRegion(tex, 0, 0, tex.width, topPart)
@@ -114,7 +114,7 @@ class RedBouncer(engine: Engine) : PlayerBouncer(engine, InputType.DPAD) {
         get() = AssetRegistry["tex_bouncer_red"]
     override val semitone: Int = 3
     override val tint: Color
-        get() = engine.dpadBouncerTint
+        get() = engine.dpadBouncerCurrentTint
 
     init {
         origin.x = 24f
@@ -126,7 +126,7 @@ class YellowBouncer(engine: Engine) : PlayerBouncer(engine, InputType.A) {
         get() = AssetRegistry["tex_bouncer_yellow"]
     override val semitone: Int = -4
     override val tint: Color
-        get() = engine.aBouncerTint
+        get() = engine.aBouncerCurrentTint
 
     init {
         origin.x = 11f

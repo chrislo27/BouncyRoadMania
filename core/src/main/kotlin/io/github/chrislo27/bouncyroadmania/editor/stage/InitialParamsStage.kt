@@ -73,6 +73,10 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
                 engine.gradientStart.set(engine.gradientEnd)
                 engine.gradientEnd.set(tmp)
                 updateColours()
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.gradientCurrentEnd.set(engine.gradientEnd)
+                    engine.gradientCurrentStart.set(engine.gradientStart)
+                }
             }
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0f, screenHeight = 0f,
                     pixelX = -48f, pixelWidth = 48f, pixelY = -48f, pixelHeight = 48f)
@@ -121,6 +125,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
                 engine.normalBouncerTint.set(c)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.normalBouncerCurrentTint.set(c)
+                }
             }
         }
         elements += normalBouncerTint
@@ -132,6 +139,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.tooltipText = "initialParams.reset"
             this.leftClickAction = { _, _ ->
                 normalBouncerTint.setColor(Engine.DEFAULT_NORMAL_BOUNCER)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.normalBouncerCurrentTint.set(normalBouncerTint.currentColour)
+                }
             }
             this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
@@ -147,6 +157,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.location.set(screenX = 0.3f, screenY = 0.4f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
                 engine.aBouncerTint.set(c)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.aBouncerCurrentTint.set(c)
+                }
             }
         }
         elements += aBouncerTint
@@ -158,6 +171,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.tooltipText = "initialParams.reset"
             this.leftClickAction = { _, _ ->
                 aBouncerTint.setColor(Engine.DEFAULT_A_BOUNCER)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.aBouncerCurrentTint.set(aBouncerTint.currentColour)
+                }
             }
             this.location.set(screenX = 0.3f, screenY = 0.6f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
@@ -173,6 +189,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.location.set(screenX = 0.3f, screenY = 0.1f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
                 engine.dpadBouncerTint.set(c)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.dpadBouncerCurrentTint.set(c)
+                }
             }
         }
         elements += dpadBouncerTint
@@ -184,6 +203,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.tooltipText = "initialParams.reset"
             this.leftClickAction = { _, _ ->
                 dpadBouncerTint.setColor(Engine.DEFAULT_DPAD_BOUNCER)
+                if (engine.playState == PlayState.STOPPED) {
+                    engine.dpadBouncerCurrentTint.set(dpadBouncerTint.currentColour)
+                }
             }
             this.location.set(screenX = 0.3f, screenY = 0.35f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
         }
