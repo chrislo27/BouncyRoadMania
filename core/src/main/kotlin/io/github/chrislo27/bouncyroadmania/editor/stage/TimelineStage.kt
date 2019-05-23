@@ -13,6 +13,7 @@ import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.event.DeployEvent
 import io.github.chrislo27.bouncyroadmania.engine.event.Event
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.toolboks.i18n.Localization
@@ -83,6 +84,21 @@ class TimelineStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
                     batch.color = event.getRenderColor(editor, editor.theme)
                     batch.fillRect(x + event.bounds.x * unitWidth, y + event.bounds.y * unitHeight,
                             event.bounds.width * unitWidth, event.bounds.height * unitHeight)
+                    if (event is DeployEvent) {
+                        for (i in 1 until engine.bouncers.size - 1) {
+                            val b = engine.bouncers[i]
+                            if (b == engine.yellowBouncer) {
+                                batch.setColor(1f, 0.9f, 0.1f, 0.5f)
+                            } else if (b == engine.redBouncer) {
+                                batch.setColor(1f, 0f, 0f, 0.5f)
+                            } else {
+                                continue
+                            }
+
+                            batch.fillRect(x + (event.bounds.x + (event.bounds.width * i)) * unitWidth, y + event.bounds.y * unitHeight,
+                                    event.bounds.width * unitWidth, event.bounds.height * unitHeight)
+                        }
+                    }
                 }
 
                 // horizontal lines
