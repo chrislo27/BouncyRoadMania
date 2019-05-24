@@ -315,11 +315,11 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     val editor = EditorScreen(main) // ScreenRegistry.getNonNull("editor")
                     main.screen = TransitionScreen(main, main.screen, editor, WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
-                MenuItem("mainMenu.settings") {
-                    currentMenuKey = "settings"
-                }.apply {
-                    this.enabled = false
-                },
+//                MenuItem("mainMenu.settings") {
+//                    currentMenuKey = "settings"
+//                }.apply {
+//                    this.enabled = false
+//                },
                 mainDebugItem,
                 MenuItem("mainMenu.quit") {
                     currentMenuKey = "seeYouLater"
