@@ -172,7 +172,7 @@ class MusicSelectStage(val editor: Editor, palette: UIPalette, parent: MenuOverl
             }
             this.location.set(screenX = 0.25f, screenWidth = 0.5f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
-                this.text = "musicSelect.fileChooserTitle"
+                this.text = "musicSelect.chooseMusic"
                 this.isLocalizationKey = true
             })
         }
