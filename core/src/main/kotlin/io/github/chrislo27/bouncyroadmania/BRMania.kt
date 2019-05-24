@@ -9,7 +9,7 @@ object BRMania {
 
     const val TITLE = "Bouncy Road Mania"
     const val GITHUB = "https://github.com/chrislo27/BouncyRoadMania"
-    val VERSION: Version = Version(0, 4, 0, "DEVELOPMENT")
+    val VERSION: Version = Version(0, 4, 0, "")
     const val WIDTH = 1280
     const val HEIGHT = 720
     val BRMANIA_FOLDER: FileHandle by lazy { (Gdx.files.external(".bouncyroadmania/")).apply(FileHandle::mkdirs) }
