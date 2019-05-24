@@ -83,7 +83,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             })
             this.leftClickAction = { _, _ ->
                 engine.playState = PlayState.STOPPED
-                playSelectSfx()
+                playStartOverSfx()
                 reset()
             }
         }
@@ -159,6 +159,10 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     
     protected open fun playSelectSfx() {
         AssetRegistry.get<Sound>("sfx_select").play()
+    }
+
+    protected open fun playStartOverSfx() {
+        AssetRegistry.get<Sound>("sfx_enter_game").play()
     }
 
     protected open fun onQuit() {

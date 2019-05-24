@@ -199,6 +199,8 @@ class Engine : Clock(), Disposable {
     val normalBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(normalBouncerTint)
     val aBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(aBouncerTint)
     val dpadBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(dpadBouncerTint)
+    private var skillStarSpinAnimation: Float = 0f
+    private var skillStarPulseAnimation: Float = 0f
 
     // Practice related
     var currentTextBox: TextBox? = null
@@ -369,6 +371,29 @@ class Engine : Clock(), Disposable {
             }
         }
 
+        if (skillStarInput.isFinite()) {
+            if (skillStarSpinAnimation > 0) {
+                skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
+                if (skillStarSpinAnimation < 0)
+                    skillStarSpinAnimation = 0f
+            }
+            if (skillStarPulseAnimation > 0) {
+                skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
+                if (skillStarPulseAnimation < 0)
+                    skillStarPulseAnimation = 0f
+            } else {
+                // Pulse before skill star input
+                val threshold = 0.1f
+                for (i in 0 until 4) {
+                    val beatPoint = tempos.beatsToSeconds(skillStarInput - i)
+                    if (seconds in beatPoint..beatPoint + threshold) {
+                        skillStarPulseAnimation = 0.5f
+                        break
+                    }
+                }
+            }
+        }
+        
         // No super update
         if (playState != PlayState.PLAYING)
             return
@@ -528,6 +553,16 @@ class Engine : Clock(), Disposable {
             font.scaleMul(1f / 0.5f)
             font.unscaleFont()
         }
+        
+        if (skillStarInput.isFinite()) {
+            val texColoured = AssetRegistry.get<Texture>("tex_skill_star")
+            val texGrey = AssetRegistry.get<Texture>("tex_skill_star_grey")
+            
+            val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
+            val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
+            batch.draw(if (gotSkillStar) texColoured else texGrey, 1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation,
+                    0, 0, texColoured.width, texColoured.height, false, false)
+        }
 
         if (xMoreTimes > 0) {
             val font = BRManiaApp.instance.defaultBorderedFontLarge
@@ -620,9 +655,11 @@ class Engine : Clock(), Disposable {
     }
 
     fun fireSkillStar() {
-        if (gotSkillStar)
+        if (gotSkillStar || skillStarInput.isInfinite())
             return
         gotSkillStar = true
+        skillStarSpinAnimation = 1f
+        skillStarPulseAnimation = 2f
         AssetRegistry.get<BeadsSound>("sfx_skill_star").play()
     }
 
@@ -631,6 +668,8 @@ class Engine : Clock(), Disposable {
         expectedNumInputs = 0
         lastInputMap.clear()
         gotSkillStar = false
+        skillStarSpinAnimation = 0f
+        skillStarPulseAnimation = 0f
     }
 
     fun wouldEventsFitNewTrackCount(newCount: Int): Boolean {

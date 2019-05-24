@@ -22,6 +22,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tex_bouncer_red", "images/game/red.png")
         AssetRegistry.loadAsset<Texture>("tex_bouncer_yellow", "images/game/yellow.png")
         AssetRegistry.loadAsset<Texture>("tex_main_menu_gradient", "images/main_menu_gradient.png")
+        AssetRegistry.loadAsset<Texture>("tex_skill_star", "images/game/skill_star.png")
+        AssetRegistry.loadAsset<Texture>("tex_skill_star_grey", "images/game/skill_star_grey.png")
 
         AssetRegistry.loadAsset<Texture>("event_stretchable_arrow", "images/stretchable/arrow.png")
 
