@@ -11,6 +11,7 @@ object Credits {
     RHRE credits
     WaluigiTime64
     FrankPlanet
+    meuol
      */
 
     private infix fun String.crediting(persons: String): Credit =

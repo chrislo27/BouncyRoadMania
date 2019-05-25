@@ -1,22 +1,22 @@
-package io.github.chrislo27.bouncyroadmania.editor.stage
+package io.github.chrislo27.bouncyroadmania.editor.stage.initialparams
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.GradientDirection
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
 import io.github.chrislo27.toolboks.registry.AssetRegistry
-import io.github.chrislo27.toolboks.ui.*
+import io.github.chrislo27.toolboks.ui.Button
+import io.github.chrislo27.toolboks.ui.ImageLabel
+import io.github.chrislo27.toolboks.ui.TextLabel
+import io.github.chrislo27.toolboks.ui.UIPalette
 
 
-class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
-    : Stage<EditorScreen>(parent, parent.camera, parent.pixelsWidth, parent.pixelsHeight) {
-
-    val engine: Engine get() = editor.engine
+class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
+    : CategoryStage(ipStage, palette, "initialParams.category.colours") {
 
     val gradientFirst: ColourPicker<EditorScreen>
     val gradientLast: ColourPicker<EditorScreen>
@@ -96,7 +96,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
                 removeLabel(verticalLabel)
                 removeLabel(horizontalLabel)
                 addLabel(if (engine.gradientDirection == GradientDirection.VERTICAL) verticalLabel else horizontalLabel)
-                parent.updatePositions()
+                this@ColoursStage.updatePositions()
             }
         }.apply {
             this.leftClickAction = { _, _ ->
@@ -221,8 +221,8 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         dpadBouncerTint.setColor(engine.dpadBouncerTint.initial)
     }
 
-    fun onEngineChange(engine: Engine) {
+
+    override fun onEngineChange(engine: Engine) {
         updateColours(engine)
     }
-
 }

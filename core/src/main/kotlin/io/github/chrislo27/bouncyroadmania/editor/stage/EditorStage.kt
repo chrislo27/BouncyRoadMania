@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.editor.EditMode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.editor.stage.initialparams.InitialParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.EngineEventListener
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
