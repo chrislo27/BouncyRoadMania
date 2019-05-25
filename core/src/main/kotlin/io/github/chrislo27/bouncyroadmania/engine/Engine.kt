@@ -500,7 +500,7 @@ class Engine : Clock(), Disposable {
 
         if (playState != PlayState.STOPPED) {
             events.forEach { evt ->
-                if (evt is BgImageEvent) {
+                if (evt is BgImageEvent && !evt.foreground) {
                     renderBgImageEvent(batch, evt)
                 }
             }
@@ -510,7 +510,7 @@ class Engine : Clock(), Disposable {
 
         if (playState != PlayState.STOPPED) {
             events.forEach { evt ->
-                if (evt is BgImageEvent) {
+                if (evt is BgImageEvent && evt.foreground) {
                     renderBgImageEvent(batch, evt)
                 }
             }
