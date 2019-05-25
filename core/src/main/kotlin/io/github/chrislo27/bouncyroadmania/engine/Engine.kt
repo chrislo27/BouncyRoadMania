@@ -107,7 +107,6 @@ class Engine : Clock(), Disposable {
                                     it.whilePlaying()
                                     it.playbackCompletion = PlaybackCompletion.FINISHED
                                     it.onEnd()
-                                    println("simulated")
                                 }
                                 it.playbackCompletion = PlaybackCompletion.FINISHED
                             } else {
