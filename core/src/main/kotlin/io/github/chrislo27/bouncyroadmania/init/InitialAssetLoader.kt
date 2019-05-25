@@ -93,6 +93,15 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Sound>("sfx_blip", "sounds/pause/blip.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_select", "sounds/pause/select.ogg")
         
+        AssetRegistry.loadAsset<Sound>("sfx_results_first", "sounds/game/results/results_first.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_results_middle", "sounds/game/results/results_middle.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_results_end", "sounds/game/results/results_end.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_results_try_again", "sounds/game/results/results_try_again.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_results_ok", "sounds/game/results/results_ok.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_results_superb", "sounds/game/results/results_superb.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_score_filling", "sounds/game/results/score_filling.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_score_finish", "sounds/game/results/score_finish.ogg")
+        
         AssetRegistry.loadAsset<Sound>("sfx_enter_game", "sounds/enter_game.ogg")
 
         AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")
