@@ -12,6 +12,7 @@ object Credits {
     WaluigiTime64
     FrankPlanet
     meuol
+    Lvl100Feraligatr
      */
 
     private infix fun String.crediting(persons: String): Credit =

@@ -101,6 +101,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Sound>("sfx_results_superb", "sounds/game/results/results_superb.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_score_filling", "sounds/game/results/score_filling.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_score_finish", "sounds/game/results/score_finish.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_score_finish_new_high_score", "sounds/game/results/score_finish_nhs.ogg")
         
         AssetRegistry.loadAsset<Sound>("sfx_enter_game", "sounds/enter_game.ogg")
 
