@@ -15,14 +15,12 @@ import io.github.chrislo27.bouncyroadmania.util.transition.FadeOut
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
-import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.transition.TransitionScreen
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ColourPane
 import io.github.chrislo27.toolboks.ui.Stage
 import io.github.chrislo27.toolboks.ui.TextLabel
-import kotlin.math.roundToInt
 
 
 open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRManiaApp, PlayingScreen>(main) {
@@ -170,20 +168,17 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     }
 
     protected open fun onEnd() {
-        // Transition away to proper results TODO
-        val scoreInt = engine.computeScore().roundToInt()
-        var score = "[#${when (scoreInt) {
-            in 0 until 60 -> TRY_AGAIN_COLOUR
-            in 60 until 80 -> OK_COLOUR
-            else -> SUPERB_COLOUR
-        }}]$scoreInt[]"
-        if (engine.skillStarInput.isFinite()) {
-            score = "[${if (engine.gotSkillStar) "YELLOW" else "GRAY"}]★[] $score"
+        // Transition away to proper results
+        val score = engine.computeScore()
+        if (robotEnabled) {
+            main.screen = TransitionScreen(main, main.screen,
+                    GameSelectScreen(main),
+                    FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
+        } else {
+            main.screen = TransitionScreen(main, main.screen,
+                    ResultsScreen(main, score),
+                    FadeOut(1f, Color.BLACK), null)
         }
-        main.screen = TransitionScreen(main, main.screen,
-                GameSelectScreen(main, if (robotEnabled) null else Localization["playing.tmpResults", score, Localization["gameSelect.select"]]),
-                FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
-//            main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), FadeOut(0.5f, Color.BLACK), WipeFrom(Color.BLACK, 0.35f))
     }
 
     fun pauseUnpause() {

@@ -22,6 +22,7 @@ import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.InterpolatableColor
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.input.Score
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.*
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
@@ -346,9 +347,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     currentMenuKey = "main"
                 }
         )
-        
+
         menus["seeYouLater"] = listOf(
-                MenuItem("mainMenu.seeYouLater"){}.apply {
+                MenuItem("mainMenu.seeYouLater") {}.apply {
                     this.enabled = false
                 }
         )
@@ -357,6 +358,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         menus["test"] = listOf(
                 MenuItem("TestEngineScreen", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, TestEngineScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                },
+                MenuItem("ResultsScreen", isLocalizationKey = false) {
+                    currentMenuKey = "test_results"
                 },
                 MenuItem("TinyFD", isLocalizationKey = false) {
                     currentMenuKey = "test_tinyfd"
@@ -388,6 +392,41 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 },
                 MenuItem("Colour select", isLocalizationKey = false) {
                     println(TinyFDWrapper.selectColor("Select a colour", Color.PINK))
+                },
+                MenuItem("mainMenu.back") {
+                    currentMenuKey = "test"
+                }
+        )
+        menus["test_results"] = listOf(
+                MenuItem("Score: 20", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
+                            Score(20, 20f, false, Localization["results.default.title"], Localization["results.default.second.negative"], "line2\nsecond line2")),
+                            WipeTo(Color.BLACK, 0.35f), null)
+                },
+                MenuItem("Score: 55", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
+                            Score(55, 55f, false, Localization["results.default.title"], Localization["results.default.first.negative"], "line2\nsecond line2")),
+                            WipeTo(Color.BLACK, 0.35f), null)
+                },
+                MenuItem("Score: 65", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
+                            Score(65, 65f, false, Localization["results.default.title"], Localization["results.default.ok"], "line2\nsecond line2")),
+                            WipeTo(Color.BLACK, 0.35f), null)
+                },
+                MenuItem("Score: 75", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
+                            Score(75, 75f, false, Localization["results.default.title"], Localization["results.default.first.positive"], "line2\nsecond line2")),
+                            WipeTo(Color.BLACK, 0.35f), null)
+                },
+                MenuItem("Score: 80", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
+                            Score(80, 80f, false, Localization["results.default.title"], Localization["results.default.first.positive"], "line2\nsecond line2")),
+                            WipeTo(Color.BLACK, 0.35f), null)
+                },
+                MenuItem("Score: 100", isLocalizationKey = false) {
+                    main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
+                            Score(100, 100f, false, Localization["results.default.title"], Localization["results.default.second.positive"], "line2\nsecond line2")),
+                            WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("mainMenu.back") {
                     currentMenuKey = "test"

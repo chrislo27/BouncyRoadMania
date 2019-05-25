@@ -17,6 +17,7 @@ import io.github.chrislo27.bouncyroadmania.engine.entity.*
 import io.github.chrislo27.bouncyroadmania.engine.event.*
 import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
+import io.github.chrislo27.bouncyroadmania.engine.input.Score
 import io.github.chrislo27.bouncyroadmania.engine.timesignature.TimeSignatures
 import io.github.chrislo27.bouncyroadmania.engine.tracker.TrackerContainer
 import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolumes
@@ -293,8 +294,19 @@ class Engine : Clock(), Disposable {
         }
     }
 
-    fun computeScore(): Float {
-        return (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / expectedNumInputs.coerceAtLeast(1) * 100).toFloat()
+    fun computeScore(): Score {
+        val scoreRaw = (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / expectedNumInputs.coerceAtLeast(1) * 100).toFloat()
+        val scoreInt = scoreRaw.roundToInt().coerceIn(0, 100)
+        val resultsText = this.resultsText
+        val line: String = when (scoreInt) {
+            in 0 until 50 -> resultsText.secondNegative
+            in 50 until 60 -> resultsText.firstNegative
+            in 60 until 75 -> resultsText.ok
+            in 75 until 85 -> resultsText.firstPositive
+            in 85..100 -> resultsText.secondPositive
+            else -> "<score was not in range from 0..100>"
+        }
+        return Score(scoreInt, scoreRaw, gotSkillStar, resultsText.title, line)
     }
 
     private fun setMusicVolume() {
