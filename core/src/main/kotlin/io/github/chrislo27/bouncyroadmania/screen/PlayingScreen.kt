@@ -84,7 +84,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.leftClickAction = { _, _ ->
                 engine.playState = PlayState.STOPPED
                 playStartOverSfx()
-                reset()
+                reset(0.5f)
             }
         }
         stage.elements += restartButton
@@ -147,13 +147,13 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         super.render(delta)
     }
 
-    private fun reset() {
+    private fun reset(secondsBefore: Float = 1f) {
         robotEnabled = false
         engine.requiresPlayerInput = true
         paused = null
         (robotModeButton.labels.first() as TextLabel).text = "playing.robot.off"
         engine.resetInputs()
-        engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - 1f)
+        engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - secondsBefore)
         engine.playState = PlayState.PLAYING
     }
     
