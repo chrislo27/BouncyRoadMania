@@ -53,6 +53,7 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
         val obj = root.putObject("resultsText")
         val text = resultsText
         obj.put("title", text.title)
+        obj.put("ok", text.ok)
         obj.put("firstPositive", text.firstPositive)
         obj.put("firstNegative", text.firstNegative)
         obj.put("secondPositive", text.secondPositive)
@@ -137,7 +138,7 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     val resultsTextObj = root["resultsText"] as? ObjectNode
     if (resultsTextObj != null) {
         val stock = ResultsText()
-        this.resultsText = ResultsText(resultsTextObj["title"]?.asText() ?: stock.title, resultsTextObj["firstPositive"]?.asText() ?: stock.firstPositive, resultsTextObj["firstNegative"]?.asText() ?: stock.firstNegative, resultsTextObj["secondPositive"]?.asText() ?: stock.secondPositive, resultsTextObj["secondNegative"]?.asText() ?: stock.secondNegative)
+        this.resultsText = ResultsText(resultsTextObj["title"]?.asText() ?: stock.title, resultsTextObj["ok"]?.asText() ?: stock.ok, resultsTextObj["firstPositive"]?.asText() ?: stock.firstPositive, resultsTextObj["firstNegative"]?.asText() ?: stock.firstNegative, resultsTextObj["secondPositive"]?.asText() ?: stock.secondPositive, resultsTextObj["secondNegative"]?.asText() ?: stock.secondNegative)
     }
 
     removeAllEvents(events.toList())

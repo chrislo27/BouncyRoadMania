@@ -12,6 +12,7 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
     : CategoryStage(ipStage, palette, "initialParams.category.results") {
 
     val titleField: TextField<EditorScreen>
+    val okField: TextField<EditorScreen>
     val firstPosField: TextField<EditorScreen>
     val firstNegField: TextField<EditorScreen>
     val secondPosField: TextField<EditorScreen>
@@ -34,6 +35,20 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.background = true
         }
         elements += titleField
+        elements += TextLabel(labelPalette, this, this).apply {
+            this.location.set(pixelX = 8f, screenX = 0.5f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 1, pixelHeight = 40f)
+            this.isLocalizationKey = true
+            this.text = "initialParams.results.ok"
+            this.textWrapping = false
+            this.textAlign = Align.left
+        }
+        okField = TextField(palette, this, this).apply {
+            this.location.set(pixelX = 8f, screenX = 0.5f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 2, pixelHeight = 40f)
+            this.canPaste = true
+            this.canInputNewlines = true
+            this.background = true
+        }
+        elements += okField
 
         elements += TextLabel(labelPalette, this, this).apply {
             this.location.set(pixelX = 8f, screenX = 0f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 3, pixelHeight = 40f)
@@ -116,6 +131,7 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
     override fun onEngineChange(engine: Engine) {
         val resultsText = engine.resultsText
         titleField.text = resultsText.title
+        okField.text = resultsText.ok
         firstPosField.text = resultsText.firstPositive
         firstNegField.text = resultsText.firstNegative
         secondPosField.text = resultsText.secondPositive
