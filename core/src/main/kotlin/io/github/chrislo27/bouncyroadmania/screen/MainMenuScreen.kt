@@ -20,6 +20,7 @@ import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
 import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.InterpolatableColor
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.util.*
@@ -116,19 +117,17 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     private inner class ChangeGradientEvent(beat: Float, duration: Float, val nextColor: Color) : Event(beat, duration) {
         private var started: Boolean = false
-        private lateinit var oldColor: Color
         override fun action() {
             if (!started) {
-                oldColor = gradientTop.cpy()
+                gradientTop.beginLerp(nextColor)
                 started = true
             }
-            gradientTop.set(oldColor)
             val progress = if (duration == 0f) 1f else ((engine.beat - beat) / duration).coerceIn(0f, 1f)
-            gradientTop.lerp(nextColor, progress)
+            gradientTop.lerp(progress)
         }
 
         override fun onDelete() {
-            gradientTop.set(nextColor)
+            gradientTop.current.set(nextColor)
         }
     }
 
@@ -143,7 +142,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
-    val gradientTop: Color get() = engine.gradientCurrentEnd
+    val gradientTop: InterpolatableColor get() = engine.gradientEnd
     val music: Music by lazy {
         AssetRegistry.get<Music>("music_main_menu").apply {
             isLooping = true

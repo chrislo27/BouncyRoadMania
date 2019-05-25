@@ -31,24 +31,27 @@ object EventRegistry {
         })
         add(Instantiator("gradient_start", listOf(), "instantiator.gradient_start.name", true, "instantiator.gradient_start.summary", true, "instantiator.gradient_start.desc", true) { engine ->
             GradientChangeEvent(engine, this, true).apply {
-                this.color.set(engine.gradientStart)
+                this.color.set(engine.gradientStart.initial)
                 this.onColorChange()
             }
         })
         add(Instantiator("gradient_end", listOf(), "instantiator.gradient_end.name", true, "instantiator.gradient_end.summary", true, "instantiator.gradient_end.desc", true) { engine ->
             GradientChangeEvent(engine, this, false).apply {
-                this.color.set(engine.gradientEnd)
+                this.color.set(engine.gradientEnd.initial)
                 this.onColorChange()
             }
         })
         add(Instantiator("bouncer_colour", listOf(), "instantiator.bouncer_colour.name", true, "instantiator.bouncer_colour.summary", true, "instantiator.bouncer_colour.desc", true) { engine ->
             BouncerColourEvent(engine, this).apply {
-                this.color.set(this.tintOrigin)
+                this.color.set(this.tintTarget.initial)
                 this.onColorChange()
             }
         })
         add(Instantiator("background_image", listOf(), "instantiator.background_image.name", true, "instantiator.background_image.summary", true, "instantiator.background_image.desc", true) { engine ->
-            BgImageEvent(engine, this)
+            BgImageEvent(engine, this, false)
+        })
+        add(Instantiator("foreground_image", listOf(), "instantiator.foreground_image.name", true, "instantiator.foreground_image.summary", true, "instantiator.foreground_image.desc", true) { engine ->
+            BgImageEvent(engine, this, true)
         })
         add(Instantiator("text_box", listOf(), "instantiator.text_box.name", true, "instantiator.text_box.summary", true, "instantiator.text_box.desc", true) { engine ->
             SpawnTextBoxEvent(engine, TextBox("", false), this)

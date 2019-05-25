@@ -35,17 +35,17 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     root.put("trackCount", trackCount)
     root.put("isAutosave", isAutosave)
 
-    root.put("gradientFirst", gradientStart.toJsonString())
-    root.put("gradientLast", gradientEnd.toJsonString())
+    root.put("gradientFirst", gradientStart.initial.toJsonString())
+    root.put("gradientLast", gradientEnd.initial.toJsonString())
     root.put("gradientDirection", gradientDirection.name)
 
     // bouncers
     run {
         val obj = root.putObject("bouncers")
         val tint = obj.putObject("tint")
-        tint.put("normal", normalBouncerTint.toJsonString())
-        tint.put("a", aBouncerTint.toJsonString())
-        tint.put("dpad", dpadBouncerTint.toJsonString())
+        tint.put("normal", normalBouncerTint.initial.toJsonString())
+        tint.put("a", aBouncerTint.initial.toJsonString())
+        tint.put("dpad", dpadBouncerTint.initial.toJsonString())
     }
 
     // textures
@@ -102,8 +102,10 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     musicStartSec = root["musicStartSec"].floatValue()
     trackCount = root["trackCount"].intValue()
 
-    gradientStart.fromJsonString(root["gradientFirst"]?.asText())
-    gradientEnd.fromJsonString(root["gradientLast"]?.asText())
+    gradientStart.initial.fromJsonString(root["gradientFirst"]?.asText())
+    gradientEnd.initial.fromJsonString(root["gradientLast"]?.asText())
+    gradientStart.reset()
+    gradientEnd.reset()
     gradientDirection = GradientDirection.VALUES.find { it.name == root["gradientDirection"]?.asText() } ?: gradientDirection
 
     // bouncers
@@ -112,9 +114,12 @@ fun Engine.fromEngineJson(root: ObjectNode) {
         // tints
         val tintObj = bouncersObj["tint"] as? ObjectNode
         if (tintObj != null) {
-            normalBouncerTint.fromJsonString(tintObj["normal"]?.asText())
-            aBouncerTint.fromJsonString(tintObj["a"]?.asText())
-            dpadBouncerTint.fromJsonString(tintObj["dpad"]?.asText())
+            normalBouncerTint.initial.fromJsonString(tintObj["normal"]?.asText())
+            aBouncerTint.initial.fromJsonString(tintObj["a"]?.asText())
+            dpadBouncerTint.initial.fromJsonString(tintObj["dpad"]?.asText())
+            normalBouncerTint.reset()
+            aBouncerTint.reset()
+            dpadBouncerTint.reset()
         }
     }
 

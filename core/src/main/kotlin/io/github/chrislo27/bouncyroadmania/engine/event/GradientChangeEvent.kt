@@ -7,6 +7,7 @@ import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.InterpolatableColor
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
@@ -25,8 +26,7 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
     override val hasEditableParams: Boolean = true
     override val shouldAlwaysBeSimulated: Boolean = true
 
-    private val gradientTarget: Color get() = if (first) this.engine.gradientCurrentStart else this.engine.gradientCurrentEnd
-    private val gradientOrigin: Color get() = if (first) this.engine.gradientStart else this.engine.gradientEnd
+    private val gradientTarget: InterpolatableColor get() = if (first) this.engine.gradientStart else this.engine.gradientEnd
     val color: Color = Color(1f, 1f, 1f, 1f)
 
     override val renderText: String
@@ -48,16 +48,16 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
     }
 
     override fun onStart() {
-        startColor.set(gradientTarget)
+        gradientTarget.beginLerp(color)
     }
 
     override fun whilePlaying() {
         val a = ((engine.beat - bounds.x) / bounds.width).coerceIn(0f, 1f)
-        gradientTarget.set(startColor).lerp(color, a)
+        gradientTarget.lerp(a)
     }
 
     override fun onEnd() {
-        gradientTarget.set(color)
+        gradientTarget.lerp(1f)
     }
 
     override fun fromJson(node: ObjectNode) {
@@ -101,7 +101,7 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
                     val mostRecentColor = engine.events.sortedBy { it.bounds.maxX }.asReversed()
                             .filterIsInstance<GradientChangeEvent>()
                             .find { it.first == first && it.bounds.maxX < bounds.maxX && it != this@GradientChangeEvent }
-                    val c = Color(mostRecentColor?.color ?: gradientOrigin)
+                    val c = Color(mostRecentColor?.color ?: gradientTarget.initial)
                     parent.editor.mutate(object : ReversibleAction<Editor> {
                         val picker: WeakReference<ColourPicker<EditorScreen>> = WeakReference(colourPicker)
                         val lastColor = Color(this@GradientChangeEvent.color)
@@ -128,7 +128,7 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
                     this.text = "gradientChangeEvent.resetToInitial"
                 })
                 this.leftClickAction = { _, _ ->
-                    val c = Color(gradientOrigin)
+                    val c = Color(gradientTarget.initial)
                     parent.editor.mutate(object : ReversibleAction<Editor> {
                         val picker: WeakReference<ColourPicker<EditorScreen>> = WeakReference(colourPicker)
                         val lastColor = Color(this@GradientChangeEvent.color)

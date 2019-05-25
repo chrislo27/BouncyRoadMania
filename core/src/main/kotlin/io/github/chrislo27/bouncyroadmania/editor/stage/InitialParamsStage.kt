@@ -39,9 +39,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         gradientFirst = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
-                engine.gradientStart.set(c)
+                engine.gradientStart.initial.set(c)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.gradientCurrentStart.set(c)
+                    engine.gradientStart.current.set(c)
                 }
             }
         }
@@ -57,9 +57,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         gradientLast = ColourPicker(gradientPalette, this, this).apply {
             this.location.set(screenX = 0.05f, screenY = 0.5f, screenWidth = 0.2f, screenHeight = 0.2f)
             this.onColourChange = { c ->
-                engine.gradientEnd.set(c)
+                engine.gradientEnd.initial.set(c)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.gradientCurrentEnd.set(c)
+                    engine.gradientEnd.current.set(c)
                 }
             }
         }
@@ -69,13 +69,13 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
                 this.image = TextureRegion(AssetRegistry.get<Texture>("ui_swap"))
             })
             this.leftClickAction = { _, _ ->
-                val tmp = Color(1f, 1f, 1f, 1f).set(engine.gradientStart)
-                engine.gradientStart.set(engine.gradientEnd)
-                engine.gradientEnd.set(tmp)
+                val tmp = Color(1f, 1f, 1f, 1f).set(engine.gradientStart.initial)
+                engine.gradientStart.initial.set(engine.gradientEnd.initial)
+                engine.gradientEnd.initial.set(tmp)
                 updateColours()
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.gradientCurrentEnd.set(engine.gradientEnd)
-                    engine.gradientCurrentStart.set(engine.gradientStart)
+                    engine.gradientEnd.current.set(engine.gradientEnd.initial)
+                    engine.gradientStart.current.set(engine.gradientStart.initial)
                 }
             }
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0f, screenHeight = 0f,
@@ -124,9 +124,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         normalBouncerTint = ColourPicker(gradientPalette, this, this, true).apply {
             this.location.set(screenX = 0.3f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
-                engine.normalBouncerTint.set(c)
+                engine.normalBouncerTint.initial.set(c)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.normalBouncerCurrentTint.set(c)
+                    engine.normalBouncerTint.current.set(c)
                 }
             }
         }
@@ -140,7 +140,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.leftClickAction = { _, _ ->
                 normalBouncerTint.setColor(Engine.DEFAULT_NORMAL_BOUNCER)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.normalBouncerCurrentTint.set(normalBouncerTint.currentColour)
+                    engine.normalBouncerTint.current.set(normalBouncerTint.currentColour)
                 }
             }
             this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
@@ -156,9 +156,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         aBouncerTint = ColourPicker(gradientPalette, this, this, true).apply {
             this.location.set(screenX = 0.3f, screenY = 0.4f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
-                engine.aBouncerTint.set(c)
+                engine.aBouncerTint.initial.set(c)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.aBouncerCurrentTint.set(c)
+                    engine.aBouncerTint.current.set(c)
                 }
             }
         }
@@ -172,7 +172,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.leftClickAction = { _, _ ->
                 aBouncerTint.setColor(Engine.DEFAULT_A_BOUNCER)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.aBouncerCurrentTint.set(aBouncerTint.currentColour)
+                    engine.aBouncerTint.current.set(aBouncerTint.currentColour)
                 }
             }
             this.location.set(screenX = 0.3f, screenY = 0.6f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
@@ -188,9 +188,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         dpadBouncerTint = ColourPicker(gradientPalette, this, this, true).apply {
             this.location.set(screenX = 0.3f, screenY = 0.1f, screenWidth = 0.2f, screenHeight = 0.25f)
             this.onColourChange = { c ->
-                engine.dpadBouncerTint.set(c)
+                engine.dpadBouncerTint.initial.set(c)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.dpadBouncerCurrentTint.set(c)
+                    engine.dpadBouncerTint.current.set(c)
                 }
             }
         }
@@ -204,7 +204,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.leftClickAction = { _, _ ->
                 dpadBouncerTint.setColor(Engine.DEFAULT_DPAD_BOUNCER)
                 if (engine.playState == PlayState.STOPPED) {
-                    engine.dpadBouncerCurrentTint.set(dpadBouncerTint.currentColour)
+                    engine.dpadBouncerTint.current.set(dpadBouncerTint.currentColour)
                 }
             }
             this.location.set(screenX = 0.3f, screenY = 0.35f, screenWidth = 0f, screenHeight = 0.05f, pixelX = -32f, pixelWidth = 32f)
@@ -214,11 +214,11 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
     }
 
     fun updateColours(engine: Engine = this.engine) {
-        gradientFirst.setColor(engine.gradientStart)
-        gradientLast.setColor(engine.gradientEnd)
-        normalBouncerTint.setColor(engine.normalBouncerTint)
-        aBouncerTint.setColor(engine.aBouncerTint)
-        dpadBouncerTint.setColor(engine.dpadBouncerTint)
+        gradientFirst.setColor(engine.gradientStart.initial)
+        gradientLast.setColor(engine.gradientEnd.initial)
+        normalBouncerTint.setColor(engine.normalBouncerTint.initial)
+        aBouncerTint.setColor(engine.aBouncerTint.initial)
+        dpadBouncerTint.setColor(engine.dpadBouncerTint.initial)
     }
 
     fun onEngineChange(engine: Engine) {

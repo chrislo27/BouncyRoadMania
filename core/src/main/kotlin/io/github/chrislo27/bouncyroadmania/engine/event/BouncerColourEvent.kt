@@ -7,6 +7,7 @@ import io.github.chrislo27.bouncyroadmania.editor.oopsies.ReversibleAction
 import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
 import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.InterpolatableColor
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
@@ -35,12 +36,7 @@ class BouncerColourEvent(engine: Engine, instantiator: Instantiator) : Instantia
 
     val color: Color = Color(1f, 1f, 1f, 1f)
     var bouncerType: BouncerType = BouncerType.NORMAL
-    private val tintTarget: Color get() = when (bouncerType) {
-        BouncerType.NORMAL -> engine.normalBouncerCurrentTint
-        BouncerType.A -> engine.aBouncerCurrentTint
-        BouncerType.DPAD -> engine.dpadBouncerCurrentTint
-    }
-    val tintOrigin: Color get() = when (bouncerType) {
+    val tintTarget: InterpolatableColor get() = when (bouncerType) {
         BouncerType.NORMAL -> engine.normalBouncerTint
         BouncerType.A -> engine.aBouncerTint
         BouncerType.DPAD -> engine.dpadBouncerTint
@@ -49,8 +45,6 @@ class BouncerColourEvent(engine: Engine, instantiator: Instantiator) : Instantia
     override val renderText: String
         get() = renderTextBacking
     private var renderTextBacking: String = ""
-
-    private val startColor = Color(1f, 1f, 1f, 1f)
 
     init {
         onColorChange()
@@ -74,16 +68,16 @@ class BouncerColourEvent(engine: Engine, instantiator: Instantiator) : Instantia
     }
 
     override fun onStart() {
-        startColor.set(tintTarget)
+        tintTarget.beginLerp(color)
     }
 
     override fun whilePlaying() {
         val a = ((engine.beat - bounds.x) / bounds.width).coerceIn(0f, 1f)
-        tintTarget.set(startColor).lerp(color, a)
+        tintTarget.lerp(a)
     }
 
     override fun onEnd() {
-        tintTarget.set(color)
+        tintTarget.lerp(1f)
     }
 
     override fun fromJson(node: ObjectNode) {
@@ -122,7 +116,7 @@ class BouncerColourEvent(engine: Engine, instantiator: Instantiator) : Instantia
                     val mostRecentColor = engine.events.sortedBy { it.bounds.maxX }.asReversed()
                             .filterIsInstance<BouncerColourEvent>()
                             .find { it.bouncerType == bouncerType && it.bounds.maxX < bounds.maxX && it != this@BouncerColourEvent }
-                    val c = Color(mostRecentColor?.color ?: tintOrigin)
+                    val c = Color(mostRecentColor?.color ?: tintTarget.initial)
                     parent.editor.mutate(object : ReversibleAction<Editor> {
                         val picker: WeakReference<ColourPicker<EditorScreen>> = WeakReference(colourPicker)
                         val lastColor = Color(this@BouncerColourEvent.color)
@@ -149,7 +143,7 @@ class BouncerColourEvent(engine: Engine, instantiator: Instantiator) : Instantia
                     this.text = "bouncerColourEvent.resetToInitial"
                 })
                 this.leftClickAction = { _, _ ->
-                    val c = Color(tintOrigin)
+                    val c = Color(tintTarget.initial)
                     parent.editor.mutate(object : ReversibleAction<Editor> {
                         val picker: WeakReference<ColourPicker<EditorScreen>> = WeakReference(colourPicker)
                         val lastColor = Color(this@BouncerColourEvent.color)

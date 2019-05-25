@@ -108,11 +108,11 @@ class Engine : Clock(), Disposable {
                                 it.playbackCompletion = PlaybackCompletion.WAITING
                             }
                         }
-                        gradientCurrentStart.set(gradientStart)
-                        gradientCurrentEnd.set(gradientEnd)
-                        normalBouncerCurrentTint.set(normalBouncerTint)
-                        aBouncerCurrentTint.set(aBouncerTint)
-                        dpadBouncerCurrentTint.set(dpadBouncerTint)
+                        gradientStart.reset()
+                        gradientEnd.reset()
+                        normalBouncerTint.reset()
+                        aBouncerTint.reset()
+                        dpadBouncerTint.reset()
 
                         lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
                         lastMetronomeMeasurePart = -1
@@ -188,17 +188,12 @@ class Engine : Clock(), Disposable {
 
     // Visuals
     val textures: Map<String, Texture> = mutableMapOf()
-    val gradientEnd: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_GRADIENT)
-    val gradientStart: Color = Color(0f, 0f, 0f, 1f)
-    val gradientCurrentEnd: Color = Color(1f, 1f, 1f, 1f).set(gradientEnd)
-    val gradientCurrentStart: Color = Color(0f, 0f, 0f, 1f).set(gradientStart)
     var gradientDirection: GradientDirection = GradientDirection.VERTICAL
-    val normalBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_NORMAL_BOUNCER)
-    val aBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_A_BOUNCER)
-    val dpadBouncerTint: Color = Color(1f, 1f, 1f, 1f).set(DEFAULT_DPAD_BOUNCER)
-    val normalBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(normalBouncerTint)
-    val aBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(aBouncerTint)
-    val dpadBouncerCurrentTint: Color = Color(1f, 1f, 1f, 1f).set(dpadBouncerTint)
+    val gradientEnd: InterpolatableColor = InterpolatableColor(DEFAULT_GRADIENT)
+    val gradientStart: InterpolatableColor = InterpolatableColor(Color.BLACK)
+    val normalBouncerTint: InterpolatableColor = InterpolatableColor(DEFAULT_NORMAL_BOUNCER)
+    val aBouncerTint: InterpolatableColor = InterpolatableColor(DEFAULT_A_BOUNCER)
+    val dpadBouncerTint: InterpolatableColor = InterpolatableColor(DEFAULT_DPAD_BOUNCER)
     private var skillStarSpinAnimation: Float = 0f
     private var skillStarPulseAnimation: Float = 0f
 
@@ -255,6 +250,7 @@ class Engine : Clock(), Disposable {
     fun addEvent(event: Event) {
         if (event !in events) {
             (events as MutableList) += event
+            events.sortWith(EventPosComparator)
             recomputeCachedData()
             listeners.keys.forEach { it.onEventAdded(event) }
         }
@@ -263,6 +259,7 @@ class Engine : Clock(), Disposable {
     fun removeEvent(event: Event) {
         val oldSize = events.size
         (events as MutableList) -= event
+        events.sortWith(EventPosComparator)
         if (events.size != oldSize) {
             recomputeCachedData()
             listeners.keys.forEach { it.onEventRemoved(event) }
@@ -279,6 +276,7 @@ class Engine : Clock(), Disposable {
             }
         }
         if (this.events.size != oldSize) {
+            this.events.sortWith(EventPosComparator)
             recomputeCachedData()
         }
     }
@@ -289,6 +287,7 @@ class Engine : Clock(), Disposable {
         this.events.removeAll(events)
         events.forEach { listeners.keys.forEach { l -> l.onEventRemoved(it) } }
         if (this.events.size != oldSize) {
+            this.events.sortWith(EventPosComparator)
             recomputeCachedData()
         }
     }
@@ -393,7 +392,7 @@ class Engine : Clock(), Disposable {
                 }
             }
         }
-        
+
         // No super update
         if (playState != PlayState.PLAYING)
             return
@@ -457,6 +456,36 @@ class Engine : Clock(), Disposable {
         }
     }
 
+    private fun renderBgImageEvent(batch: SpriteBatch, evt: BgImageEvent) {
+        val image = textures[evt.textureHash]
+        val alpha = evt.getImageAlpha()
+        if (image != null && alpha > 0f) {
+            batch.setColor(1f, 1f, 1f, alpha)
+            when (val rType = evt.renderType) {
+                BgImageEvent.RenderType.FILL -> {
+                    batch.draw(image, 0f, 0f, camera.viewportWidth, camera.viewportHeight)
+                }
+                else -> {
+                    val aspectWidth = camera.viewportWidth / image.width
+                    val aspectHeight = camera.viewportHeight / image.height
+                    val aspectRatio = if (rType == BgImageEvent.RenderType.SCALE_TO_FIT) Math.min(aspectWidth, aspectHeight) else Math.max(aspectWidth, aspectHeight)
+                    val x: Float
+                    val y: Float
+                    val w: Float
+                    val h: Float
+
+                    w = image.width * aspectRatio
+                    h = image.height * aspectRatio
+                    x = camera.viewportWidth / 2 - (w / 2)
+                    y = camera.viewportHeight / 2 - (h / 2)
+
+                    batch.draw(image, x, y, w, h)
+                }
+            }
+            batch.setColor(1f, 1f, 1f, 1f)
+        }
+    }
+
     fun render(batch: SpriteBatch) {
         camera.update()
         TMP_MATRIX.set(batch.projectionMatrix)
@@ -464,46 +493,28 @@ class Engine : Clock(), Disposable {
         batch.begin()
         // gradient
         if (gradientDirection == GradientDirection.VERTICAL) {
-            batch.drawQuad(-400f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentStart, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, -400f, camera.viewportHeight, gradientCurrentEnd)
+            batch.drawQuad(-400f, 0f, gradientStart.current, camera.viewportWidth, 0f, gradientStart.current, camera.viewportWidth, camera.viewportHeight, gradientEnd.current, -400f, camera.viewportHeight, gradientEnd.current)
         } else {
-            batch.drawQuad(-400f, 0f, gradientCurrentStart, camera.viewportWidth, 0f, gradientCurrentEnd, camera.viewportWidth, camera.viewportHeight, gradientCurrentEnd, -400f, camera.viewportHeight, gradientCurrentStart)
+            batch.drawQuad(-400f, 0f, gradientStart.current, camera.viewportWidth, 0f, gradientEnd.current, camera.viewportWidth, camera.viewportHeight, gradientEnd.current, -400f, camera.viewportHeight, gradientStart.current)
         }
 
         if (playState != PlayState.STOPPED) {
-            events.sortedBy { it.bounds.x }.forEach { evt ->
+            events.forEach { evt ->
                 if (evt is BgImageEvent) {
-                    val image = textures[evt.textureHash]
-                    val alpha = evt.getImageAlpha()
-                    if (image != null && alpha > 0f) {
-                        batch.setColor(1f, 1f, 1f, alpha)
-                        when (val rType = evt.renderType) {
-                            BgImageEvent.RenderType.FILL -> {
-                                batch.draw(image, 0f, 0f, camera.viewportWidth, camera.viewportHeight)
-                            }
-                            else -> {
-                                val aspectWidth = camera.viewportWidth / image.width
-                                val aspectHeight = camera.viewportHeight / image.height
-                                val aspectRatio = if (rType == BgImageEvent.RenderType.SCALE_TO_FIT) Math.min(aspectWidth, aspectHeight) else Math.max(aspectWidth, aspectHeight)
-                                val x: Float
-                                val y: Float
-                                val w: Float
-                                val h: Float
-
-                                w = image.width * aspectRatio
-                                h = image.height * aspectRatio
-                                x = camera.viewportWidth / 2 - (w / 2)
-                                y = camera.viewportHeight / 2 - (h / 2)
-
-                                batch.draw(image, x, y, w, h)
-                            }
-                        }
-                        batch.setColor(1f, 1f, 1f, 1f)
-                    }
+                    renderBgImageEvent(batch, evt)
                 }
             }
         }
 
         projector.render(batch, entities)
+
+        if (playState != PlayState.STOPPED) {
+            events.forEach { evt ->
+                if (evt is BgImageEvent) {
+                    renderBgImageEvent(batch, evt)
+                }
+            }
+        }
 
         val textBox = currentTextBox
         if (textBox != null) {
@@ -553,11 +564,11 @@ class Engine : Clock(), Disposable {
             font.scaleMul(1f / 0.5f)
             font.unscaleFont()
         }
-        
+
         if (skillStarInput.isFinite()) {
             val texColoured = AssetRegistry.get<Texture>("tex_skill_star")
             val texGrey = AssetRegistry.get<Texture>("tex_skill_star_grey")
-            
+
             val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
             val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
             batch.draw(if (gotSkillStar) texColoured else texGrey, 1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation,

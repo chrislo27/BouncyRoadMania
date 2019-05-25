@@ -30,7 +30,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 
-class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
+class BgImageEvent(engine: Engine, instantiator: Instantiator, val foreground: Boolean)
+    : InstantiatedEvent(engine, instantiator) {
 
     enum class RenderType(val localization: String, val equivalent: ImageLabel.ImageRendering) {
         FILL("bgImageEvent.renderType.fill", ImageLabel.ImageRendering.RENDER_FULL),
@@ -56,7 +57,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
     }
 
     override fun copy(): BgImageEvent {
-        return BgImageEvent(engine, instantiator).also {
+        return BgImageEvent(engine, instantiator, foreground).also {
             it.bounds.set(this.bounds)
             it.updateInterpolation(true)
             it.textureHash = this.textureHash
@@ -201,7 +202,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
                     this.fontScaleMultiplier = 0.9f
                 })
                 this.tooltipTextIsLocalizationKey = true
-                this.tooltipText = renderType.localization + ".tooltip"
+                this.tooltipText = renderType.localization + ".tooltip.${if (foreground) "fg" else "bg"}"
                 fun cycle(dir: Int) {
                     val current = renderType
                     val values = RenderType.VALUES
@@ -209,7 +210,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEve
                     val next: RenderType = if (nextIndex < 0) values.last() else if (nextIndex >= values.size) values.first() else values[nextIndex]
                     renderType = next
                     img.renderType = next.equivalent
-                    this.tooltipText = next.localization + ".tooltip"
+                    this.tooltipText = next.localization + ".tooltip.${if (foreground) "fg" else "bg"}"
                     (labels.first() as TextLabel).text = next.localization
                 }
                 this.leftClickAction = { _, _ ->
