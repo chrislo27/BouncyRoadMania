@@ -117,6 +117,12 @@ class SpawnTextBoxEvent(engine: Engine, var textBox: TextBox, instantiator: Inst
                 this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 3.75f))
                 this.fontScaleMultiplier = 0.75f
             }
+            contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
+                this.isLocalizationKey = true
+                this.text = "textField.enterNewlines"
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 4.25f))
+                this.fontScaleMultiplier = 0.75f
+            }
         }
     }
     
