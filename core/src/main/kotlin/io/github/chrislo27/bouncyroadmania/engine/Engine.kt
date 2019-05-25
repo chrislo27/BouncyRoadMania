@@ -174,6 +174,7 @@ class Engine : Clock(), Disposable {
     var skillStarInput: Float = Float.POSITIVE_INFINITY
         private set
     var gotSkillStar: Boolean = false
+    var resultsText: ResultsText = ResultsText()
 
     val entities: MutableList<Entity> = mutableListOf()
     var bouncers: List<Bouncer> = listOf()

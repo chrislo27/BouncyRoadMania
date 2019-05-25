@@ -47,6 +47,17 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
         tint.put("a", aBouncerTint.initial.toJsonString())
         tint.put("dpad", dpadBouncerTint.initial.toJsonString())
     }
+    
+    // results text
+    run {
+        val obj = root.putObject("resultsText")
+        val text = resultsText
+        obj.put("title", text.title)
+        obj.put("firstPositive", text.firstPositive)
+        obj.put("firstNegative", text.firstNegative)
+        obj.put("secondPositive", text.secondPositive)
+        obj.put("secondNegative", text.secondNegative)
+    }
 
     // textures
     root.putArray("textures").also { ar ->
@@ -121,6 +132,12 @@ fun Engine.fromEngineJson(root: ObjectNode) {
             aBouncerTint.reset()
             dpadBouncerTint.reset()
         }
+    }
+    
+    val resultsTextObj = root["resultsText"] as? ObjectNode
+    if (resultsTextObj != null) {
+        val stock = ResultsText()
+        this.resultsText = ResultsText(resultsTextObj["title"]?.asText() ?: stock.title, resultsTextObj["firstPositive"]?.asText() ?: stock.firstPositive, resultsTextObj["firstNegative"]?.asText() ?: stock.firstNegative, resultsTextObj["secondPositive"]?.asText() ?: stock.secondPositive, resultsTextObj["secondNegative"]?.asText() ?: stock.secondNegative)
     }
 
     removeAllEvents(events.toList())

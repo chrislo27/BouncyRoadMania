@@ -39,8 +39,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
         val categoryWidth = 1f / categories.size
         categories.forEachIndexed { i, category ->
             categoriesStage.elements += object : Button<EditorScreen>(palette, categoriesStage, categoriesStage) {
+                val SELECTED_TINT: Color = Color(0.5f, 1f, 1f, 1f)
                 override fun render(screen: EditorScreen, batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
-                    (labels.first() as TextLabel).textColor = if (category.visible) Color.CYAN else null
+                    (labels.first() as TextLabel).textColor = if (category.visible) SELECTED_TINT else null
                     super.render(screen, batch, shapeRenderer)
                 }
             }.apply {
