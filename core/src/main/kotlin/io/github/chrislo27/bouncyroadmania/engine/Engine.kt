@@ -94,6 +94,11 @@ class Engine : Clock(), Disposable {
                         recomputeCachedData()
                         resetInputs()
                         seconds = tempos.beatsToSeconds(playbackStart)
+                        gradientStart.reset()
+                        gradientEnd.reset()
+                        normalBouncerTint.reset()
+                        aBouncerTint.reset()
+                        dpadBouncerTint.reset()
                         events.forEach {
                             if (it.getUpperUpdateableBound() < beat) {
                                 if (it.shouldAlwaysBeSimulated) {
@@ -102,17 +107,13 @@ class Engine : Clock(), Disposable {
                                     it.whilePlaying()
                                     it.playbackCompletion = PlaybackCompletion.FINISHED
                                     it.onEnd()
+                                    println("simulated")
                                 }
                                 it.playbackCompletion = PlaybackCompletion.FINISHED
                             } else {
                                 it.playbackCompletion = PlaybackCompletion.WAITING
                             }
                         }
-                        gradientStart.reset()
-                        gradientEnd.reset()
-                        normalBouncerTint.reset()
-                        aBouncerTint.reset()
-                        dpadBouncerTint.reset()
 
                         lastMetronomeMeasure = Math.ceil(playbackStart - 1.0).toInt()
                         lastMetronomeMeasurePart = -1

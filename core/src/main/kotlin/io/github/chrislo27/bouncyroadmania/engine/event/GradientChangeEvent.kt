@@ -33,8 +33,6 @@ class GradientChangeEvent(engine: Engine, instantiator: Instantiator, val first:
         get() = renderTextBacking
     private var renderTextBacking: String = ""
 
-    private val startColor = Color(1f, 1f, 1f, 1f)
-
     init {
         onColorChange()
     }
