@@ -31,7 +31,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
         elements += TextLabel(palette, this, this).apply {
             this.textWrapping = false
             this.isLocalizationKey = true
-            this.text = "initialParams.gradientFirst"
+            this.text = "initialParams.colours.gradientFirst"
             this.fontScaleMultiplier = 0.85f
             this.background = true
             this.location.set(screenX = 0.05f, screenY = 0.95f, screenWidth = 0.2f, screenHeight = 0.05f)
@@ -49,7 +49,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
         elements += TextLabel(palette, this, this).apply {
             this.textWrapping = false
             this.isLocalizationKey = true
-            this.text = "initialParams.gradientLast"
+            this.text = "initialParams.colours.gradientLast"
             this.fontScaleMultiplier = 0.85f
             this.background = true
             this.location.set(screenX = 0.05f, screenY = 0.7f, screenWidth = 0.2f, screenHeight = 0.05f)
@@ -81,7 +81,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0f, screenHeight = 0f,
                     pixelX = -48f, pixelWidth = 48f, pixelY = -48f, pixelHeight = 48f)
             this.tooltipTextIsLocalizationKey = true
-            this.tooltipText = "initialParams.swap"
+            this.tooltipText = "initialParams.colours.swap"
         }
         gradientDir = object : Button<EditorScreen>(palette, this, this) {
             val verticalLabel = ImageLabel(palette, this, this.stage).apply {
@@ -108,7 +108,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.location.set(screenX = 0.05f, screenY = 0.75f, screenWidth = 0f, screenHeight = 0f,
                     pixelX = -48f, pixelWidth = 48f, pixelY = 0f, pixelHeight = 48f)
             this.tooltipTextIsLocalizationKey = true
-            this.tooltipText = "initialParams.changeDir"
+            this.tooltipText = "initialParams.colours.changeDir"
         }
         elements += gradientDir
 
@@ -117,7 +117,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.isLocalizationKey = true
             this.fontScaleMultiplier = 0.85f
-            this.text = "initialParams.normalBouncerTint"
+            this.text = "initialParams.colours.normalBouncerTint"
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.95f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
@@ -149,7 +149,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.isLocalizationKey = true
             this.fontScaleMultiplier = 0.85f
-            this.text = "initialParams.aBouncerTint"
+            this.text = "initialParams.colours.aBouncerTint"
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.65f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
@@ -181,7 +181,7 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.isLocalizationKey = true
             this.fontScaleMultiplier = 0.85f
-            this.text = "initialParams.dpadBouncerTint"
+            this.text = "initialParams.colours.dpadBouncerTint"
             this.background = true
             this.location.set(screenX = 0.3f, screenY = 0.35f, screenWidth = 0.2f, screenHeight = 0.05f)
         }
@@ -220,7 +220,6 @@ class ColoursStage(ipStage: InitialParamsStage, palette: UIPalette)
         aBouncerTint.setColor(engine.aBouncerTint.initial)
         dpadBouncerTint.setColor(engine.dpadBouncerTint.initial)
     }
-
 
     override fun onEngineChange(engine: Engine) {
         updateColours(engine)
