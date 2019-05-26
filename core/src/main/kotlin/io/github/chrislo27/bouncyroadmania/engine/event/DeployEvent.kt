@@ -33,7 +33,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
 
     override val isStretchable: Boolean = true
     override val hasEditableParams: Boolean = true
-
+    override val shouldAlwaysBeSimulated: Boolean = true
     var firstBounceHasSound: Boolean = false
     val color: Color = Color(1f, 1f, 1f, 1f)
     var semitoneOffset: Int by Delegates.observable(0) { _, _, _ ->
