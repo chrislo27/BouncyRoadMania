@@ -93,6 +93,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         engine.entities += Ball(engine, this.bounds.width, this.bounds.x, firstBounceHasSound, Color(color), semitoneOffset).apply {
             startOff()
         }
+        println("deployed with width ${bounds.width}")
     }
 
     override fun fromJson(node: ObjectNode) {

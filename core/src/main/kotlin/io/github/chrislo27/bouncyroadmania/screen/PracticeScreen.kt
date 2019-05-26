@@ -17,6 +17,7 @@ import io.github.chrislo27.bouncyroadmania.engine.tracker.musicvolume.MusicVolum
 import io.github.chrislo27.bouncyroadmania.engine.tracker.tempo.TempoChange
 import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.bouncyroadmania.util.Swing
+import io.github.chrislo27.bouncyroadmania.util.TempoUtils
 import io.github.chrislo27.bouncyroadmania.util.transition.FadeOut
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
@@ -78,17 +79,18 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
          */
 
         val textBoxInst = EventRegistry.map.getValue("text_box")
+        val deployInst = EventRegistry.map.getValue("deploy")
 
         // Populate
         with(engine) {
             playbackStart = 0f
             musicStartSec = 1.5f
             tempos.add(TempoChange(tempos, 0f, 60f, Swing.STRAIGHT, 0f))
-            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.stage1-1"], true), textBoxInst).apply {
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.standard.stage1-1"], true), textBoxInst).apply {
                 this.bounds.x = 0f
                 this.bounds.width = 0.5f
             })
-            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.stage1-2"], true), textBoxInst).apply {
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.standard.stage1-2"], true), textBoxInst).apply {
                 this.bounds.x = 0.5f
                 this.bounds.width = 0.5f
             })
@@ -98,7 +100,7 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
             })
             val firstPractice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
                 listOf(
-                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                        DeployEvent(engine, deployInst).apply {
                             this.bounds.width = 1f
                             this.bounds.x = offset - this.bounds.width
                         }
@@ -106,18 +108,18 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
             }
             val secondPractice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
                 listOf(
-                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                        DeployEvent(engine, deployInst).apply {
                             this.bounds.width = 1f
                             this.bounds.x = offset - this.bounds.width
                         },
-                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                        DeployEvent(engine, deployInst).apply {
                             this.bounds.width = 1f
                             this.bounds.x = offset - this.bounds.width + 2f
                         })
             }
             val thirdPractice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
                 listOf(
-                        DeployEvent(engine, EventRegistry.map.getValue("deploy")).apply {
+                        DeployEvent(engine, deployInst).apply {
                             this.bounds.width = 0.5f
                             this.bounds.x = offset - this.bounds.width
                         }
@@ -128,11 +130,11 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
                 musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-1"], true), textBoxInst).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.standard.stage4-1"], true), textBoxInst).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
                 })
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage4-2"], true), textBoxInst).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.standard.stage4-2"], true), textBoxInst).apply {
                     this.bounds.x = origin + 2f
                     this.bounds.width = 0.5f
                 })
@@ -147,11 +149,11 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
                 musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 6f, 0f, 100))
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-1"], true), textBoxInst).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.standard.stage3-1"], true), textBoxInst).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
                 })
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage3-2"], true), textBoxInst).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.standard.stage3-2"], true), textBoxInst).apply {
                     this.bounds.x = origin + 2f
                     this.bounds.width = 0.5f
                 })
@@ -176,11 +178,11 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
                 val origin = bounds.maxX + 2f
                 musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
                 musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 6f, 0f, 100))
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-1"], true), textBoxInst).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.standard.stage2-1"], true), textBoxInst).apply {
                     this.bounds.x = origin + 1f
                     this.bounds.width = 0.5f
                 })
-                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.stage2-2"], true), textBoxInst).apply {
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.standard.stage2-2"], true), textBoxInst).apply {
                     this.bounds.x = origin + 2f
                     this.bounds.width = 0.5f
                 })
@@ -219,18 +221,79 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
 
         /*
         Order of events:
-        
+        Let's practice the\n"long-short-fast" pattern.
+        (For the purposes of this\ndemo, the long ball
+        will jump ahead to\nspeed things up.)
+        [long-short-fast x3]
+        Great job!
+        You're a pro at this.\nReady for the real thing?
          */
 
         val textBoxInst = EventRegistry.map.getValue("text_box")
+        val deployInst = EventRegistry.map.getValue("deploy")
 
         // Populate
         with(engine) {
             playbackStart = 0f
-            musicStartSec = 1.5f
+            musicStartSec = TempoUtils.beatsToSeconds(4f, 154f)
             tempos.add(TempoChange(tempos, 0f, 154f, Swing.STRAIGHT, 0f))
 
-            // TODO
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.lsf.stage1-1"], true), textBoxInst).apply {
+                this.bounds.x = 0f
+                this.bounds.width = 1f
+            })
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.lsf.stage1-2"], true), textBoxInst).apply {
+                this.bounds.x = 1f
+                this.bounds.width = 1f
+            })
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.lsf.stage1-3"], true), textBoxInst).apply {
+                this.bounds.x = 2f
+                this.bounds.width = 1f
+            })
+            addEvent(XMoreTimesEvent(engine, 3).apply {
+                this.bounds.x = 3f
+            })
+            
+            val practice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
+                listOf(
+                        DeployEvent(engine, deployInst).apply {
+                            this.bounds.width = 2f
+                            this.bounds.x = offset - 18f
+                        },
+                        DeployEvent(engine, deployInst).apply {
+                            this.bounds.width = 1f
+                            this.bounds.x = offset - 1f
+                        },
+                        DeployEvent(engine, deployInst).apply {
+                            this.bounds.width = 0.5f
+                            this.bounds.x = offset + 7.5f
+                        }
+                )
+            }
+            
+            addEvent(PracticeGroupEvent(engine, practice, {
+                // Add music fade
+                val origin = bounds.maxX + 2f
+                musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.lsf.stage2-1"], true), textBoxInst).apply {
+                    this.bounds.x = origin + 1f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.lsf.stage2-2"], true), textBoxInst).apply {
+                    this.bounds.x = origin + 2f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SimpleEvent(engine, {
+                    engine.playState = PlayState.STOPPED
+                }).apply {
+                    this.bounds.x = origin + 4f
+                })
+            }, 1f).apply {
+                this.bounds.width = 15f
+                this.bounds.x = 4f
+            })
+            
         }
 
         return engine
