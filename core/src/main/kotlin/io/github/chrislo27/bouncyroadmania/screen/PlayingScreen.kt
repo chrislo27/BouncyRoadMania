@@ -136,6 +136,15 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         engine.render(batch)
 
         stage.visible = paused != null
+        if (paused == null) {
+            if (!Gdx.input.isCursorCatched) {
+                Gdx.input.isCursorCatched = true
+            }
+        } else {
+            if (Gdx.input.isCursorCatched) {
+                Gdx.input.isCursorCatched = false
+            }
+        }
         super.render(delta)
     }
 
@@ -259,6 +268,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     override fun hide() {
         super.hide()
         engine.dispose()
+        Gdx.input.isCursorCatched = false
     }
 
     override fun getDebugString(): String? {
