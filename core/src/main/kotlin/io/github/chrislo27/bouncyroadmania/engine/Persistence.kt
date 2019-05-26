@@ -42,6 +42,7 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     // bouncers
     run {
         val obj = root.putObject("bouncers")
+        obj.put("count", bouncerCount)
         val tint = obj.putObject("tint")
         tint.put("normal", normalBouncerTint.initial.toJsonString())
         tint.put("a", aBouncerTint.initial.toJsonString())
@@ -122,6 +123,7 @@ fun Engine.fromEngineJson(root: ObjectNode) {
 
     // bouncers
     val bouncersObj = root["bouncers"] as? ObjectNode
+    bouncerCount = bouncersObj?.get("count")?.asInt(Engine.DEFAULT_BOUNCER_COUNT) ?: Engine.DEFAULT_BOUNCER_COUNT
     if (bouncersObj != null) {
         // tints
         val tintObj = bouncersObj["tint"] as? ObjectNode

@@ -140,7 +140,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     data class MenuAnimation(val key: String, val speed: Float = 0.35f, var progress: Float = 0f, var reversed: Boolean = false)
 
-    val engine: Engine = Engine()
+    val engine: Engine = Engine().apply {
+        bouncerCount = 15
+    }
     val camera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }

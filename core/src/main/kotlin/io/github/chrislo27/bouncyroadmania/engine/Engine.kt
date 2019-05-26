@@ -48,6 +48,10 @@ class Engine : Clock(), Disposable {
         val MIN_TRACK_COUNT: Int = 4
         val MAX_TRACK_COUNT: Int = 8
         val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
+        
+        val MIN_BOUNCER_COUNT: Int = 5
+        val MAX_BOUNCER_COUNT: Int = 15
+        val DEFAULT_BOUNCER_COUNT: Int = 15
 
         val DEFAULT_GRADIENT: Color = Color.valueOf("0296FFFF")
         val DEFAULT_NORMAL_BOUNCER: Color = Color.valueOf("08BDFFFF")
@@ -138,11 +142,16 @@ class Engine : Clock(), Disposable {
 
     var trackCount: Int = DEFAULT_TRACK_COUNT
         set(value) {
-            field = value
+            field = value.coerceAtLeast(1)
             events.filterIsInstance<EndEvent>().forEach {
                 it.bounds.y = 0f
                 it.bounds.height = value.toFloat()
             }
+        }
+    var bouncerCount: Int = DEFAULT_BOUNCER_COUNT
+        set(value) {
+            field = if (value < 0) DEFAULT_BOUNCER_COUNT else value.coerceAtLeast(MIN_BOUNCER_COUNT)
+            addBouncers()
         }
     var duration: Float = Float.POSITIVE_INFINITY
         private set
@@ -204,12 +213,13 @@ class Engine : Clock(), Disposable {
     var xMoreTimes: Int = 0
     var clearText: Float = 0f
 
-    fun addBouncers(numVisibleBouncers: Int = 15) {
+    fun addBouncers() {
         entities.removeAll(bouncers)
         bouncers = listOf()
 
         val radius = 1200f
         val bouncers = mutableListOf<Bouncer>()
+        val numVisibleBouncers = this.bouncerCount
         val midpoint = numVisibleBouncers / 2 + 1f
         for (i in -1..numVisibleBouncers) {
             val angle = (180.0 * (i / (numVisibleBouncers - 1.0))) - 90
