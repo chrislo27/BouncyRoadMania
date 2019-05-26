@@ -351,10 +351,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         )
         menus["practices"] = listOf(
                 MenuItem("mainMenu.practice.standard") {
-                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main), WipeTo(Color.BLACK, 0.35f), null)
+                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main, PracticeStage.STANDARD), WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("mainMenu.practice.longShortFast") {
-                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main), WipeTo(Color.BLACK, 0.35f), null)
+                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main, PracticeStage.LONG_SHORT_FAST), WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("mainMenu.back") {
                     currentMenuKey = "main"

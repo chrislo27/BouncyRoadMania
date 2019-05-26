@@ -47,12 +47,16 @@ class PracticeScreen(main: BRManiaApp, engine: Engine) : PlayingScreen(main, eng
 
 }
 
+enum class PracticeStage {
+    STANDARD, LONG_SHORT_FAST
+}
+
 /**
  * A black screen to hide loading of the practice music
  */
-class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, LoadingPracticeScreen>(main) {
+class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) : ToolboksScreen<BRManiaApp, LoadingPracticeScreen>(main) {
 
-    private fun createPracticeEngine(): Engine {
+    private fun createStandardPractice(): Engine {
         val engine = Engine()
         engine.music = MusicData(Gdx.files.internal("music/practice.ogg"), engine).apply {
             this.music.setLooping(true)
@@ -72,7 +76,7 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
         Amazing!
         You've got the skills.\nReady for the real thing?
          */
-        
+
         val textBoxInst = EventRegistry.map.getValue("text_box")
 
         // Populate
@@ -207,10 +211,36 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
         return engine
     }
 
-    private val task: Deferred<Engine> = GlobalScope.async { createPracticeEngine() }
+    private fun createLongShortFastPractice(): Engine {
+        val engine = Engine()
+        engine.music = MusicData(Gdx.files.internal("music/practice.ogg"), engine).apply {
+            this.music.setLooping(true)
+        }
 
-    override fun render(delta: Float) {
-        super.render(delta)
+        /*
+        Order of events:
+        
+         */
+
+        val textBoxInst = EventRegistry.map.getValue("text_box")
+
+        // Populate
+        with(engine) {
+            playbackStart = 0f
+            musicStartSec = 1.5f
+            tempos.add(TempoChange(tempos, 0f, 154f, Swing.STRAIGHT, 0f))
+
+            // TODO
+        }
+
+        return engine
+    }
+
+    private val task: Deferred<Engine> = GlobalScope.async {
+        when (practiceStage) {
+            PracticeStage.STANDARD -> createStandardPractice()
+            PracticeStage.LONG_SHORT_FAST -> createLongShortFastPractice()
+        }
     }
 
     @ExperimentalCoroutinesApi
@@ -228,7 +258,6 @@ class LoadingPracticeScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, Loadi
             main.screen = TransitionScreen(main, main.screen, MainMenuScreen(main), null, WipeFrom(Color.BLACK, 0.35f))
         }
     }
-
 
     override fun tickUpdate() {
     }
