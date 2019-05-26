@@ -66,6 +66,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             ret
         }
         private val INACTIVE_TIME = 10f
+        private val TIPS: List<String> = listOf("mainMenu.tips.practiceModes", "mainMenu.tips.tryOthers", "mainMenu.tips.editColours", "mainMenu.tips.bgImages", "mainMenu.tips.skillStars")
     }
 
     private open inner class Event(val beat: Float, val duration: Float) {
@@ -212,6 +213,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var clickedOnMenu: MenuItem? = null
     private var stopMusicOnHide = true
     private var inactiveTime: Float = 0f
+    private var currentTip: Pair<String, List<String>> = TIPS.random().let { Localization[it] }.let { it to /*it.toCharArray().map { it.toString() }*/ it.split(' ').map { "$it " } }
 
     init {
         val palette = main.uiPalette
@@ -309,7 +311,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     main.screen = TransitionScreen(main, main.screen, GameSelectScreen(main), WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
                 },
                 MenuItem("mainMenu.practice") {
-                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main), WipeTo(Color.BLACK, 0.35f), null)
+                    currentMenuKey = "practices"
                 },
                 MenuItem("mainMenu.edit") {
                     val editor = EditorScreen(main) // ScreenRegistry.getNonNull("editor")
@@ -342,6 +344,17 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 MenuItem("mainMenu.settings.controls") {
                 }.apply {
                     this.enabled = false
+                },
+                MenuItem("mainMenu.back") {
+                    currentMenuKey = "main"
+                }
+        )
+        menus["practices"] = listOf(
+                MenuItem("mainMenu.practice.standard") {
+                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main), WipeTo(Color.BLACK, 0.35f), null)
+                },
+                MenuItem("mainMenu.practice.longShortFast") {
+                    main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main), WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("mainMenu.back") {
                     currentMenuKey = "main"
@@ -632,6 +645,25 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 menuFont.setColor(1f, 1f, 1f, 1f)
             }
             menuFont.unscaleFont()
+
+            val tip = currentTip
+            if (tip.first.isNotEmpty()) {
+                val font = main.defaultBorderedFont
+                font.scaleFont(camera)
+                val availableWidth = camera.viewportWidth * 0.9f
+                val width = font.getTextWidth(tip.first, availableWidth, false)
+                var posX = camera.viewportWidth / 2f - width / 2f
+                val baseY = camera.viewportHeight * 0.9f
+                tip.second.forEachIndexed { i, word ->
+                    val beatPulse = Interpolation.smoother.apply(((1f - engine.beat % 1) - 0.6f).coerceIn(0f, 0.4f) / 0.4f)
+                    val parity = if (i % 2 == 0) 1 else -1
+                    val beatParity = if (engine.beat.toInt() % 2 == 0) 1 else -1
+                    val offsetY = (parity * beatParity * beatPulse) * 4f
+                    posX += font.draw(batch, word, posX, baseY + offsetY, 0f, Align.left, false).width
+                }
+
+                font.unscaleFont()
+            }
 
             batch.end()
             batch.projectionMatrix = TMP_MATRIX
