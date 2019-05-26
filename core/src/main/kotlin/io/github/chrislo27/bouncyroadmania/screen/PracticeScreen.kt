@@ -50,7 +50,7 @@ class PracticeScreen(main: BRManiaApp, engine: Engine) : PlayingScreen(main, eng
 }
 
 enum class PracticeStage {
-    STANDARD, LONG_SHORT_FAST
+    STANDARD, LONG_SHORT_FAST, SKILL_STAR
 }
 
 /**
@@ -302,10 +302,93 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
         return engine
     }
 
+    private fun createSkillStarPractice(): Engine {
+        val engine = Engine()
+        engine.music = MusicData(Gdx.files.internal("music/practice.ogg"), engine).apply {
+            this.music.setLooping(true)
+        }
+
+        /*
+        Order of events:
+        
+         */
+
+        val textBoxInst = EventRegistry.map.getValue("text_box")
+        val deployInst = EventRegistry.map.getValue("deploy")
+
+        // Populate
+        with(engine) {
+            playbackStart = 0f
+            musicStartSec = TempoUtils.beatsToSeconds(4f, 154f)
+            tempos.add(TempoChange(tempos, 0f, 154f, Swing.STRAIGHT, 0f))
+
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.lsf.stage1-1"], true), textBoxInst).apply {
+                this.bounds.x = 0f
+                this.bounds.width = 1f
+            })
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.lsf.stage1-2"], true), textBoxInst).apply {
+                this.bounds.x = 1f
+                this.bounds.width = 1f
+            })
+            addEvent(SpawnTextBoxEvent(this, TextBox(Localization["practice.lsf.stage1-3"], true), textBoxInst).apply {
+                this.bounds.x = 2f
+                this.bounds.width = 1f
+            })
+            addEvent(XMoreTimesEvent(engine, 3).apply {
+                this.bounds.x = 3f
+            })
+
+            val practice: PracticeGroupEvent.(Float) -> List<Event> = { offset ->
+                listOf(
+                        DeployEvent(engine, deployInst).apply {
+                            this.bounds.width = 2f
+                            this.bounds.x = offset - 18f
+                        },
+                        DeployEvent(engine, deployInst).apply {
+                            this.bounds.width = 1f
+                            this.bounds.x = offset - 1f
+                        },
+                        DeployEvent(engine, deployInst).apply {
+                            this.bounds.width = 0.5f
+                            this.bounds.x = offset + 7.5f
+                        }
+                )
+            }
+
+            addEvent(PracticeGroupEvent(engine, practice, {
+                // Add music fade
+                val origin = bounds.maxX + 2f
+                musicVolumes.add(MusicVolumeChange(musicVolumes, bounds.maxX, 2f, 0))
+                musicVolumes.add(MusicVolumeChange(musicVolumes, origin + 4f, 0f, 100))
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.lsf.stage2-1"], true), textBoxInst).apply {
+                    this.bounds.x = origin + 1f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SpawnTextBoxEvent(engine, TextBox(Localization["practice.lsf.stage2-2"], true), textBoxInst).apply {
+                    this.bounds.x = origin + 2f
+                    this.bounds.width = 0.5f
+                })
+                addEvent(SimpleEvent(engine, {
+                    engine.playState = PlayState.STOPPED
+                    main.preferences.putBoolean(PreferenceKeys.PRACTICE_COMPLETE_PREFIX + PracticeStage.LONG_SHORT_FAST.name, true).flush()
+                }).apply {
+                    this.bounds.x = origin + 4f
+                })
+            }, 1f).apply {
+                this.bounds.width = 15f
+                this.bounds.x = 4f
+            })
+
+        }
+
+        return engine
+    }
+
     private val task: Deferred<Engine> = GlobalScope.async {
         when (practiceStage) {
             PracticeStage.STANDARD -> createStandardPractice()
             PracticeStage.LONG_SHORT_FAST -> createLongShortFastPractice()
+            PracticeStage.SKILL_STAR -> createSkillStarPractice()
         }
     }
 
