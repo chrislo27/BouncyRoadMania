@@ -3,6 +3,7 @@ package io.github.chrislo27.bouncyroadmania.screen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.engine.MusicData
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
@@ -140,6 +141,7 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
                 })
                 addEvent(SimpleEvent(engine, {
                     engine.playState = PlayState.STOPPED
+                    main.preferences.putBoolean(PreferenceKeys.PRACTICE_COMPLETE_PREFIX + PracticeStage.STANDARD.name, true).flush()
                 }).apply {
                     this.bounds.x = origin + 4f
                 })
@@ -286,6 +288,7 @@ class LoadingPracticeScreen(main: BRManiaApp, val practiceStage: PracticeStage) 
                 })
                 addEvent(SimpleEvent(engine, {
                     engine.playState = PlayState.STOPPED
+                    main.preferences.putBoolean(PreferenceKeys.PRACTICE_COMPLETE_PREFIX + PracticeStage.LONG_SHORT_FAST.name, true).flush()
                 }).apply {
                     this.bounds.x = origin + 4f
                 })

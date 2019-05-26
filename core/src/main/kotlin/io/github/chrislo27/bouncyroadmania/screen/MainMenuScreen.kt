@@ -349,10 +349,10 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 }
         )
         menus["practices"] = listOf(
-                MenuItem("mainMenu.practice.standard") {
+                MenuItem((if (!main.preferences.getBoolean(PreferenceKeys.PRACTICE_COMPLETE_PREFIX + PracticeStage.STANDARD.name, false)) "${Localization["mainMenu.practice.new"]} " else "") + Localization["mainMenu.practice.standard"], isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main, PracticeStage.STANDARD), WipeTo(Color.BLACK, 0.35f), null)
                 },
-                MenuItem("mainMenu.practice.longShortFast") {
+                MenuItem((if (!main.preferences.getBoolean(PreferenceKeys.PRACTICE_COMPLETE_PREFIX + PracticeStage.LONG_SHORT_FAST.name, false)) "${Localization["mainMenu.practice.new"]} " else "") + Localization["mainMenu.practice.longShortFast"], isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, LoadingPracticeScreen(main, PracticeStage.LONG_SHORT_FAST), WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("mainMenu.back") {

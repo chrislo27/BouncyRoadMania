@@ -50,7 +50,9 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         val httpClient: AsyncHttpClient = Dsl.asyncHttpClient(DefaultAsyncHttpClientConfig.Builder().setThreadFactory { Thread(it).apply { isDaemon = true } }.setFollowRedirect(true).setCompressionEnforced(true))
 
         private const val RAINBOW_STR = "RAINBOW"
-        private val rainbowColor: Color = Color()
+        private val rainbowColor: Color = Color(1f, 1f, 1f, 1f)
+        private const val LIGHT_RAINBOW_STR = "LIGHT_RAINBOW"
+        private val lightRainbowColor: Color = Color(1f, 1f, 1f, 1f)
 
         init {
             Colors.put("X", Color.CLEAR)
@@ -233,6 +235,8 @@ class BRManiaApp(logger: Logger, logToFile: File?)
         secondsElapsed += Gdx.graphics.deltaTime
         rainbowColor.fromHsv(MathHelper.getSawtoothWave(2f) * 360f, 0.8f, 0.8f)
         Colors.put(RAINBOW_STR, rainbowColor)
+        lightRainbowColor.fromHsv(MathHelper.getSawtoothWave(1.5f) * 360f, 0.3f, 0.75f)
+        Colors.put(LIGHT_RAINBOW_STR, lightRainbowColor)
         super.preRender()
     }
 
