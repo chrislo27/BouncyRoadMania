@@ -204,20 +204,20 @@ class Engine : Clock(), Disposable {
     var xMoreTimes: Int = 0
     var clearText: Float = 0f
 
-    fun addBouncers() {
+    fun addBouncers(numVisibleBouncers: Int = 15) {
         entities.removeAll(bouncers)
         bouncers = listOf()
 
         val radius = 1200f
         val bouncers = mutableListOf<Bouncer>()
-        // midpoint index = 8
-        for (i in -1..15) {
-            val angle = (180.0 * (i / 14.0)) - 90
-            val bouncer: Bouncer = if (i == 13) {
+        val midpoint = numVisibleBouncers / 2 + 1f
+        for (i in -1..numVisibleBouncers) {
+            val angle = (180.0 * (i / (numVisibleBouncers - 1.0))) - 90
+            val bouncer: Bouncer = if (i == numVisibleBouncers - 2) {
                 RedBouncer(this).apply {
                     redBouncer = this
                 }
-            } else if (i == 12) {
+            } else if (i == numVisibleBouncers - 3) {
                 YellowBouncer(this).apply {
                     yellowBouncer = this
                 }
@@ -225,18 +225,18 @@ class Engine : Clock(), Disposable {
                 Bouncer(this)
             }
 
-            if (i !in 0 until 15) {
+            if (i !in 0 until numVisibleBouncers) {
                 bouncer.isSilent = true
-            } else if (i == 14) {
+            } else if (i == numVisibleBouncers - 1) {
                 bouncer.soundHandle = "sfx_cymbal"
             }
 
             val sin = Math.sin(Math.toRadians(angle)).toFloat()
             val z: Float = (-sin + 1) * 0.3f
 
-            bouncer.posY = Interpolation.sineIn.apply(640f, 150f, i / 14f)
+            bouncer.posY = Interpolation.sineIn.apply(640f, 150f, i / (numVisibleBouncers - 1f))
 
-            bouncer.posX = radius * if (i <= 8) Interpolation.sineOut.apply(i / 8f) else Interpolation.sineOut.apply(1f - ((i - 8) / 6f))
+            bouncer.posX = radius * if (i <= midpoint) Interpolation.sineOut.apply(i / midpoint) else Interpolation.sineOut.apply(1f - ((i - midpoint) / (numVisibleBouncers - 1 - midpoint)))
             bouncer.posZ = z
 
             bouncers += bouncer
