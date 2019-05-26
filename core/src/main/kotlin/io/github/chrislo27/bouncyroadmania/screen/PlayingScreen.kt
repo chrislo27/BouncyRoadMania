@@ -25,12 +25,6 @@ import io.github.chrislo27.toolboks.ui.TextLabel
 
 open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRManiaApp, PlayingScreen>(main) {
 
-    companion object {
-        val TRY_AGAIN_COLOUR = "01BDFD"
-        val OK_COLOUR = "00CD00"
-        val SUPERB_COLOUR = "FD0304"
-    }
-
     data class PauseState(val lastPlayState: PlayState)
 
     final override val stage: Stage<PlayingScreen> = Stage(null, main.defaultCamera, 1280f, 720f)
