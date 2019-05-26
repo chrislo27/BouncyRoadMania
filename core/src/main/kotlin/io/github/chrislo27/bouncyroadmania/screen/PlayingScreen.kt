@@ -136,7 +136,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         engine.render(batch)
 
         stage.visible = paused != null
-        if (paused == null) {
+        if (paused == null && main.screen == this) {
             if (!Gdx.input.isCursorCatched) {
                 Gdx.input.isCursorCatched = true
             }
