@@ -659,6 +659,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     val parity = if (i % 2 == 0) 1 else -1
                     val beatParity = if (engine.beat.toInt() % 2 == 0) 1 else -1
                     val offsetY = (parity * beatParity * beatPulse) * 4f
+//                    val offsetY = MathUtils.sinDeg(360f * MathHelper.getSawtoothWave(System.currentTimeMillis() - i * 30L, 0.5f * 60f / engine.tempos.tempoAtSeconds(engine.seconds))) * 1f
                     posX += font.draw(batch, word, posX, baseY + offsetY, 0f, Align.left, false).width
                 }
 
