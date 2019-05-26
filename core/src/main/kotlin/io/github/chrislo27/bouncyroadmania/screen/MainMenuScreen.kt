@@ -644,9 +644,13 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                 val font = main.defaultBorderedFont
                 font.scaleFont(camera)
                 val availableWidth = camera.viewportWidth * 0.9f
-                val width = font.getTextWidth(tip.first, availableWidth, false)
+                val unboundedWidth = font.getTextWidth(tip.first)
+                val width = unboundedWidth.coerceAtMost(availableWidth)
                 var posX = camera.viewportWidth / 2f - width / 2f
                 val baseY = camera.viewportHeight * 0.9f
+                if (unboundedWidth > availableWidth) {
+                    font.data.scaleX *= (width / unboundedWidth)
+                }
                 tip.second.forEachIndexed { i, word ->
                     val beatPulse = Interpolation.smoother.apply(((1f - engine.beat % 1) - 0.6f).coerceIn(0f, 0.4f) / 0.4f)
                     val parity = if (i % 2 == 0) 1 else -1
