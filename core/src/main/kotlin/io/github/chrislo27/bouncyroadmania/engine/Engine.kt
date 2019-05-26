@@ -356,6 +356,14 @@ class Engine : Clock(), Disposable {
             if (event.isUpdateable(beat)) {
                 event.playbackCompletion = PlaybackCompletion.PLAYING
                 event.onStart()
+            } else if (beat >= event.getUpperUpdateableBound()) {
+                if (event.shouldAlwaysBeSimulated) {
+                    event.playbackCompletion = PlaybackCompletion.PLAYING
+                    event.onStart()
+                    event.whilePlaying()
+                }
+                event.onEnd()
+                event.playbackCompletion = PlaybackCompletion.FINISHED
             }
         }
 
