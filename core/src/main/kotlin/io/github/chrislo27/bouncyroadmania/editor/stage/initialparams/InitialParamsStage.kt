@@ -18,7 +18,9 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
     val categoriesStage: Stage<EditorScreen>
     private val categories: List<CategoryStage>
     val coloursStage: ColoursStage
+    val enginePropertiesStage: EnginePropertiesStage
     val resultsStage: ResultsStage
+    val metadataStage: MetadataStage
 
     init {
         categoriesStage = Stage(this, this.camera, this.pixelsWidth, this.pixelsHeight).apply {
@@ -30,12 +32,20 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
             this.location.set(pixelHeight = -32f)
         }
         this.elements += coloursStage
+        enginePropertiesStage = EnginePropertiesStage(this, palette).apply {
+            this.location.set(pixelHeight = -32f)
+        }
+        this.elements += enginePropertiesStage
         resultsStage = ResultsStage(this, palette).apply {
             this.location.set(pixelHeight = -32f)
         }
         this.elements += resultsStage
+        metadataStage = MetadataStage(this, palette).apply {
+            this.location.set(pixelHeight = -32f)
+        }
+        this.elements += metadataStage
 
-        categories = listOf(coloursStage, resultsStage)
+        categories = listOf(coloursStage, enginePropertiesStage, resultsStage, metadataStage)
         val categoryWidth = 1f / categories.size
         categories.forEachIndexed { i, category ->
             categoriesStage.elements += object : Button<EditorScreen>(palette, categoriesStage, categoriesStage) {
@@ -48,7 +58,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
                 this.location.set(screenX = i * categoryWidth, screenWidth = categoryWidth)
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
                     this.textWrapping = false
-//                    this.fontScaleMultiplier = 0.9f
+                    this.fontScaleMultiplier = 0.925f
                     this.isLocalizationKey = true
                     this.text = category.title
                 })

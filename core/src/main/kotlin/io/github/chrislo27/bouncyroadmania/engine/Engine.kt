@@ -48,7 +48,7 @@ class Engine : Clock(), Disposable {
         val MIN_TRACK_COUNT: Int = 4
         val MAX_TRACK_COUNT: Int = 8
         val DEFAULT_TRACK_COUNT: Int = MIN_TRACK_COUNT
-        
+
         val MIN_BOUNCER_COUNT: Int = 5
         val MAX_BOUNCER_COUNT: Int = 15
         val DEFAULT_BOUNCER_COUNT: Int = 15
@@ -220,7 +220,7 @@ class Engine : Clock(), Disposable {
         val radius = 1200f
         val bouncers = mutableListOf<Bouncer>()
         val numVisibleBouncers = this.bouncerCount
-        val midpoint = numVisibleBouncers / 2 + 1f
+        val midpoint = ((numVisibleBouncers / 2f).roundToInt() * 1f).coerceAtMost(numVisibleBouncers - 3f)
         for (i in -1..numVisibleBouncers) {
             val angle = (180.0 * (i / (numVisibleBouncers - 1.0))) - 90
             val bouncer: Bouncer = if (i == numVisibleBouncers - 2) {
