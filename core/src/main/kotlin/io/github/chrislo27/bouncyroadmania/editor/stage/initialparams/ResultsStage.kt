@@ -20,7 +20,7 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
 
     init {
         val labelPalette = palette.copy(ftfont = ipStage.editor.main.defaultBorderedFontFTF)
-        
+
         elements += TextLabel(labelPalette, this, this).apply {
             this.location.set(pixelX = 8f, screenX = 0f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 1, pixelHeight = 40f)
             this.isLocalizationKey = true
@@ -28,7 +28,13 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.textAlign = Align.left
         }
-        titleField = TextField(palette, this, this).apply {
+        titleField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
+            override fun onEnterPressed(): Boolean {
+                hasFocus = false
+                engine.resultsText = engine.resultsText.copy(title = this.text)
+                return true
+            }
+        }.apply {
             this.location.set(pixelX = 8f, screenX = 0f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 2, pixelHeight = 40f)
             this.canPaste = true
             this.canInputNewlines = true
@@ -42,7 +48,13 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.textAlign = Align.left
         }
-        okField = TextField(palette, this, this).apply {
+        okField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
+            override fun onEnterPressed(): Boolean {
+                hasFocus = false
+                engine.resultsText = engine.resultsText.copy(title = this.text)
+                return true
+            }
+        }.apply {
             this.location.set(pixelX = 8f, screenX = 0.5f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 2, pixelHeight = 40f)
             this.canPaste = true
             this.canInputNewlines = true
@@ -57,7 +69,13 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.textAlign = Align.left
         }
-        firstPosField = TextField(palette, this, this).apply {
+        firstPosField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
+            override fun onEnterPressed(): Boolean {
+                hasFocus = false
+                engine.resultsText = engine.resultsText.copy(firstPositive = this.text)
+                return true
+            }
+        }.apply {
             this.location.set(pixelX = 8f, screenX = 0f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 4, pixelHeight = 40f)
             this.canPaste = true
             this.canInputNewlines = true
@@ -71,7 +89,13 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.textAlign = Align.left
         }
-        firstNegField = TextField(palette, this, this).apply {
+        firstNegField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
+            override fun onEnterPressed(): Boolean {
+                hasFocus = false
+                engine.resultsText = engine.resultsText.copy(firstNegative = this.text)
+                return true
+            }
+        }.apply {
             this.location.set(pixelX = 8f, screenX = 0.5f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 4, pixelHeight = 40f)
             this.canPaste = true
             this.canInputNewlines = true
@@ -86,7 +110,13 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.textAlign = Align.left
         }
-        secondPosField = TextField(palette, this, this).apply {
+        secondPosField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
+            override fun onEnterPressed(): Boolean {
+                hasFocus = false
+                engine.resultsText = engine.resultsText.copy(secondPositive = this.text)
+                return true
+            }
+        }.apply {
             this.location.set(pixelX = 8f, screenX = 0f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 6, pixelHeight = 40f)
             this.canPaste = true
             this.canInputNewlines = true
@@ -100,14 +130,20 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textWrapping = false
             this.textAlign = Align.left
         }
-        secondNegField = TextField(palette, this, this).apply {
+        secondNegField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
+            override fun onEnterPressed(): Boolean {
+                hasFocus = false
+                engine.resultsText = engine.resultsText.copy(secondNegative = this.text)
+                return true
+            }
+        }.apply {
             this.location.set(pixelX = 8f, screenX = 0.5f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 6, pixelHeight = 40f)
             this.canPaste = true
             this.canInputNewlines = true
             this.background = true
         }
         elements += secondNegField
-        
+
         elements += TextLabel(palette, this, this).apply {
             this.location.set(pixelX = 8f, screenX = 0.25f, screenWidth = 0.5f, pixelWidth = -16f, screenHeight = 0f, screenY = 0f, pixelY = 40f * 1, pixelHeight = 40f)
             this.isLocalizationKey = true
@@ -124,7 +160,7 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.textAlign = Align.center
             this.background = true
         }
-        
+
         onEngineChange(engine)
     }
 
