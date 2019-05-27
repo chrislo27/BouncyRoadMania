@@ -82,7 +82,7 @@ class InitialParamsStage(val editor: Editor, parent: EditorStage, palette: UIPal
     }
 
     fun onEngineChange(engine: Engine) {
-        coloursStage.onEngineChange(engine)
+        categories.forEach { it.onEngineChange(engine) }
     }
 
 }
