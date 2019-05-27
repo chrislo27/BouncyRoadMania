@@ -79,7 +79,7 @@ class MetadataStage(ipStage: InitialParamsStage, palette: UIPalette)
     fun updateLabels() {
         difficultyDown.enabled = engine.difficulty > Engine.MIN_DIFFICULTY
         difficultyUp.enabled = engine.difficulty < Engine.MAX_DIFFICULTY
-        difficulty.text = "[YELLOW]${"★".repeat(engine.difficulty)}[][GRAY]${"★".repeat(Engine.MAX_DIFFICULTY - engine.difficulty)}[]"
+        difficulty.text = if (engine.difficulty == 0) Localization["initialParams.metadata.difficultyNotSet"] else engine.getDifficultyString()
         version.text = Localization["initialParams.metadata.version", engine.version.toString()]
     }
 
