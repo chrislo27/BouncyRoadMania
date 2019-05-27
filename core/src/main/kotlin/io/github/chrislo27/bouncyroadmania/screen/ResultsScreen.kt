@@ -135,8 +135,16 @@ class ResultsScreen(main: BRManiaApp, val score: Score)
                 timeout = (145f / 60) * (resultsScreen.score.scoreInt / 100f)
             }
 
+            override fun isDone(): Boolean {
+                return super.isDone() || Gdx.input.isKeyJustPressed(Input.Keys.J)
+            }
+
             override fun update() {
                 resultsScreen.currentScoreScroll = MathUtils.lerp(0f, resultsScreen.score.scoreInt * 1f, (progress / timeout).coerceIn(0f, 1f)).toInt()
+            }
+
+            override fun whenDone() {
+                resultsScreen.currentScoreScroll = resultsScreen.score.scoreInt
             }
 
             override fun nextStage(): Stages {
@@ -270,10 +278,14 @@ class ResultsScreen(main: BRManiaApp, val score: Score)
             scoreFont.scaleMul(1f / 0.75f)
             scoreFont.unscaleFont()
             
-            if (currentScoreScroll == score.scoreInt && score.skillStar) {
-                font.color = Color.YELLOW
-                font.draw(batch, "★", camera.viewportWidth / 2f - width, 260f, 0f, Align.right, false)
+            if (currentScoreScroll == score.scoreInt) {
+                var bonus = ""
+                if (score.noMiss)
+                    bonus += Localization["results.noMiss"]
+                if (score.skillStar)
+                    bonus += " [YELLOW]★[]"
                 font.setColor(1f, 1f, 1f, 1f)
+                font.draw(batch, bonus, camera.viewportWidth / 2f - width, 260f, 0f, Align.right, false)
             }
         }
         

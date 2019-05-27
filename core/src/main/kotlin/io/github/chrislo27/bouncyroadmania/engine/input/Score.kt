@@ -3,7 +3,7 @@ package io.github.chrislo27.bouncyroadmania.engine.input
 import com.badlogic.gdx.graphics.Color
 
 
-data class Score(val scoreInt: Int, val scoreRaw: Float, val skillStar: Boolean,
+data class Score(val scoreInt: Int, val scoreRaw: Float, val skillStar: Boolean, val noMiss: Boolean,
                  val title: String, val line1: String, val line2: String = "",
                  val ranking: Ranking = Ranking.getRanking(scoreInt)) {
     val butStillJustOk: Boolean = ranking == Ranking.OK && scoreInt >= 75

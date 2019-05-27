@@ -316,7 +316,7 @@ class Engine : Clock(), Disposable {
             in 85..100 -> resultsText.secondPositive
             else -> "<score was not in range from 0..100>"
         }
-        return Score(scoreInt, scoreRaw, gotSkillStar, resultsText.title, line)
+        return Score(scoreInt, scoreRaw, gotSkillStar, inputResults.size == expectedNumInputs, resultsText.title, line)
     }
 
     private fun setMusicVolume() {

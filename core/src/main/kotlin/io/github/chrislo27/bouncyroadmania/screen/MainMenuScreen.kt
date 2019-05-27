@@ -408,32 +408,32 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         menus["test_results"] = listOf(
                 MenuItem("Score: 20", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
-                            Score(20, 20f, false, Localization["results.default.title"], Localization["results.default.second.negative"], "line2\nsecond line2")),
+                            Score(20, 20f, false, false, Localization["results.default.title"], Localization["results.default.second.negative"], "line2\nsecond line2")),
                             WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("Score: 55", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
-                            Score(55, 55f, false, Localization["results.default.title"], Localization["results.default.first.negative"], "line2\nsecond line2")),
+                            Score(55, 55f, false, false, Localization["results.default.title"], Localization["results.default.first.negative"], "line2\nsecond line2")),
                             WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("Score: 65", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
-                            Score(65, 65f, false, Localization["results.default.title"], Localization["results.default.ok"], "line2\nsecond line2")),
+                            Score(65, 65f, false, false, Localization["results.default.title"], Localization["results.default.ok"], "line2\nsecond line2")),
                             WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("Score: 75", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
-                            Score(75, 75f, false, Localization["results.default.title"], Localization["results.default.first.positive"], "line2\nsecond line2")),
+                            Score(75, 75f, false, false, Localization["results.default.title"], Localization["results.default.first.positive"], "line2\nsecond line2")),
                             WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("Score: 80", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
-                            Score(80, 80f, false, Localization["results.default.title"], Localization["results.default.first.positive"], "line2\nsecond line2")),
+                            Score(80, 80f, false, false, Localization["results.default.title"], Localization["results.default.first.positive"], "line2\nsecond line2")),
                             WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("Score: 100", isLocalizationKey = false) {
                     main.screen = TransitionScreen(main, main.screen, ResultsScreen(main,
-                            Score(100, 100f, false, Localization["results.default.title"], Localization["results.default.second.positive"], "line2\nsecond line2")),
+                            Score(100, 100f, false, true, Localization["results.default.title"], Localization["results.default.second.positive"], "line2\nsecond line2")),
                             WipeTo(Color.BLACK, 0.35f), null)
                 },
                 MenuItem("mainMenu.back") {
