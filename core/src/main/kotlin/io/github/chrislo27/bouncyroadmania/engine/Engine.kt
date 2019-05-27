@@ -55,7 +55,7 @@ class Engine : Clock(), Disposable {
         
         val MIN_DIFFICULTY: Int = 1
         val MAX_DIFFICULTY: Int = 5
-        val DEFAULT_DIFFICULTY: Int = 1
+        val DEFAULT_DIFFICULTY: Int = 0
 
         val DEFAULT_GRADIENT: Color = Color.valueOf("0296FFFF")
         val DEFAULT_NORMAL_BOUNCER: Color = Color.valueOf("08BDFFFF")
