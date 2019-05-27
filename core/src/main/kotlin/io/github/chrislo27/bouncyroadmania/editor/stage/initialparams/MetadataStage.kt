@@ -35,6 +35,8 @@ class MetadataStage(ipStage: InitialParamsStage, palette: UIPalette)
             this.text = "initialParams.metadata.recommendedDifficulty"
             this.textWrapping = false
             this.textAlign = Align.left
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "initialParams.metadata.recommendedDifficulty.tooltip"
         }
         difficultyDown = Button(palette, this, this).apply {
             this.location.set(pixelX = 8f, screenX = 0f, screenWidth = 0f, pixelWidth = 40f, screenHeight = 0f, screenY = 1f, pixelY = -40f * 2, pixelHeight = 40f)
