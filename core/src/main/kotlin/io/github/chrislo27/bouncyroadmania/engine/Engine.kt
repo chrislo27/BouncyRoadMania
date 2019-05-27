@@ -52,6 +52,10 @@ class Engine : Clock(), Disposable {
         val MIN_BOUNCER_COUNT: Int = 5
         val MAX_BOUNCER_COUNT: Int = 15
         val DEFAULT_BOUNCER_COUNT: Int = 15
+        
+        val MIN_DIFFICULTY: Int = 1
+        val MAX_DIFFICULTY: Int = 5
+        val DEFAULT_DIFFICULTY: Int = 1
 
         val DEFAULT_GRADIENT: Color = Color.valueOf("0296FFFF")
         val DEFAULT_NORMAL_BOUNCER: Color = Color.valueOf("08BDFFFF")
@@ -152,6 +156,10 @@ class Engine : Clock(), Disposable {
         set(value) {
             field = if (value < 0) DEFAULT_BOUNCER_COUNT else value.coerceAtLeast(MIN_BOUNCER_COUNT)
             addBouncers()
+        }
+    var difficulty: Int = DEFAULT_DIFFICULTY
+        set(value) {
+            field = value.coerceIn(0, MAX_DIFFICULTY)
         }
     var duration: Float = Float.POSITIVE_INFINITY
         private set
@@ -318,6 +326,8 @@ class Engine : Clock(), Disposable {
         }
         return Score(scoreInt, scoreRaw, gotSkillStar, inputResults.size == expectedNumInputs, resultsText.title, line)
     }
+    
+    fun getDifficultyString(): String = if (difficulty == 0) "" else "[YELLOW]${"★".repeat(difficulty)}[][GRAY]${"★".repeat(Engine.MAX_DIFFICULTY - difficulty)}[]"
 
     private fun setMusicVolume() {
         val music = music ?: return

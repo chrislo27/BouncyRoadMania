@@ -276,7 +276,7 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
                     } else {
                         Gdx.app.postRunnable {
                             loadState = LoadState.Loaded(newEngine)
-                            label.text = Localization["gameSelect.readyToPlay", file.name]
+                            label.text = Localization["gameSelect.readyToPlay", file.name, newEngine.getDifficultyString()]
                             playButton.visible = true
                             openDiffButton.visible = true
                             openButton.visible = false

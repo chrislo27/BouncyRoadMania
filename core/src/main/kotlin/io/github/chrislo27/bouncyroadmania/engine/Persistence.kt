@@ -34,6 +34,7 @@ fun Engine.toEngineJson(isAutosave: Boolean): ObjectNode {
     root.put("musicStartSec", musicStartSec)
     root.put("trackCount", trackCount)
     root.put("isAutosave", isAutosave)
+    root.put("difficulty", difficulty)
 
     root.put("gradientFirst", gradientStart.initial.toJsonString())
     root.put("gradientLast", gradientEnd.initial.toJsonString())
@@ -114,6 +115,7 @@ fun Engine.fromEngineJson(root: ObjectNode) {
     playbackStart = root["playbackStart"].floatValue()
     musicStartSec = root["musicStartSec"].floatValue()
     trackCount = root["trackCount"].intValue()
+    difficulty = root["difficulty"]?.asInt(0) ?: 0
 
     gradientStart.initial.fromJsonString(root["gradientFirst"]?.asText())
     gradientEnd.initial.fromJsonString(root["gradientLast"]?.asText())
