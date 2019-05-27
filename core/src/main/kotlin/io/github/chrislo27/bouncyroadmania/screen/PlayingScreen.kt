@@ -44,7 +44,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.background = true
         }
         stage.elements += ColourPane(stage, stage).apply {
-            this.colour.set(0f, 0f, 0f, 0.75f)
+            this.colour.set(1f, 1f, 1f, 0.5f)
         }
         stage.elements += TextLabel(palette.copy(ftfont = main.kurokaneBorderedFontFTF), stage, stage).apply {
             this.textAlign = Align.center
