@@ -107,11 +107,13 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
 
         AssetRegistry.loadAsset<Music>("music_main_menu", "music/Balloon_Game_short.ogg")
         AssetRegistry.loadAsset<Music>("music_play_screen", "music/Faster_Does_It.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_main_menu_intro", "music/main_menu_intro.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
         assets["cursor_horizontal_resize"] =
                 Gdx.graphics.newCursor(Pixmap(Gdx.files.internal("images/cursor/horizontal_resize.png")), 16, 8)
+//        assets["sfx_main_menu_intro"] = Gdx.audio.newSound(Gdx.files.internal("music/main_menu_intro.ogg"))
     }
 
 }

@@ -198,6 +198,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     val titleWiggle: FloatArray = FloatArray(3) { 0f }
     val menuPadding = 64f
+    val titleXStart = menuPadding / 2f
     val menuTop = 420f
     val menuWidth = camera.viewportWidth / 2f - menuPadding
     val menus: MutableMap<String, List<MenuItem>> = mutableMapOf()
@@ -609,7 +610,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             val titleFont = main.cometBorderedFont
             titleFont.scaleFont(camera)
             titleFont.scaleMul(0.6f)
-            var titleX = menuPadding / 2f
+            var titleX = titleXStart
             TITLE.forEachIndexed { i, s ->
                 titleX += titleFont.draw(batch, s, titleX, menuTop + titleFont.lineHeight + titleFont.capHeight * titleWiggle[i]).width
             }

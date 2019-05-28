@@ -18,7 +18,6 @@ import io.github.chrislo27.bouncyroadmania.editor.EditorTheme
 import io.github.chrislo27.bouncyroadmania.engine.entity.BouncerShaders
 import io.github.chrislo27.bouncyroadmania.init.InitialAssetLoader
 import io.github.chrislo27.bouncyroadmania.screen.AssetRegistryLoadingScreen
-import io.github.chrislo27.bouncyroadmania.screen.MainMenuScreen
 import io.github.chrislo27.bouncyroadmania.util.JsonHandler
 import io.github.chrislo27.bouncyroadmania.util.ReleaseObject
 import io.github.chrislo27.toolboks.ResizeAction
@@ -196,9 +195,9 @@ class BRManiaApp(logger: Logger, logToFile: File?)
             fun addOtherScreens() {
 
             }
-            this.screen = AssetRegistryLoadingScreen(this).setNextScreen {
+            this.screen = AssetRegistryLoadingScreen(this).onFinishLoading {
                 addOtherScreens()
-                MainMenuScreen(this)
+//                MainMenuScreen(this)
             }
         }
 
