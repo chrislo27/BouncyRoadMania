@@ -197,6 +197,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var lastGhVersion: Version = Version.UNKNOWN
 
     val titleWiggle: FloatArray = FloatArray(3) { 0f }
+    var hideTitle: Boolean = false
     val menuPadding = 64f
     val titleXStart = menuPadding / 2f
     val menuTop = 420f
@@ -607,14 +608,16 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             batch.projectionMatrix = camera.combined
             batch.begin()
 
-            val titleFont = main.cometBorderedFont
-            titleFont.scaleFont(camera)
-            titleFont.scaleMul(0.6f)
-            var titleX = titleXStart
-            TITLE.forEachIndexed { i, s ->
-                titleX += titleFont.draw(batch, s, titleX, menuTop + titleFont.lineHeight + titleFont.capHeight * titleWiggle[i]).width
+            if (!hideTitle) {
+                val titleFont = main.cometBorderedFont
+                titleFont.scaleFont(camera)
+                titleFont.scaleMul(0.6f)
+                var titleX = titleXStart
+                TITLE.forEachIndexed { i, s ->
+                    titleX += titleFont.draw(batch, s, titleX, menuTop + titleFont.lineHeight + titleFont.capHeight * titleWiggle[i]).width
+                }
+                titleFont.unscaleFont()
             }
-            titleFont.unscaleFont()
 
             val menuIndex = getMenuIndex()
             val currentMenu = currentMenu
@@ -755,6 +758,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     override fun show() {
         super.show()
         DiscordHelper.updatePresence(PresenceState.MainMenu)
+        hideTitle = false
     }
 
     override fun hide() {

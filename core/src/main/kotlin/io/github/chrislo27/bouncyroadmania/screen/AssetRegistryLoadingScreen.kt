@@ -41,8 +41,8 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
 
     private lateinit var mainMenuScreen: MainMenuScreen
     private lateinit var transitionScreen: TransitionScreen<BRManiaApp>
-    private var lastTitleX: Float = 0f
-    private var lastTitleY: Float = 0f
+    private var lastTitleX: Float = -1f
+    private var lastTitleY: Float = -1f
 
     override fun render(delta: Float) {
         super.render(delta)
@@ -70,14 +70,20 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
                 line)
 
         // title
-        val titleFont = main.cometBorderedFont
-        titleFont.scaleFont(camera)
-        titleFont.scaleMul(0.6f)
-        val textW = titleFont.getTextWidth(BRMania.TITLE)
-        lastTitleX = camera.viewportWidth / 2f - textW / 2
-        lastTitleY = camera.viewportHeight / 2f + titleFont.capHeight / 2f
-        titleFont.draw(batch, BRMania.TITLE, lastTitleX, lastTitleY)
-        titleFont.unscaleFont()
+        if (main.screen === this) {
+            val titleFont = main.cometBorderedFont
+            titleFont.scaleFont(camera)
+            titleFont.scaleMul(0.6f)
+            val textW = titleFont.getTextWidth(BRMania.TITLE)
+            if (lastTitleX == -1f) {
+                lastTitleX = camera.viewportWidth / 2f - textW / 2
+            }
+            if (lastTitleY == -1f) {
+                lastTitleY = camera.viewportHeight / 2f + titleFont.capHeight / 2f
+            }
+            titleFont.draw(batch, BRMania.TITLE, lastTitleX, lastTitleY)
+            titleFont.unscaleFont()
+        }
 
         batch.end()
         batch.projectionMatrix = main.defaultCamera.combined
@@ -93,43 +99,25 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
                 AssetRegistry.get<Sound>("sfx_main_menu_intro").play(if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) 0f else 1f)
                 mainMenuScreen = MainMenuScreen(main).apply {
                     this.music.stop()
+                    this.hideTitle = true
                 }
-                transitionScreen = TransitionScreen(main, this, mainMenuScreen,
-                        object : WipeTo(Color.BLACK, 0.25f) {
-                            override fun render(transitionScreen: TransitionScreen<*>, screenRender: () -> Unit) {
-                                super.render(transitionScreen, screenRender)
-                                val batch = main.batch
-                                batch.projectionMatrix = camera.combined
-                                batch.begin()
-                                val titleFont = main.cometBorderedFont
-                                titleFont.scaleFont(camera)
-                                titleFont.scaleMul(0.6f)
-                                val titleX = Interpolation.smooth.apply(lastTitleX, mainMenuScreen.titleXStart, transitionScreen.percentageCurrent * 0.5f)
-                                val titleY = Interpolation.smooth.apply(lastTitleY, mainMenuScreen.menuTop + titleFont.lineHeight, transitionScreen.percentageCurrent * 0.5f)
-                                titleFont.draw(batch, BRMania.TITLE, titleX, titleY)
-                                titleFont.unscaleFont()
-                                batch.end()
-                                batch.projectionMatrix = main.defaultCamera.combined
-                            }
-                        },
-                        object : WipeFrom(Color.BLACK, 0.25f) {
-                            override fun render(transitionScreen: TransitionScreen<*>, screenRender: () -> Unit) {
-                                super.render(transitionScreen, screenRender)
-                                val batch = main.batch
-                                batch.projectionMatrix = camera.combined
-                                batch.begin()
-                                val titleFont = main.cometBorderedFont
-                                titleFont.scaleFont(camera)
-                                titleFont.scaleMul(0.6f)
-                                val titleX = Interpolation.smooth.apply(lastTitleX, mainMenuScreen.titleXStart, transitionScreen.percentageCurrent * 0.5f + 0.5f)
-                                val titleY = Interpolation.smooth.apply(lastTitleY, mainMenuScreen.menuTop + titleFont.lineHeight, transitionScreen.percentageCurrent * 0.5f + 0.5f)
-                                titleFont.draw(batch, BRMania.TITLE, titleX, titleY)
-                                titleFont.unscaleFont()
-                                batch.end()
-                                batch.projectionMatrix = main.defaultCamera.combined
-                            }
-                        }
-                )
+                transitionScreen = object : TransitionScreen<BRManiaApp>(main, this@AssetRegistryLoadingScreen, mainMenuScreen, WipeTo(Color.BLACK, 0.25f), WipeFrom(Color.BLACK, 0.25f)) {
+                    override fun render(delta: Float) {
+                        super.render(delta)
+                        val batch = main.batch
+                        batch.projectionMatrix = camera.combined
+                        batch.begin()
+                        val titleFont = main.cometBorderedFont
+                        titleFont.scaleFont(camera)
+                        titleFont.scaleMul(0.6f)
+                        val titleX = Interpolation.smooth.apply(lastTitleX, mainMenuScreen.titleXStart, percentageTotal)
+                        val titleY = Interpolation.smooth.apply(lastTitleY, mainMenuScreen.menuTop + titleFont.lineHeight, percentageTotal)
+                        titleFont.draw(batch, BRMania.TITLE, titleX, titleY)
+                        titleFont.unscaleFont()
+                        batch.end()
+                        batch.projectionMatrix = main.defaultCamera.combined
+                    }
+                }
             } else {
                 transition += Gdx.graphics.deltaTime
                 if (transition >= INTRO_LENGTH) {
