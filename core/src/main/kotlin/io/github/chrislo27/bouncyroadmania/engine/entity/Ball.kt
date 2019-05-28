@@ -14,7 +14,8 @@ import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 
 
-class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firstHasSound: Boolean = false, val color: Color = Color(1f, 1f, 1f, 1f), val semitoneOffset: Int = 0)
+class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float,
+           val firstHasSound: Boolean = false, val color: Color = Color(1f, 1f, 1f, 1f), val semitoneOffset: Int = 0, val cancelCymbal: Boolean = false)
     : Entity(engine) {
 
     data class Bounce(val fromX: Float, val fromY: Float, val fromZ: Float, val toX: Float, val toY: Float, val toZ: Float, val arcHeight: Float,
@@ -142,10 +143,12 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float, val firs
                             }
                         } else if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
                                         ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
-                            if (!newFrom.isSilent) {
-                                engine.lastBounceTinkSound[newFrom.soundHandle] = engine.seconds
+                            if (newFrom.soundHandle != "sfx_cymbal" || !cancelCymbal) {
+                                if (!newFrom.isSilent) {
+                                    engine.lastBounceTinkSound[newFrom.soundHandle] = engine.seconds
+                                }
+                                newFrom.playSound(semitoneAdd = semitoneOffset)
                             }
-                            newFrom.playSound(semitoneAdd = semitoneOffset)
                         }
                         newFrom.bounceAnimation()
                     } else {

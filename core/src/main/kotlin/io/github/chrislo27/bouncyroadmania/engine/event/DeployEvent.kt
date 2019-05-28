@@ -13,6 +13,7 @@ import io.github.chrislo27.bouncyroadmania.engine.entity.Ball
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
+import io.github.chrislo27.bouncyroadmania.util.FalseCheckbox
 import io.github.chrislo27.bouncyroadmania.util.TrueCheckbox
 import io.github.chrislo27.bouncyroadmania.util.fromJsonString
 import io.github.chrislo27.bouncyroadmania.util.toJsonString
@@ -35,6 +36,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
     override val hasEditableParams: Boolean = true
     override val shouldAlwaysBeSimulated: Boolean = true
     var firstBounceHasSound: Boolean = false
+    var cancelCymbal: Boolean = false
     val color: Color = Color(1f, 1f, 1f, 1f)
     var semitoneOffset: Int by Delegates.observable(0) { _, _, _ ->
         onParamsChange()
@@ -90,7 +92,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
     }
 
     override fun onStart() {
-        engine.entities += Ball(engine, this.bounds.width, this.bounds.x, firstBounceHasSound, Color(color), semitoneOffset).apply {
+        engine.entities += Ball(engine, this.bounds.width, this.bounds.x, firstBounceHasSound, Color(color), semitoneOffset, cancelCymbal).apply {
             startOff()
         }
     }
@@ -100,6 +102,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         firstBounceHasSound = node["firstBounceHasSound"]?.asBoolean(false) ?: false
         color.fromJsonString(node["color"]?.asText())
         semitoneOffset = node["semitone"]?.asInt(0) ?: 0
+        cancelCymbal = node["cancelCymbal"]?.asBoolean(false) ?: false
         onParamsChange()
     }
 
@@ -114,6 +117,9 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
         if (semitoneOffset != 0) {
             node.put("semitone", semitoneOffset)
         }
+        if (cancelCymbal) {
+            node.put("cancelCymbal", cancelCymbal)
+        }
     }
 
     override fun copy(): DeployEvent {
@@ -123,13 +129,13 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
             it.firstBounceHasSound = this.firstBounceHasSound
             it.color.set(this.color)
             it.semitoneOffset = this.semitoneOffset
+            it.cancelCymbal = this.cancelCymbal
         }
     }
 
     inner class DeployEventParamsStage(parent: EditorStage) : EventParamsStage<DeployEvent>(parent, this@DeployEvent) {
         init {
             val size = 48f
-            val padding = 16f
             contentStage.elements += object : TrueCheckbox<EditorScreen>(palette, contentStage, contentStage) {
                 private val thisCheckbox: TrueCheckbox<EditorScreen> = this
                 override fun onLeftClick(xPercent: Float, yPercent: Float) {
@@ -156,16 +162,44 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                 this.textLabel.text = "deployEvent.firstBounceHasSound"
                 this.tooltipTextIsLocalizationKey = true
                 this.tooltipText = "deployEvent.firstBounceHasSound.tooltip"
-                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size))
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size - 8f, pixelY = -(size) + 4f)
+            }
+            contentStage.elements += object : FalseCheckbox<EditorScreen>(palette, contentStage, contentStage) {
+                private val thisCheckbox: FalseCheckbox<EditorScreen> = this
+                override fun onLeftClick(xPercent: Float, yPercent: Float) {
+                    super.onLeftClick(xPercent, yPercent)
+                    parent.editor.mutate(object : ReversibleAction<Editor> {
+                        val checkbox: WeakReference<FalseCheckbox<EditorScreen>> = WeakReference(thisCheckbox)
+                        val value = checked
+                        override fun redo(context: Editor) {
+                            event.cancelCymbal = value
+                            checkbox.get()?.checked = value
+                            onParamsChange()
+                        }
+
+                        override fun undo(context: Editor) {
+                            event.cancelCymbal = !value
+                            checkbox.get()?.checked = !value
+                            onParamsChange()
+                        }
+                    })
+                }
+            }.apply {
+                this.checked = event.cancelCymbal
+                this.textLabel.isLocalizationKey = true
+                this.textLabel.text = "deployEvent.cancelCymbal"
+                this.tooltipTextIsLocalizationKey = true
+                this.tooltipText = "deployEvent.cancelCymbal.tooltip"
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size - 8f, pixelY = -(size * 2f) + 4f)
             }
             contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
                 this.isLocalizationKey = true
                 this.text = "deployEvent.ballColour"
-                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 2))
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size, pixelY = -(size * 3))
             }
             contentStage.elements += ColourPicker(palette, contentStage, contentStage, true).apply {
                 this.setColor(color)
-                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size * 4, pixelY = -(size * 6))
+                this.location.set(screenY = 1f, screenHeight = 0f, pixelHeight = size * 4, pixelY = -(size * 7))
                 this.onColourChange = { c ->
                     color.set(c)
                     onParamsChange()
@@ -175,7 +209,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
             contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
                 this.isLocalizationKey = true
                 this.text = "deployEvent.semitone"
-                this.location.set(screenY = 1f, screenHeight = 0f, screenWidth = 0.5f, pixelHeight = size, pixelY = -(size * 7))
+                this.location.set(screenY = 1f, screenHeight = 0f, screenWidth = 0.5f, pixelHeight = size, pixelY = -(size * 8))
             }
             contentStage.elements += object : TextLabel<EditorScreen>(palette, contentStage, contentStage) {
                 override fun getRealText(): String {
@@ -184,7 +218,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
             }.apply {
                 this.background = true
                 this.isLocalizationKey = false
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.7f, screenWidth = 0.1f, pixelHeight = size, pixelY = -(size * 7f))
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.7f, screenWidth = 0.1f, pixelHeight = size, pixelY = -(size * 8f))
             }
             val buttonPalette = palette.copy(fontScale = 0.85f)
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
@@ -196,7 +230,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset -= 5
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.5f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.5f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 8f) + size * 0.125f)
             }
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -207,7 +241,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset -= 1
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.6f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.6f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 8f) + size * 0.125f)
             }
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -218,7 +252,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset += 1
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.8f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.8f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 8f) + size * 0.125f)
             }
             contentStage.elements += Button(buttonPalette, contentStage, contentStage).apply {
                 this.addLabel(TextLabel(palette, this, this.stage).apply {
@@ -229,7 +263,7 @@ class DeployEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEven
                     this@DeployEvent.semitoneOffset += 5
                     this@DeployEvent.semitoneOffset = this@DeployEvent.semitoneOffset.coerceIn(SEMITONE_RANGE)
                 }
-                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.9f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 7f) + size * 0.125f)
+                this.location.set(screenY = 1f, screenHeight = 0f, screenX = 0.9f + 0.025f / 2, screenWidth = 0.075f, pixelHeight = size * 0.75f, pixelY = -(size * 8f) + size * 0.125f)
             }
         }
     }
