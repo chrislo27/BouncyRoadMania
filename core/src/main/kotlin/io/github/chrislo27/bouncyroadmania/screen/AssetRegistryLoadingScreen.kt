@@ -51,14 +51,13 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
         val cam = camera
         val batch = main.batch
         batch.projectionMatrix = cam.combined
-
-        batch.setColor(1f, 1f, 1f, 1f)
-
         val width = cam.viewportWidth * 0.75f
         val height = cam.viewportHeight * 0.05f
         val line = height / 8f
 
         batch.begin()
+
+        batch.setColor(1f, 1f, 1f, if (!finishedLoading) 1f else (1f - (transition / 0.25f).coerceIn(0f, 1f)))
 
         val progress = lastProgress
         batch.fillRect(cam.viewportWidth * 0.5f - width * 0.5f,
@@ -68,6 +67,8 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
                 cam.viewportHeight * 0.3f - (height) * 0.5f - line * 2,
                 width + (line * 4), height + (line * 4),
                 line)
+
+        batch.setColor(1f, 1f, 1f, 1f)
 
         // title
         if (main.screen === this) {
