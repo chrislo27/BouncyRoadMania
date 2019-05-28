@@ -51,7 +51,7 @@ class ResultsStage(ipStage: InitialParamsStage, palette: UIPalette)
         okField = object : TextField<EditorScreen>(palette, this@ResultsStage, this@ResultsStage) {
             override fun onEnterPressed(): Boolean {
                 hasFocus = false
-                engine.resultsText = engine.resultsText.copy(title = this.text)
+                engine.resultsText = engine.resultsText.copy(ok = this.text)
                 return true
             }
         }.apply {
