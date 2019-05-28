@@ -43,6 +43,13 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
     private lateinit var transitionScreen: TransitionScreen<BRManiaApp>
     private var lastTitleX: Float = -1f
     private var lastTitleY: Float = -1f
+    private val titleWiggle: FloatArray = FloatArray(3) { 0f }
+
+    init {
+        titleWiggle[0] = 1f + 0.297f * 8f
+        titleWiggle[1] = 1f + 0.569f * 8f
+        titleWiggle[2] = 1f + 0.687f * 8f
+    }
 
     override fun render(delta: Float) {
         super.render(delta)
@@ -82,7 +89,11 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
             if (lastTitleY == -1f) {
                 lastTitleY = camera.viewportHeight / 2f + titleFont.capHeight / 2f
             }
-            titleFont.draw(batch, BRMania.TITLE, lastTitleX, lastTitleY)
+            var titleX = lastTitleX
+            MainMenuScreen.TITLE.forEachIndexed { i, s ->
+                val titleY = lastTitleY + titleFont.capHeight * if (titleWiggle[i] > 1) 0f else titleWiggle[i]
+                titleX += titleFont.draw(batch, s, titleX, titleY).width
+            }
             titleFont.unscaleFont()
         }
 
@@ -105,6 +116,7 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
                 transitionScreen = object : TransitionScreen<BRManiaApp>(main, this@AssetRegistryLoadingScreen, mainMenuScreen, WipeTo(Color.BLACK, 0.25f), WipeFrom(Color.BLACK, 0.25f)) {
                     override fun render(delta: Float) {
                         super.render(delta)
+
                         val batch = main.batch
                         batch.projectionMatrix = camera.combined
                         batch.begin()
@@ -121,6 +133,15 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
                 }
             } else {
                 transition += Gdx.graphics.deltaTime
+                for (i in 0 until titleWiggle.size) {
+                    if (titleWiggle[i] != 0f) {
+                        val sign = Math.signum(titleWiggle[i])
+                        titleWiggle[i] -= sign * Gdx.graphics.deltaTime * 8f
+                        if (Math.signum(titleWiggle[i]) != sign && titleWiggle[i] != 0f) {
+                            titleWiggle[i] = 0f
+                        }
+                    }
+                }
                 if (transition >= INTRO_LENGTH) {
                     mainMenuScreen.music.play()
                     main.screen = transitionScreen
