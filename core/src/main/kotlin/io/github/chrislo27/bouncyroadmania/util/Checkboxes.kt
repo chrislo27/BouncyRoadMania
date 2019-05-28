@@ -21,7 +21,7 @@ open class TrueCheckbox<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UI
 open class FalseCheckbox<S : ToolboksScreen<*, *>>(palette: UIPalette, parent: UIElement<S>, stage: Stage<S>)
     : Checkbox<S>(palette, parent, stage) {
 
-    override val uncheckedTex: TextureRegion? = TextureRegion(AssetRegistry.get<Texture>("ui_checkbox_unchcked"))
+    override val uncheckedTex: TextureRegion? = TextureRegion(AssetRegistry.get<Texture>("ui_checkbox_unchecked"))
     override val checkedTex: TextureRegion? = TextureRegion(AssetRegistry.get<Texture>("ui_checkbox_x"))
 
 }
