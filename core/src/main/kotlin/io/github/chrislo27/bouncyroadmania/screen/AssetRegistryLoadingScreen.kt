@@ -57,7 +57,7 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
 
         batch.begin()
 
-        batch.setColor(1f, 1f, 1f, if (!finishedLoading) 1f else (1f - (transition / 0.25f).coerceIn(0f, 1f)))
+        batch.setColor(1f, 1f, 1f, 1f)
 
         val progress = lastProgress
         batch.fillRect(cam.viewportWidth * 0.5f - width * 0.5f,
