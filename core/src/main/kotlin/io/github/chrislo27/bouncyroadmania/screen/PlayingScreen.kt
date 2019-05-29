@@ -115,7 +115,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
                 this.textWrapping = false
-                this.text = "playing.robot.off"
+                this.text = "playing.robot.${if (!engine.requiresPlayerInput) "on" else "off"}"
             })
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "playing.robot.tooltip"
@@ -142,7 +142,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     }
 
     init {
-        reset()
+        reset(robotMode = !engine.requiresPlayerInput)
     }
 
     override fun render(delta: Float) {

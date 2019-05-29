@@ -74,6 +74,7 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
     val playButton: Button<GameSelectScreen>
     val openButton: Button<GameSelectScreen>
     val openDiffButton: Button<GameSelectScreen>
+    val robotModeCheckbox: Checkbox<GameSelectScreen>
     @Volatile
     private var loadState: LoadState = LoadState.None
         set(value) {
@@ -83,6 +84,7 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
             playButton.visible = false
             openButton.visible = value !is LoadState.IsWorking
             openDiffButton.visible = false
+            robotModeCheckbox.visible = false
         }
 
     init {
@@ -205,6 +207,21 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
             this.visible = false
         }
         stage.elements += openDiffButton
+        robotModeCheckbox = TrueCheckbox(palette, stage, stage).apply {
+            this.textLabel.apply {
+                this.isLocalizationKey = true
+                this.text = "gameSelect.robotMode"
+                this.textWrapping = false
+            }
+            this.location.set(screenX = 0.725f, screenWidth = 0.25f, screenY = 0.1f, screenHeight = 0.1f)
+            this.visible = false
+            this.checked = false
+            this.checkedStateChanged = { value ->
+                AssetRegistry.get<Sound>("sfx_robot_${if (value) "on" else "off"}").play()
+                (loadState as? LoadState.Loaded)?.engine?.requiresPlayerInput = !value
+            }
+        }
+        stage.elements += robotModeCheckbox
 
         backButton = Button(palette, stage, stage).apply {
             this.location.set(screenY = 1f, screenWidth = 0f, screenHeight = 0f, pixelWidth = 32f, pixelHeight = 32f, pixelY = -32f)
@@ -280,6 +297,7 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
                             playButton.visible = true
                             openDiffButton.visible = true
                             openButton.visible = false
+                            robotModeCheckbox.visible = true
                         }
                     }
                 } catch (e: Exception) {
