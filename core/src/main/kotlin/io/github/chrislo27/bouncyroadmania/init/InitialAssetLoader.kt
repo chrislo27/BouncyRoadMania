@@ -113,6 +113,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
         assets["cursor_horizontal_resize"] =
                 Gdx.graphics.newCursor(Pixmap(Gdx.files.internal("images/cursor/horizontal_resize.png")), 16, 8)
+        assets["cursor_invisible"] =
+                Gdx.graphics.newCursor(Pixmap(Gdx.files.internal("images/cursor/invisible.png")), 1, 1)
 //        assets["sfx_main_menu_intro"] = Gdx.audio.newSound(Gdx.files.internal("music/main_menu_intro.ogg"))
     }
 

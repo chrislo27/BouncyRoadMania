@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
@@ -37,6 +38,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
 
     protected var robotEnabled: Boolean = false
     protected var paused: PauseState? = null
+    
+    private var isCursorInvisible = false
 
     init {
         val palette = main.uiPalette
@@ -148,15 +151,6 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         engine.render(batch)
 
         stage.visible = paused != null
-        if (paused == null && main.screen == this) {
-            if (!Gdx.input.isCursorCatched) {
-                Gdx.input.isCursorCatched = true
-            }
-        } else {
-            if (Gdx.input.isCursorCatched) {
-                Gdx.input.isCursorCatched = false
-            }
-        }
         super.render(delta)
     }
 
@@ -224,6 +218,18 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 onEnd()
             }
         }
+        
+        if (paused == null) {
+            if (!isCursorInvisible) {
+                isCursorInvisible = true
+                Gdx.graphics.setCursor(AssetRegistry["cursor_invisible"])
+            }
+        } else {
+            if (isCursorInvisible) {
+                isCursorInvisible = false
+                Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
+            }
+        }
     }
 
     override fun keyUp(keycode: Int): Boolean {
@@ -280,7 +286,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
     override fun hide() {
         super.hide()
         engine.dispose()
-        Gdx.input.isCursorCatched = false
+        isCursorInvisible = false
+        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
     }
 
     override fun getDebugString(): String? {
