@@ -15,12 +15,14 @@ import io.github.chrislo27.bouncyroadmania.util.transition.FadeOut
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
+import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.registry.AssetRegistry
 import io.github.chrislo27.toolboks.transition.TransitionScreen
 import io.github.chrislo27.toolboks.ui.Button
 import io.github.chrislo27.toolboks.ui.ColourPane
 import io.github.chrislo27.toolboks.ui.Stage
 import io.github.chrislo27.toolboks.ui.TextLabel
+import io.github.chrislo27.toolboks.util.gdxutils.isShiftDown
 
 
 open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRManiaApp, PlayingScreen>(main) {
@@ -68,7 +70,11 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         stage.elements += resumeButton
         restartButton = Button(palette, stage, stage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 300f, pixelHeight = 64f, screenX = 0.35f, screenWidth = 0.3f)
-            this.addLabel(TextLabel(palette, this, this.stage).apply {
+            this.addLabel(object : TextLabel<PlayingScreen>(palette, this, this.stage){
+                override fun getRealText(): String {
+                    return if (Gdx.input.isShiftDown()) Localization["playing.pauseMenu.restart.withRobotMode"] else super.getRealText()
+                }
+            }.apply {
                 this.isLocalizationKey = true
                 this.textWrapping = false
                 this.text = "playing.pauseMenu.restart"
@@ -76,8 +82,14 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.leftClickAction = { _, _ ->
                 engine.playState = PlayState.STOPPED
                 playStartOverSfx()
-                reset(0.5f)
+                val shiftDown = Gdx.input.isShiftDown()
+                reset(0.5f, robotMode = shiftDown)
+                if (shiftDown) {
+                    AssetRegistry.get<Sound>("sfx_robot_on").play()
+                }
             }
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "playing.pauseMenu.restart.tooltip"
         }
         stage.elements += restartButton
         quitButton = Button(palette, stage, stage).apply {
@@ -148,11 +160,11 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         super.render(delta)
     }
 
-    private fun reset(secondsBefore: Float = 1f) {
-        robotEnabled = false
-        engine.requiresPlayerInput = true
+    private fun reset(secondsBefore: Float = 1f, robotMode: Boolean = false) {
+        robotEnabled = robotMode
+        engine.requiresPlayerInput = !robotMode
         paused = null
-        (robotModeButton.labels.first() as TextLabel).text = "playing.robot.off"
+        (robotModeButton.labels.first() as TextLabel).text = "playing.robot.${if (robotMode) "on" else "off"}"
         engine.resetInputs()
         engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - secondsBefore)
         engine.playState = PlayState.PLAYING
