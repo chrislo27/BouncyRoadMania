@@ -219,7 +219,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             }
         }
         
-        if (paused == null) {
+        if (paused == null && main.screen == this) {
             if (!isCursorInvisible) {
                 isCursorInvisible = true
                 Gdx.graphics.setCursor(AssetRegistry["cursor_invisible"])
