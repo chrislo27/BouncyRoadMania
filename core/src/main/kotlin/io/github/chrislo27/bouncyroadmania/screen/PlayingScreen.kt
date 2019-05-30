@@ -194,7 +194,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             titleFont.scaleFont(pauseCamera)
             titleFont.scaleMul(0.9f)
             batch.projectionMatrix = TMP_CAMERA_MATRIX.set(pauseCamera.combined).mul(PAUSED_TITLE_MATRIX)
-            titleFont.drawCompressed(batch, Localization["playing.pauseMenu.title"], 0f, 0f, 475f, Align.left)
+            titleFont.drawCompressed(batch, Localization["playing.pauseMenu.title"], 0f, 0f, 475f, Align.center)
             batch.projectionMatrix = pauseCamera.combined
             titleFont.unscaleFont()
 
