@@ -43,6 +43,22 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator, val foreground: B
         }
     }
 
+    companion object {
+        fun Event.getAlpha(fadeTransitions: Boolean): Float {
+            var transitionDur = 1f
+            if (bounds.width < transitionDur * 2) {
+                transitionDur = bounds.width / 2f
+            }
+            val t = transitionDur / bounds.width
+
+            val progress = (engine.beat - bounds.x) / bounds.width
+            if (!fadeTransitions) {
+                return if (progress in 0f..1f) 1f else 0f
+            }
+            return if (progress !in 0f..1f) 0f else if (progress < t) (progress / t) else if (progress > 1f - t) (1f - (progress - (1f - t)) / t) else 1f
+        }
+    }
+
     override val canBeCopied: Boolean = true
     override val isStretchable: Boolean = true
     override val hasEditableParams: Boolean = true
@@ -66,19 +82,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator, val foreground: B
         }
     }
 
-    fun getImageAlpha(): Float {
-        var transitionDur = 1f
-        if (bounds.width < transitionDur * 2) {
-            transitionDur = bounds.width / 2f
-        }
-        val t = transitionDur / bounds.width
-
-        val progress = (engine.beat - bounds.x) / bounds.width
-        if (!this.fadeTransitions) {
-            return if (progress in 0f..1f) 1f else 0f
-        }
-        return if (progress !in 0f..1f) 0f else if (progress < t) (progress / t) else if (progress > 1f - t) (1f - (progress - (1f - t)) / t) else 1f
-    }
+    fun getImageAlpha(): Float = this.getAlpha(this.fadeTransitions)
 
     override fun createParamsStage(editor: Editor, stage: EditorStage): BgImageEventParamsStage {
         return BgImageEventParamsStage(stage)
@@ -244,7 +248,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator, val foreground: B
                 this.textLabel.text = "bgImageEvent.fadeTransitions"
                 this.location.set(screenHeight = 0.1f, screenY = 0.125f)
             }
-            
+
             this.updatePositions()
         }
     }

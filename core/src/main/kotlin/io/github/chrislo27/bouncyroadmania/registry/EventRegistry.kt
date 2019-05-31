@@ -56,6 +56,9 @@ object EventRegistry {
         add(Instantiator("text_box", listOf(), "instantiator.text_box.name", true, "instantiator.text_box.summary", true, "instantiator.text_box.desc", true) { engine ->
             SpawnTextBoxEvent(engine, TextBox("", false), this)
         })
+        add(Instantiator("spotlight", listOf(), "instantiator.spotlight.name", true, "instantiator.spotlight.summary", true, "instantiator.spotlight.desc", true) { engine ->
+            SpotlightEvent(engine, this)
+        })
 
         map = tempMap
         list = tempList
