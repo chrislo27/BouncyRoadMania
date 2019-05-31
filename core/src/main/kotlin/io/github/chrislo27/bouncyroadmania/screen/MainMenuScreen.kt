@@ -67,8 +67,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             ret
         }
         private val INACTIVE_TIME = 10f
-        private val TIPS: List<String> = listOf("mainMenu.tips.practiceModes", "mainMenu.tips.tryOthers", "mainMenu.tips.editColours", "mainMenu.tips.bgImages", "mainMenu.tips.skillStars", "mainMenu.tips.robotMode", "mainMenu.tips.bouncerCount", "mainMenu.tips.difficultyRating")
-        private var lastTip: String = ""
+        private val SPLASHES: List<String> = listOf("practiceModes", "tryOthers", "editColours", "bgImages", "skillStars", "robotMode", "bouncerCount", "difficultyRating", "gonnaMake", "gonnaPlay", "tinkTinkTink", "rhre", "setTempo")
+        private val splashBag: MutableList<String> = SPLASHES.shuffled().toMutableList()
     }
 
     private open inner class Event(val beat: Float, val duration: Float) {
@@ -220,14 +220,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var clickedOnMenu: MenuItem? = null
     private var stopMusicOnHide = true
     private var inactiveTime: Float = 0f
-    private var currentTip: Pair<String, List<String>> = TIPS.let { list ->
-        (if (list.size == 1) list.first() else list.filterNot { it == lastTip }.random())
-                .let {
-                    lastTip = it
-                    Localization[it]
-                }
-                /*.let { it to it.toCharArray().map { it.toString() } }*/
-                .let { it to it.split(' ').map { "$it " } }
+    private var currentSplash: Pair<String, List<String>> = splashBag.let { bag ->
+        val item = bag.removeAt(0)
+        if (bag.isEmpty()) {
+            splashBag.addAll(SPLASHES.shuffled())
+        }
+        item.let {
+            Localization["mainMenu.splashes.$it"]
+        }.let { it to it.split(' ').flatMap { 
+            val splitByHyphen = it.split('-')
+            if (splitByHyphen.size >= 2) (splitByHyphen.dropLast(1).map { "$it-" } + listOf(splitByHyphen.last() + " "))
+            else listOf("$it ")
+        } }
+        /*.let { it to it.toCharArray().map { it.toString() } }*/
     }
 
     init {
@@ -661,7 +666,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             }
             menuFont.unscaleFont()
 
-            val tip = currentTip
+            val tip = currentSplash
             if (tip.first.isNotEmpty()) {
                 val font = main.defaultBorderedFont
                 font.scaleFont(camera)
