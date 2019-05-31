@@ -66,7 +66,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             ret
         }
         private val INACTIVE_TIME = 10f
-        private val TIPS: List<String> = listOf("mainMenu.tips.practiceModes", "mainMenu.tips.tryOthers", "mainMenu.tips.editColours", "mainMenu.tips.bgImages", "mainMenu.tips.skillStars")
+        private val TIPS: List<String> = listOf("mainMenu.tips.practiceModes", "mainMenu.tips.tryOthers", "mainMenu.tips.editColours", "mainMenu.tips.bgImages", "mainMenu.tips.skillStars", "mainMenu.tips.robotMode", "mainMenu.tips.bouncerCount", "mainMenu.tips.difficultyRating")
+        private var lastTip: String = ""
     }
 
     private open inner class Event(val beat: Float, val duration: Float) {
@@ -217,7 +218,15 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     private var clickedOnMenu: MenuItem? = null
     private var stopMusicOnHide = true
     private var inactiveTime: Float = 0f
-    private var currentTip: Pair<String, List<String>> = TIPS.random().let { Localization[it] }.let { it to /*it.toCharArray().map { it.toString() }*/ it.split(' ').map { "$it " } }
+    private var currentTip: Pair<String, List<String>> = TIPS.let { list ->
+        (if (list.size == 1) list.first() else list.filterNot { it == lastTip }.random())
+                .let {
+                    lastTip = it
+                    Localization[it]
+                }
+                /*.let { it to it.toCharArray().map { it.toString() } }*/
+                .let { it to it.split(' ').map { "$it " } }
+    }
 
     init {
         val palette = main.uiPalette
