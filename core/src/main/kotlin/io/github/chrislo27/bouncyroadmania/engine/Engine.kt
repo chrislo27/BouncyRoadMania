@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
@@ -540,6 +541,7 @@ class Engine : Clock(), Disposable {
         }
 
         if (playState != PlayState.STOPPED) {
+            // Background images
             events.forEach { evt ->
                 if (evt is BgImageEvent && !evt.foreground) {
                     renderBgImageEvent(batch, evt)
@@ -550,9 +552,26 @@ class Engine : Clock(), Disposable {
         projector.render(batch, entities)
 
         if (playState != PlayState.STOPPED) {
+            // Foreground images
             events.forEach { evt ->
                 if (evt is BgImageEvent && evt.foreground) {
                     renderBgImageEvent(batch, evt)
+                }
+            }
+            // Spotlights
+            if (events.any {it is SpotlightEvent && it.playbackCompletion == PlaybackCompletion.PLAYING }) {
+                val shapeRenderer = BRManiaApp.instance.shapeRenderer
+                shapeRenderer.prepareStencilMask(batch, inverted = true) {
+                    shapeRenderer.projectionMatrix = camera.combined
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+                    shapeRenderer.circle(yellowBouncer.posX, yellowBouncer.posY, 128f)
+                    shapeRenderer.circle(redBouncer.posX, redBouncer.posY, 128f)
+                    shapeRenderer.end()
+                    shapeRenderer.projectionMatrix = BRManiaApp.instance.defaultCamera.combined
+                }.useStencilMask { 
+                    batch.setColor(0f, 0f, 0f, 1f)
+                    batch.fillRect(-400f, 0f, camera.viewportWidth + 800f, camera.viewportHeight)
+                    batch.setColor(1f, 1f, 1f, 1f)
                 }
             }
         }
