@@ -7,6 +7,7 @@ import io.github.chrislo27.bouncyroadmania.editor.Editor
 import io.github.chrislo27.bouncyroadmania.editor.Tool
 import io.github.chrislo27.bouncyroadmania.registry.EventRegistry
 import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
+import io.github.chrislo27.toolboks.i18n.Localization
 import io.github.chrislo27.toolboks.ui.*
 
 
@@ -19,6 +20,7 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
     val displayScrollDown: Button<EditorScreen>
     val summary: TextLabel<EditorScreen>
     val desc: TextLabel<EditorScreen>
+    val sinceVersion: TextLabel<EditorScreen>
     val toolButtons: List<ToolButton>
 
     init {
@@ -87,7 +89,7 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
         // Title and description
         val titleAmt = 0.2f
         summary = TextLabel(palette, this, this).apply {
-            this.location.set(screenHeight = titleAmt * 0.75f, screenY = 1f - titleAmt, screenX = separator, screenWidth = 1f - separator, pixelX = 8f, pixelWidth = -16f - (Tool.VALUES.size * 32f))
+            this.location.set(screenHeight = titleAmt * 0.75f, screenY = 1f - titleAmt, screenX = separator, screenWidth = 1f - separator, pixelX = 8f, pixelWidth = -16f - (Tool.VALUES.size * 32f) - 128f)
             this.isLocalizationKey = false
             this.textAlign = Align.left
             this.textWrapping = false
@@ -95,6 +97,16 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
             this.text = ""
         }
         elements += summary
+        sinceVersion = TextLabel(palette, this, this).apply {
+            this.location.set(summary.location)
+            this.location.set(screenWidth = 0f, screenX = 1f, pixelY = 3f, pixelX = this.location.pixelWidth + 12f, pixelWidth = 128f)
+            this.isLocalizationKey = false
+            this.textAlign = Align.right
+            this.textWrapping = false
+            this.fontScaleMultiplier = 0.5f
+            this.text = ""
+        }
+        elements += sinceVersion
         desc = TextLabel(palette, this, this).apply {
             this.location.set(screenHeight = 1f - titleAmt, screenX = separator, screenWidth = 1f - separator, pixelX = 8f, pixelWidth = -16f)
             this.isLocalizationKey = false
@@ -123,10 +135,12 @@ class PickerStage(val editor: Editor, parent: EditorStage, palette: UIPalette)
         if (list.isEmpty()) {
             summary.text = ""
             desc.text = ""
+            sinceVersion.text = ""
         } else {
             val instantiator = list[index]
             summary.text = instantiator.displaySummary
             desc.text = instantiator.displayDesc
+            sinceVersion.text = Localization["instantiator.sinceVersion", instantiator.sinceVersion.toString()]
         }
         toolButtons.forEach {
             it.selected = it.tool == editor.currentTool
