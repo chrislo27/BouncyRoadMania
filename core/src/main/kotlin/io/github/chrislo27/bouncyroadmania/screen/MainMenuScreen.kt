@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -196,6 +197,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
     }
     private val versionButton: Button<MainMenuScreen>
     private var lastGhVersion: Version = Version.UNKNOWN
+    private var isCursorInvisible = false
 
     val titleWiggle: FloatArray = FloatArray(3) { 0f }
     var hideTitle: Boolean = false
@@ -728,6 +730,19 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         if (menuIndex !in 0 until currentMenu.size) {
             inactiveTime += Gdx.graphics.deltaTime
         }
+
+
+        if (inactiveTime >= INACTIVE_TIME && main.screen == this) {
+            if (!isCursorInvisible) {
+                isCursorInvisible = true
+                Gdx.graphics.setCursor(AssetRegistry["cursor_invisible"])
+            }
+        } else {
+            if (isCursorInvisible) {
+                isCursorInvisible = false
+                Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
+            }
+        }
     }
 
     override fun resize(width: Int, height: Int) {
@@ -781,6 +796,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
             music.fadeTo(0f, 0.25f)
         }
         stopMusicOnHide = true
+        isCursorInvisible = false
+        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow)
     }
 
     override fun tickUpdate() {
