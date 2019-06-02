@@ -37,6 +37,8 @@ class PracticeScreen(main: BRManiaApp, engine: Engine) : PlayingScreen(main, eng
     init {
         restartButton.enabled = false
         robotModeButton.visible = false
+        timingDisplay.location.set(pixelY = 5f)
+        stage.updatePositions()
     }
 
     override fun onQuit() {
