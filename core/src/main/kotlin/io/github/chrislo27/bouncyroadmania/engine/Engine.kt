@@ -564,8 +564,10 @@ class Engine : Clock(), Disposable {
                 shapeRenderer.prepareStencilMask(batch, inverted = true) {
                     shapeRenderer.projectionMatrix = camera.combined
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
-                    shapeRenderer.circle(yellowBouncer.posX, yellowBouncer.posY, 128f)
-                    shapeRenderer.circle(redBouncer.posX, redBouncer.posY, 128f)
+                    val spotlightRadius = 128f
+                    val segments = (8f * Math.cbrt(spotlightRadius * (BRManiaApp.instance.defaultCamera.viewportWidth / 1280.0)).toFloat()).roundToInt().coerceAtLeast(32)
+                    shapeRenderer.circle(yellowBouncer.posX, yellowBouncer.posY, spotlightRadius, segments)
+                    shapeRenderer.circle(redBouncer.posX, redBouncer.posY, spotlightRadius, segments)
                     shapeRenderer.end()
                     shapeRenderer.projectionMatrix = BRManiaApp.instance.defaultCamera.combined
                 }.useStencilMask { 
