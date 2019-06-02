@@ -39,11 +39,11 @@ class TimingDisplayStage<S : ToolboksScreen<*, *>>(parent: UIElement<S>, camera:
         // Border
         this.elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, alpha)
-            this.location.set(screenWidth = 0f, pixelX = -1f, pixelY = -1f, pixelWidth = 1f)
+            this.location.set(screenWidth = 0f, pixelX = -1f, pixelY = -1f, pixelHeight = 2f, pixelWidth = 1f)
         }
         this.elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, alpha)
-            this.location.set(screenWidth = 0f, screenX = 1f, pixelX = 0f, pixelY = -1f, pixelWidth = 1f)
+            this.location.set(screenWidth = 0f, screenX = 1f, pixelX = 0f, pixelY = -1f, pixelHeight = 2f, pixelWidth = 1f)
         }
         this.elements += ColourPane(this, this).apply {
             this.colour.set(0f, 0f, 0f, alpha)
