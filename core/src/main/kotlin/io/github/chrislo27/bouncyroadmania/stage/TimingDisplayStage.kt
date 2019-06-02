@@ -36,6 +36,23 @@ class TimingDisplayStage<S : ToolboksScreen<*, *>>(parent: UIElement<S>, camera:
     private val texRegionBarely: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_input_timing"), 256, 0, 128, 128)
 
     init {
+        // Border
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(0f, 0f, 0f, alpha)
+            this.location.set(screenWidth = 0f, pixelX = -1f, pixelY = -1f, pixelWidth = 1f)
+        }
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(0f, 0f, 0f, alpha)
+            this.location.set(screenWidth = 0f, screenX = 1f, pixelX = 0f, pixelY = -1f, pixelWidth = 1f)
+        }
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(0f, 0f, 0f, alpha)
+            this.location.set(screenHeight = 0f, pixelX = 0f, pixelY = -1f, pixelHeight = 1f)
+        }
+        this.elements += ColourPane(this, this).apply {
+            this.colour.set(0f, 0f, 0f, alpha)
+            this.location.set(screenY = 1f, screenHeight = 0f, pixelX = 0f, pixelY = 0f, pixelHeight = 1f)
+        }
         fun addColourPane(color: Color, x: Float, percentage: Float) {
             val actualWidth = percentage / 2f   
             this.elements += ColourPane(this, this).apply {
