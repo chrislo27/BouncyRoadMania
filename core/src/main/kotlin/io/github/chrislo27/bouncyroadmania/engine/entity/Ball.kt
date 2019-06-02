@@ -142,6 +142,7 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float,
                                     engine.fireSkillStar()
                                 }
                             }
+                            engine.addInputResult(InputResult((newFrom as PlayerBouncer).inputType, 0f, 0f))
                         } else if (!MathUtils.isEqual(engine.lastBounceTinkSound[newFrom.soundHandle]
                                         ?: Float.NEGATIVE_INFINITY, engine.seconds, 0.05f)) {
                             if (newFrom.soundHandle != "sfx_cymbal" || !cancelCymbal) {
