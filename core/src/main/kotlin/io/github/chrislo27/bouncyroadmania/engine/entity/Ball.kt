@@ -12,6 +12,7 @@ import io.github.chrislo27.bouncyroadmania.soundsystem.beads.BeadsSound
 import io.github.chrislo27.bouncyroadmania.util.WaveUtils
 import io.github.chrislo27.toolboks.Toolboks
 import io.github.chrislo27.toolboks.registry.AssetRegistry
+import kotlin.math.absoluteValue
 
 
 class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float,
@@ -191,8 +192,8 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float,
             // Pending input
             val inputSecs = engine.seconds
             if (fo.bouncer.inputType == inputType && inputSecs in fo.minSeconds..fo.maxSeconds) {
-                val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.MAX_OFFSET_SEC)
-                engine.inputResults += inputResult
+                val inputResult = InputResult(fo.bouncer.inputType, inputSecs - fo.perfectSeconds, (inputSecs - fo.perfectSeconds) / Engine.BARELY_OFFSET)
+                engine.addInputResult(inputResult)
                 // Check skill star
                 if (engine.skillStarInput.isFinite() && !engine.gotSkillStar && inputResult.inputScore == InputScore.ACE) {
                     if (MathUtils.isEqual(engine.skillStarInput, engine.tempos.secondsToBeats(fo.perfectSeconds), 0.075f)) {
@@ -200,11 +201,13 @@ class Ball(engine: Engine, val beatsPerBounce: Float, sendOutAt: Float,
                     }
                 }
                 Toolboks.LOGGER.debug("Got input for ${inputResult.type} - ${inputResult.accuracyPercent} - ${inputResult.inputScore}")
-                bouncesSoFar++
-                fo.bouncer.playSound()
-                this.fallOff = null
-                prepareFallOff()
-                bounce(fo.bouncer, engine.bouncers[fo.bouncer.index + 1], false)
+                if (inputResult.accuracyPercent.absoluteValue <= 1f) {
+                    bouncesSoFar++
+                    fo.bouncer.playSound()
+                    this.fallOff = null
+                    prepareFallOff()
+                    bounce(fo.bouncer, engine.bouncers[fo.bouncer.index + 1], false)
+                }
                 return true
             }
         }

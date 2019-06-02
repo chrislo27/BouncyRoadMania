@@ -42,9 +42,10 @@ class Engine : Clock(), Disposable {
     companion object {
         private val TMP_MATRIX = Matrix4()
 
-        val MAX_OFFSET_SEC: Float = 5f / 60
+        val MAX_OFFSET_SEC: Float = 7f / 60
         val ACE_OFFSET: Float = 1f / 60
         val GOOD_OFFSET: Float = 3.5f / 60
+        val BARELY_OFFSET: Float = 5f / 60
 
         val MIN_TRACK_COUNT: Int = 4
         val MAX_TRACK_COUNT: Int = 8
@@ -53,7 +54,7 @@ class Engine : Clock(), Disposable {
         val MIN_BOUNCER_COUNT: Int = 5
         val MAX_BOUNCER_COUNT: Int = 15
         val DEFAULT_BOUNCER_COUNT: Int = 15
-        
+
         val MIN_DIFFICULTY: Int = 1
         val MAX_DIFFICULTY: Int = 5
         val DEFAULT_DIFFICULTY: Int = 0
@@ -188,7 +189,7 @@ class Engine : Clock(), Disposable {
         private set
 
     val events: List<Event> = mutableListOf()
-    val inputResults: MutableList<InputResult> = mutableListOf()
+    val inputResults: List<InputResult> = mutableListOf()
     var expectedNumInputs: Int = 0
     var skillStarInput: Float = Float.POSITIVE_INFINITY
         private set
@@ -313,6 +314,12 @@ class Engine : Clock(), Disposable {
         }
     }
 
+    fun addInputResult(input: InputResult) {
+        inputResults as MutableList
+        inputResults += input
+        listeners.keys.forEach { l -> l.onInputReceived(input) }
+    }
+
     fun computeScore(): Score {
         val scoreRaw = (inputResults.sumByDouble { it.inputScore.weight.toDouble() } / expectedNumInputs.coerceAtLeast(1) * 100).toFloat()
         val scoreInt = scoreRaw.roundToInt().coerceIn(0, 100)
@@ -327,7 +334,7 @@ class Engine : Clock(), Disposable {
         }
         return Score(scoreInt, scoreRaw, gotSkillStar, inputResults.size == expectedNumInputs, resultsText.title, line)
     }
-    
+
     fun getDifficultyString(): String = if (difficulty == 0) "" else "[YELLOW]${"★".repeat(difficulty)}[][GRAY]${"★".repeat(Engine.MAX_DIFFICULTY - difficulty)}[]"
 
     private fun setMusicVolume() {
@@ -559,7 +566,7 @@ class Engine : Clock(), Disposable {
                 }
             }
             // Spotlights
-            if (events.any {it is SpotlightEvent && it.playbackCompletion == PlaybackCompletion.PLAYING }) {
+            if (events.any { it is SpotlightEvent && it.playbackCompletion == PlaybackCompletion.PLAYING }) {
                 val shapeRenderer = BRManiaApp.instance.shapeRenderer
                 shapeRenderer.prepareStencilMask(batch, inverted = true) {
                     shapeRenderer.projectionMatrix = camera.combined
@@ -570,7 +577,7 @@ class Engine : Clock(), Disposable {
                     shapeRenderer.circle(redBouncer.posX, redBouncer.posY, spotlightRadius, segments)
                     shapeRenderer.end()
                     shapeRenderer.projectionMatrix = BRManiaApp.instance.defaultCamera.combined
-                }.useStencilMask { 
+                }.useStencilMask {
                     batch.setColor(0f, 0f, 0f, 1f)
                     batch.fillRect(-400f, 0f, camera.viewportWidth + 800f, camera.viewportHeight)
                     batch.setColor(1f, 1f, 1f, 1f)
@@ -737,6 +744,7 @@ class Engine : Clock(), Disposable {
     }
 
     fun resetInputs() {
+        inputResults as MutableList
         inputResults.clear()
         expectedNumInputs = 0
         lastInputMap.clear()

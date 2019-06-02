@@ -14,8 +14,11 @@ import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
 import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
+import io.github.chrislo27.bouncyroadmania.engine.EngineEventListener
 import io.github.chrislo27.bouncyroadmania.engine.PlayState
+import io.github.chrislo27.bouncyroadmania.engine.input.InputResult
 import io.github.chrislo27.bouncyroadmania.engine.input.InputType
+import io.github.chrislo27.bouncyroadmania.stage.TimingDisplayStage
 import io.github.chrislo27.bouncyroadmania.util.scaleFont
 import io.github.chrislo27.bouncyroadmania.util.transition.FadeOut
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
@@ -34,20 +37,24 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 
-open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<BRManiaApp, PlayingScreen>(main) {
+open class PlayingScreen(main: BRManiaApp, val engine: Engine)
+    : ToolboksScreen<BRManiaApp, PlayingScreen>(main), EngineEventListener {
 
     data class PauseState(val lastPlayState: PlayState)
     
     companion object {
-        protected val PAUSED_TITLE_MATRIX = Matrix4().rotate(0f, 0f, 1f, 20.556f).translate(220f, 475f, 0f)
-        protected val TMP_CAMERA_MATRIX = Matrix4()
+        protected val PAUSED_TITLE_MATRIX: Matrix4 = Matrix4().rotate(0f, 0f, 1f, 20.556f).translate(220f, 475f, 0f)
+        protected val TMP_CAMERA_MATRIX: Matrix4 = Matrix4()
     }
 
     final override val stage: Stage<PlayingScreen> = Stage(null, main.defaultCamera, 1280f, 720f)
+    protected val playStage: Stage<PlayingScreen> = Stage(stage, stage.camera, stage.pixelsWidth, stage.pixelsHeight)
+    protected val pauseStage: Stage<PlayingScreen> = Stage(stage, stage.camera, stage.pixelsWidth, stage.pixelsHeight)
     protected val robotModeButton: Button<PlayingScreen>
     protected val resumeButton: Button<PlayingScreen>
     protected val restartButton: Button<PlayingScreen>
     protected val quitButton: Button<PlayingScreen>
+    protected val timingDisplay: TimingDisplayStage<PlayingScreen>
 
     protected var robotEnabled: Boolean = false
     protected var paused: PauseState? = null
@@ -60,12 +67,20 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
 
     init {
         val palette = main.uiPalette
-        stage.visible = false
         stage.tooltipElement = TextLabel(palette.copy(backColor = Color(0f, 0f, 0f, 0.75f), fontScale = 0.75f), stage, stage).apply {
             this.textAlign = Align.center
             this.background = true
         }
-        resumeButton = Button(palette, stage, stage).apply {
+        
+        timingDisplay = TimingDisplayStage(playStage, playStage.camera).apply {
+            this.location.set(screenX = 0.6f, screenWidth = 0.25f, screenHeight = 0f, pixelY = 32f + 8f, pixelHeight = 48f)
+        }
+        playStage.elements += timingDisplay
+        
+        stage.elements += playStage
+        
+        pauseStage.visible = false
+        resumeButton = Button(palette, pauseStage, pauseStage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 275f, pixelHeight = 64f, screenX = 0.025f, screenWidth = 0.25f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
@@ -76,8 +91,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 pauseUnpause()
             }
         }
-        stage.elements += resumeButton
-        restartButton = Button(palette, stage, stage).apply {
+        pauseStage.elements += resumeButton
+        restartButton = Button(palette, pauseStage, pauseStage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 200f, pixelHeight = 64f, screenX = 0.025f, screenWidth = 0.25f)
             this.addLabel(object : TextLabel<PlayingScreen>(palette, this, this.stage){
                 override fun getRealText(): String {
@@ -100,8 +115,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "playing.pauseMenu.restart.tooltip"
         }
-        stage.elements += restartButton
-        quitButton = Button(palette, stage, stage).apply {
+        pauseStage.elements += restartButton
+        quitButton = Button(palette, pauseStage, pauseStage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 125f, pixelHeight = 64f, screenX = 0.025f, screenWidth = 0.25f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
@@ -115,8 +130,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 onQuit()
             }
         }
-        stage.elements += quitButton
-        robotModeButton = Button(palette, stage, stage).apply {
+        pauseStage.elements += quitButton
+        robotModeButton = Button(palette, pauseStage, pauseStage).apply {
             this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 125f, pixelHeight = 64f, screenX = 0.3f, screenWidth = 0.2f)
             this.addLabel(TextLabel(palette, this, this.stage).apply {
                 this.isLocalizationKey = true
@@ -132,9 +147,9 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
                 (labels.first() as TextLabel).text = "playing.robot.${if (!engine.requiresPlayerInput) "on" else "off"}"
             }
         }
-        stage.elements += robotModeButton
+        pauseStage.elements += robotModeButton
 
-        stage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), stage, stage).apply {
+        pauseStage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), pauseStage, pauseStage).apply {
             this.location.set(screenX = 0f, screenWidth = 0f, screenHeight = 0f, pixelX = 0f, pixelWidth = 220f, pixelHeight = 96f)
             this.isLocalizationKey = false
             this.text = " Game Controls:\n [YELLOW]\uE0E0[] - J\n [RED]\uE110[] - D"
@@ -144,10 +159,12 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             this.background = true
         }
 
+        stage.elements += pauseStage
         stage.updatePositions()
     }
 
     init {
+        engine.listeners[this] = Unit
         reset(robotMode = !engine.requiresPlayerInput)
     }
 
@@ -156,7 +173,8 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
 
         engine.render(batch)
 
-        stage.visible = paused != null
+        pauseStage.visible = paused != null
+        playStage.visible = paused == null
         
         if (paused != null) {
             val shapeRenderer = main.shapeRenderer
@@ -222,6 +240,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
         engine.requiresPlayerInput = !robotMode
         paused = null
         (robotModeButton.labels.first() as TextLabel).text = "playing.robot.${if (robotMode) "on" else "off"}"
+        timingDisplay.clearFlashes()
         engine.resetInputs()
         engine.playbackStart = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(engine.playbackStart) - secondsBefore)
         engine.playState = PlayState.PLAYING
@@ -333,6 +352,10 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine) : ToolboksScreen<
             return inputted
         }
         return super.keyDown(keycode)
+    }
+
+    override fun onInputReceived(input: InputResult) {
+        timingDisplay.flash(input)
     }
 
     override fun tickUpdate() {
