@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
+import io.github.chrislo27.bouncyroadmania.PreferenceKeys
 import io.github.chrislo27.bouncyroadmania.discord.DiscordHelper
 import io.github.chrislo27.bouncyroadmania.discord.PresenceState
 import io.github.chrislo27.bouncyroadmania.engine.Engine
@@ -51,6 +52,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine)
     protected val playStage: Stage<PlayingScreen> = Stage(stage, stage.camera, stage.pixelsWidth, stage.pixelsHeight)
     protected val pauseStage: Stage<PlayingScreen> = Stage(stage, stage.camera, stage.pixelsWidth, stage.pixelsHeight)
     protected val robotModeButton: Button<PlayingScreen>
+    protected val timingDisplayButton: Button<PlayingScreen>
     protected val resumeButton: Button<PlayingScreen>
     protected val restartButton: Button<PlayingScreen>
     protected val quitButton: Button<PlayingScreen>
@@ -74,6 +76,7 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine)
         
         timingDisplay = TimingDisplayStage(playStage, playStage.camera).apply {
             this.location.set(screenX = 0.6f, screenWidth = 0.25f, screenHeight = 0f, pixelY = 32f + 8f, pixelHeight = 48f)
+            this.visible = main.preferences.getBoolean(PreferenceKeys.TIMING_DISPLAY, true)
         }
         playStage.elements += timingDisplay
         
@@ -148,6 +151,21 @@ open class PlayingScreen(main: BRManiaApp, val engine: Engine)
             }
         }
         pauseStage.elements += robotModeButton
+        timingDisplayButton = Button(palette, pauseStage, pauseStage).apply {
+            this.location.set(screenY = 0f, screenHeight = 0f, pixelY = 200f, pixelHeight = 64f, screenX = 0.3f, screenWidth = 0.2f)
+            this.addLabel(TextLabel(palette, this, this.stage).apply {
+                this.isLocalizationKey = true
+                this.textWrapping = false
+                this.text = "playing.timingDisplay.${if (main.preferences.getBoolean(PreferenceKeys.TIMING_DISPLAY, true)) "on" else "off"}"
+            })
+            this.leftClickAction = { _, _ ->
+                val old = main.preferences.getBoolean(PreferenceKeys.TIMING_DISPLAY, true)
+                main.preferences.putBoolean(PreferenceKeys.TIMING_DISPLAY, !old).flush()
+                timingDisplay.visible = !old
+                (labels.first() as TextLabel).text = "playing.timingDisplay.${if (!old) "on" else "off"}"
+            }
+        }
+        pauseStage.elements += timingDisplayButton
 
         pauseStage.elements += TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), pauseStage, pauseStage).apply {
             this.location.set(screenX = 0f, screenWidth = 0f, screenHeight = 0f, pixelX = 0f, pixelWidth = 220f, pixelHeight = 96f)
