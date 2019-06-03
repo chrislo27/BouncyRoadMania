@@ -54,11 +54,14 @@ object EventRegistry {
         add(Instantiator("foreground_image", listOf(), Version(0, 5, 0), "instantiator.foreground_image.name", true, "instantiator.foreground_image.summary", true, "instantiator.foreground_image.desc", true) { engine ->
             BgImageEvent(engine, this, true)
         })
+        add(Instantiator("spotlight", listOf(), Version(0, 6, 0), "instantiator.spotlight.name", true, "instantiator.spotlight.summary", true, "instantiator.spotlight.desc", true) { engine ->
+            SpotlightEvent(engine, this)
+        })
         add(Instantiator("text_box", listOf(), Version(0, 3, 0), "instantiator.text_box.name", true, "instantiator.text_box.summary", true, "instantiator.text_box.desc", true) { engine ->
             SpawnTextBoxEvent(engine, TextBox("", false), this)
         })
-        add(Instantiator("spotlight", listOf(), Version(0, 6, 0), "instantiator.spotlight.name", true, "instantiator.spotlight.summary", true, "instantiator.spotlight.desc", true) { engine ->
-            SpotlightEvent(engine, this)
+        add(Instantiator("song_info", listOf(), Version(0, 7, 0), "instantiator.song_info.name", true, "instantiator.song_info.summary", true, "instantiator.song_info.desc", true) { engine ->
+            SongInfoEvent(engine, this)
         })
 
         map = tempMap
