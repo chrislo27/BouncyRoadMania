@@ -1,7 +1,8 @@
 # Bouncy Road Mania
 
-The spiritual successor to Karateka Mania, but for Bouncy Road
-
+Bouncy Road Mania can be described as the spiritual successor to Karateka Mania, but for Bouncy Road.<br>
+It is a full emulator for creating and playing custom Bouncy Road games. All features from
+every Rhythm Heaven game where it is featured is included, along with a few extra for more challenge and creativity.
 
 Also check out the [Rhythm Heaven Remix Editor](https://github.com/chrislo27/RhythmHeavenRemixEditor)—a fully-fledged tool to create custom remixes<br>
 
