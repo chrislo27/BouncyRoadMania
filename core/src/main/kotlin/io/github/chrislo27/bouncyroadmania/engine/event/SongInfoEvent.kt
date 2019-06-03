@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.engine.event
 
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Align
 import com.fasterxml.jackson.databind.node.ObjectNode
 import io.github.chrislo27.bouncyroadmania.editor.Editor
@@ -12,7 +13,10 @@ import io.github.chrislo27.bouncyroadmania.screen.EditorScreen
 import io.github.chrislo27.bouncyroadmania.util.TrueCheckbox
 import io.github.chrislo27.toolboks.ui.TextField
 import io.github.chrislo27.toolboks.ui.TextLabel
+import io.github.chrislo27.toolboks.util.gdxutils.maxX
 import java.lang.ref.WeakReference
+import kotlin.math.min
+import kotlin.properties.Delegates
 
 
 class SongInfoEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEvent(engine, instantiator) {
@@ -23,14 +27,32 @@ class SongInfoEvent(engine: Engine, instantiator: Instantiator) : InstantiatedEv
     override val hasEditableParams: Boolean = true
 
     var staticMode: Boolean = false
-    var songTitle: String = ""
-    var songArtist: String = ""
+    var concatenated: String = ""
+        private set
+    var songTitle: String by Delegates.observable("") { _, _, new ->
+        concatenated = if (songArtist.isEmpty()) new else "$new - $songArtist"
+    }
+    var songArtist: String by Delegates.observable("") { _, _, new ->
+        concatenated = if (songTitle.isEmpty()) new else "$songTitle - $new"
+    }
 
     override fun copy(): SongInfoEvent {
         return SongInfoEvent(engine, instantiator).also {
             it.bounds.set(this.bounds)
             it.updateInterpolation(true)
         }
+    }
+
+    fun getProgress(): Float {
+        val secondsStart = engine.tempos.beatsToSeconds(bounds.x)
+        val secondsDuration = engine.tempos.beatsToSeconds(bounds.maxX) - secondsStart
+        val transitionTime = min(secondsDuration / 2f, 0.5f)
+        val alpha = when (val s = (engine.seconds - secondsStart).coerceIn(0f, secondsDuration)) {
+            in 0f..transitionTime -> s / transitionTime
+            in secondsDuration - transitionTime..secondsDuration -> 1f - (s - (secondsDuration - transitionTime)) / transitionTime
+            else -> 1f
+        }
+        return Interpolation.circle.apply(alpha)
     }
 
     override fun createParamsStage(editor: Editor, stage: EditorStage): SongInfoEventParamsStage {

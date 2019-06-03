@@ -653,6 +653,47 @@ class Engine : Clock(), Disposable {
             font.scaleMul(1f / 0.65f)
             font.unscaleFont()
         }
+        val songInfoEvent = events.firstOrNull { it is SongInfoEvent && beat in it.bounds.x..it.bounds.maxX } as SongInfoEvent?
+        if (songInfoEvent != null) {
+            val font = if (songInfoEvent.staticMode) BRManiaApp.instance.defaultBorderedFont else BRManiaApp.instance.defaultFont
+            font.scaleFont(camera)
+            val texture = AssetRegistry.get<Texture>("ui_song_title_artist")
+            val scale = 1.15f
+            val texWidth = texture.width.toFloat() * scale * camera.zoom
+            val texHeight = texture.height.toFloat() * scale * camera.zoom
+
+            if (!songInfoEvent.staticMode) {
+                val xPercent: Float = songInfoEvent.getProgress()
+                fun renderBar(timedString: String, bottom: Boolean) {
+                    val x = if (!bottom) texWidth * xPercent - texWidth else camera.viewportWidth * camera.zoom - xPercent * texWidth
+                    val y = (camera.viewportHeight * 0.125f * camera.zoom) - if (bottom) texHeight * 1.1f else 0f
+
+                    batch.draw(texture, x, y, texWidth, texHeight,
+                            0, 0, texture.width, texture.height,
+                            bottom, bottom)
+                    font.setColor(1f, 1f, 1f, 1f)
+                    val padding = 8f * camera.zoom
+                    val textWidth = (texture.width.toFloat() - texture.height) * scale * camera.zoom - padding * 2
+                    val triangleWidth = texture.height.toFloat() * scale * camera.zoom
+                    font.drawCompressed(batch, timedString,
+                            (if (!bottom) x else x + triangleWidth) + padding,
+                            y + font.capHeight + texHeight / 2 - font.capHeight / 2,
+                            textWidth,
+                            if (bottom) Align.left else Align.right)
+                }
+
+                if (songInfoEvent.songTitle.isNotEmpty())
+                    renderBar(songInfoEvent.songTitle, false)
+                if (songInfoEvent.songArtist.isNotEmpty())
+                    renderBar(songInfoEvent.songArtist, true)
+            } else {
+                font.setColor(1f, 1f, 1f, songInfoEvent.getProgress())
+                font.drawCompressed(batch, songInfoEvent.concatenated, 4f, camera.viewportHeight - 4f, camera.viewportWidth - 8f, Align.right)
+                font.setColor(1f, 1f, 1f, 1f)
+            }
+
+            font.unscaleFont()
+        }
         if (clearText > 0f) {
             clearText -= Gdx.graphics.deltaTime / 1.5f
             if (clearText < 0f)
