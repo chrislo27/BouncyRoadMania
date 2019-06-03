@@ -3,7 +3,6 @@ package io.github.chrislo27.bouncyroadmania.screen
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
-import io.github.chrislo27.bouncyroadmania.util.transition.WipeTo
 import io.github.chrislo27.toolboks.ToolboksScreen
 import io.github.chrislo27.toolboks.transition.TransitionScreen
 
