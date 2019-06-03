@@ -35,6 +35,7 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
     private var finishCallback: () -> Unit = {}
 
     private var finishedLoading = false
+    private var stingPlayed = false
     private var transition: Float = 0f
 
     private var lastProgress = 0f
@@ -108,7 +109,6 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
             if (!finishedLoading) {
                 finishedLoading = true
                 finishCallback()
-                AssetRegistry.get<Sound>("sfx_main_menu_intro").play(if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) 0f else 1f)
                 mainMenuScreen = MainMenuScreen(main).apply {
                     this.music.stop()
                     this.hideTitle = true
@@ -132,19 +132,24 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
                     }
                 }
             } else {
-                transition += Gdx.graphics.deltaTime
-                for (i in 0 until titleWiggle.size) {
-                    if (titleWiggle[i] != 0f) {
-                        val sign = Math.signum(titleWiggle[i])
-                        titleWiggle[i] -= sign * Gdx.graphics.deltaTime * 8f
-                        if (Math.signum(titleWiggle[i]) != sign && titleWiggle[i] != 0f) {
-                            titleWiggle[i] = 0f
+                if (!stingPlayed) {
+                    stingPlayed = true
+                    AssetRegistry.get<Sound>("sfx_main_menu_intro").play(if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) 0f else 1f)
+                } else {
+                    transition += Gdx.graphics.deltaTime
+                    for (i in 0 until titleWiggle.size) {
+                        if (titleWiggle[i] != 0f) {
+                            val sign = Math.signum(titleWiggle[i])
+                            titleWiggle[i] -= sign * Gdx.graphics.deltaTime * 8f
+                            if (Math.signum(titleWiggle[i]) != sign && titleWiggle[i] != 0f) {
+                                titleWiggle[i] = 0f
+                            }
                         }
                     }
-                }
-                if (transition >= INTRO_LENGTH) {
-                    mainMenuScreen.music.play()
-                    main.screen = transitionScreen
+                    if (transition >= INTRO_LENGTH) {
+                        mainMenuScreen.music.play()
+                        main.screen = transitionScreen
+                    }
                 }
             }
         }
