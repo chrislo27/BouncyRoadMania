@@ -227,11 +227,13 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
         item.let {
             Localization["mainMenu.splashes.$it"]
-        }.let { it to it.split(' ').flatMap { 
-            val splitByHyphen = it.split('-')
-            if (splitByHyphen.size >= 2) (splitByHyphen.dropLast(1).map { "$it-" } + listOf(splitByHyphen.last() + " "))
-            else listOf("$it ")
-        } }
+        }.let {
+            it to it.split(' ').flatMap {
+                val splitByHyphen = it.split('-')
+                if (splitByHyphen.size >= 2) (splitByHyphen.dropLast(1).map { "$it-" } + listOf(splitByHyphen.last() + " "))
+                else listOf("$it ")
+            }
+        }
         /*.let { it to it.toCharArray().map { it.toString() } }*/
     }
 
@@ -334,8 +336,8 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
                     currentMenuKey = "practices"
                 },
                 MenuItem("mainMenu.edit") {
-                    val editor = EditorScreen(main) // ScreenRegistry.getNonNull("editor")
-                    main.screen = TransitionScreen(main, main.screen, editor, WipeTo(Color.BLACK, 0.35f), WipeFrom(Color.BLACK, 0.35f))
+                    val editorFactory = { EditorScreen(main) }
+                    main.screen = TransitionScreen(main, main.screen, EditorLoadingScreen(main, editorFactory), WipeTo(Color.BLACK, 0.35f), null)
                 },
 //                MenuItem("mainMenu.settings") {
 //                    currentMenuKey = "settings"
