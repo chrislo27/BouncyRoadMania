@@ -109,8 +109,7 @@ class AssetRegistryLoadingScreen(main: BRManiaApp)
             if (!finishedLoading) {
                 finishedLoading = true
                 finishCallback()
-                mainMenuScreen = MainMenuScreen(main).apply {
-                    this.music.stop()
+                mainMenuScreen = MainMenuScreen(main, playMusic = false).apply {
                     this.hideTitle = true
                 }
                 transitionScreen = object : TransitionScreen<BRManiaApp>(main, this@AssetRegistryLoadingScreen, mainMenuScreen, WipeTo(Color.BLACK, 0.25f), WipeFrom(Color.BLACK, 0.25f)) {

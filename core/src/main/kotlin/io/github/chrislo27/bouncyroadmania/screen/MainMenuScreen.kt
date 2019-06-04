@@ -44,7 +44,7 @@ import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 
-class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScreen>(main) {
+class MainMenuScreen(main: BRManiaApp, playMusic: Boolean = true) : ToolboksScreen<BRManiaApp, MainMenuScreen>(main) {
 
     companion object {
         private val TMP_MATRIX = Matrix4()
@@ -469,7 +469,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
     init {
         engine.playState = PlayState.STOPPED
-        reload()
+        reload(playMusic)
         doCycle()
         Gdx.app.postRunnable {
             Gdx.app.postRunnable {
@@ -478,7 +478,7 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
         }
     }
 
-    fun reload() {
+    fun reload(doPlayMusic: Boolean = true) {
         engine.entities.clear()
         engine.requiresPlayerInput = false
         engine.seconds = 0f
@@ -487,7 +487,9 @@ class MainMenuScreen(main: BRManiaApp) : ToolboksScreen<BRManiaApp, MainMenuScre
 
         engine.addBouncers()
         music.volume = if (main.preferences.getBoolean(PreferenceKeys.MUTE_MUSIC, false)) 0f else 1f
-        music.play()
+        if (doPlayMusic) {
+            music.play()
+        }
     }
 
     fun doCycle() {
