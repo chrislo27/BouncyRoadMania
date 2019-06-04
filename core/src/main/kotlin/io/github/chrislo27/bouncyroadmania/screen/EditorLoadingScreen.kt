@@ -1,5 +1,6 @@
 package io.github.chrislo27.bouncyroadmania.screen
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.bouncyroadmania.BRManiaApp
 import io.github.chrislo27.bouncyroadmania.util.transition.WipeFrom
@@ -13,7 +14,12 @@ class EditorLoadingScreen(main: BRManiaApp, val editorFactory: () -> EditorScree
     override fun show() {
         super.show()
 
-        main.screen = TransitionScreen(main, main.screen, editorFactory(), null, WipeFrom(Color.BLACK, 0.35f))
+        Gdx.app.postRunnable {
+            val screen = editorFactory()
+            Gdx.app.postRunnable {
+                main.screen = TransitionScreen(main, main.screen, screen, null, WipeFrom(Color.BLACK, 0.35f))
+            }
+        }
     }
 
     override fun tickUpdate() {
