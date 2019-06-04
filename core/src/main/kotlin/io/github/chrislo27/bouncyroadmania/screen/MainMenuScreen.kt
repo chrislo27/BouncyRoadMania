@@ -319,6 +319,7 @@ class MainMenuScreen(main: BRManiaApp, playMusic: Boolean = true) : ToolboksScre
             this.textAlign = Align.right
             this.textWrapping = false
             this.fontScaleMultiplier = 0.75f
+            this.visible = false
         }
 
         stage.updatePositions()
