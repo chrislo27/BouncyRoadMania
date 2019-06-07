@@ -283,6 +283,19 @@ class MainMenuScreen(main: BRManiaApp, playMusic: Boolean = true) : ToolboksScre
             this.tooltipTextIsLocalizationKey = true
             this.tooltipText = "mainMenu.tooltip.resetWindow"
         }
+        stage.elements += Button(palette, stage, stage).apply {
+            this.location.set(screenWidth = 0f, screenHeight = 0f,
+                    pixelWidth = 32f, pixelHeight = 32f, pixelX = 0f, pixelY = camera.viewportHeight - 32f)
+            this.leftClickAction = { _, _ ->
+                Gdx.net.openURI(BRMania.GITHUB)
+            }
+            this.addLabel(ImageLabel(palette, this, this.stage).apply {
+                this.renderType = ImageLabel.ImageRendering.ASPECT_RATIO
+                this.image = TextureRegion(AssetRegistry.get<Texture>("ui_github_mark"))
+            })
+            this.tooltipTextIsLocalizationKey = true
+            this.tooltipText = "mainMenu.github"
+        }
         versionButton = Button(palette, stage, stage).apply {
             this.addLabel(TextLabel(palette.copy(ftfont = main.defaultBorderedFontFTF), this, this.stage).apply {
                 this.isLocalizationKey = false
