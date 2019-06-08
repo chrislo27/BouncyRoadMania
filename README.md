@@ -7,7 +7,7 @@ every Rhythm Heaven game where it is featured is included, along with a few extr
 Also check out the [Rhythm Heaven Remix Editor](https://github.com/chrislo27/RhythmHeavenRemixEditor)—a fully-fledged tool to create custom remixes<br>
 
 [![Downloads](https://img.shields.io/github/downloads/chrislo27/BouncyRoadMania/total.svg)](https://github.com/chrislo27/BouncyRoadMania/releases)<br>
-[![GitHub license](https://img.shields.io/github/license/chrislo27/RhythmHeavenRemixEditor.svg)](https://github.com/chrislo27/BouncyRoadMania/blob/dev/LICENSE.txt)
+[![GitHub license](https://img.shields.io/github/license/chrislo27/BouncyRoadMania.svg)](https://github.com/chrislo27/BouncyRoadMania/blob/master/LICENSE.txt)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VA45DPLCC4958)
 
 ![editor screenshot](https://user-images.githubusercontent.com/6299069/58276568-a7571780-7d4c-11e9-8c4a-1383736cf698.png)
