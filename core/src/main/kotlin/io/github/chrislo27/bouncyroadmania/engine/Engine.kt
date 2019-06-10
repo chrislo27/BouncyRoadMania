@@ -189,6 +189,7 @@ class Engine : Clock(), Disposable {
         private set
 
     val events: List<Event> = mutableListOf()
+    val eventsReversed: List<Event> = events.asReversed()
     val inputResults: List<InputResult> = mutableListOf()
     var expectedNumInputs: Int = 0
     var skillStarInput: Float = Float.POSITIVE_INFINITY
@@ -566,7 +567,8 @@ class Engine : Clock(), Disposable {
                 }
             }
             // Spotlights
-            if (events.any { it is SpotlightEvent && it.playbackCompletion == PlaybackCompletion.PLAYING }) {
+            val spotlight = eventsReversed.firstOrNull { it is SpotlightEvent && it.playbackCompletion == PlaybackCompletion.PLAYING } as SpotlightEvent?
+            if (spotlight != null) {
                 val shapeRenderer = BRManiaApp.instance.shapeRenderer
                 shapeRenderer.prepareStencilMask(batch, inverted = true) {
                     shapeRenderer.projectionMatrix = camera.combined
@@ -578,7 +580,7 @@ class Engine : Clock(), Disposable {
                     shapeRenderer.end()
                     shapeRenderer.projectionMatrix = BRManiaApp.instance.defaultCamera.combined
                 }.useStencilMask {
-                    batch.setColor(0f, 0f, 0f, 1f)
+                    batch.color = spotlight.shadow
                     batch.fillRect(-400f, 0f, camera.viewportWidth + 800f, camera.viewportHeight)
                     batch.setColor(1f, 1f, 1f, 1f)
                 }

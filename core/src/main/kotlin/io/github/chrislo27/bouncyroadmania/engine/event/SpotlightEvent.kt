@@ -1,25 +1,26 @@
 package io.github.chrislo27.bouncyroadmania.engine.event
 
+import com.badlogic.gdx.graphics.Color
+import com.fasterxml.jackson.databind.node.ObjectNode
+import io.github.chrislo27.bouncyroadmania.editor.Editor
+import io.github.chrislo27.bouncyroadmania.editor.stage.EditorStage
+import io.github.chrislo27.bouncyroadmania.editor.stage.EventParamsStage
 import io.github.chrislo27.bouncyroadmania.engine.Engine
 import io.github.chrislo27.bouncyroadmania.registry.Instantiator
+import io.github.chrislo27.bouncyroadmania.stage.ColourPicker
+import io.github.chrislo27.bouncyroadmania.util.fromJsonString
+import io.github.chrislo27.bouncyroadmania.util.toJsonString
+import io.github.chrislo27.toolboks.ui.TextLabel
 
 
 class SpotlightEvent(engine: Engine, instantiator: Instantiator)
     : InstantiatedEvent(engine, instantiator) {
-
-//    enum class SpotlightTarget {
-//        A, DPAD;
-//        companion object {
-//            val VALUES = values().toList()
-//            val BITS: Map<SpotlightTarget, Int> = VALUES.associateWith { VALUES.indexOf(it) }
-//        }
-//    }
     
     override val canBeCopied: Boolean = true
-//    override val hasEditableParams: Boolean = true
+    override val hasEditableParams: Boolean = true
     override val isStretchable: Boolean = true
     
-//    val targets: EnumSet<SpotlightTarget> = EnumSet.allOf(SpotlightTarget::class.java)
+    val shadow: Color = Color(0f, 0f, 0f, 238f / 255f)
 
     init {
         bounds.width = 1f
@@ -29,67 +30,43 @@ class SpotlightEvent(engine: Engine, instantiator: Instantiator)
         return SpotlightEvent(engine, instantiator).also {
             it.bounds.set(this.bounds)
             it.updateInterpolation(true)
-//            it.targets.clear()
-//            it.targets.addAll(this.targets)
+            it.shadow.set(this.shadow)
         }
     }
 
-//    override fun createParamsStage(editor: Editor, stage: EditorStage): SpotlightEventParamsStage {
-//        return SpotlightEventParamsStage(stage)
-//    }
+    override fun createParamsStage(editor: Editor, stage: EditorStage): SpotlightEventParamsStage {
+        return SpotlightEventParamsStage(stage)
+    }
 
-//    override fun fromJson(node: ObjectNode) {
-//        super.fromJson(node)
-//        targets.clear()
-//        val targetsNode = node["targets"]?.asInt(0)
-//        if (targetsNode != null) {
-//            SpotlightTarget.VALUES.forEachIndexed { i, t ->
-//                if (targetsNode and (1 shl i) > 0) {
-//                    targets.add(t)
-//                }
-//            }
-//        } else {
-//            targets.addAll(SpotlightTarget.VALUES)
-//        }
-//    }
+    override fun fromJson(node: ObjectNode) {
+        super.fromJson(node)
+        shadow.fromJsonString(node["shadow"]?.asText())
+    }
 
-//    override fun toJson(node: ObjectNode) {
-//        super.toJson(node)
-//        node.put("targets", targets.fold(0) { res, it ->
-//            res or (1 shl SpotlightTarget.BITS.getValue(it))
-//        })
-//    }
+    override fun toJson(node: ObjectNode) {
+        node.put("shadow", shadow.toJsonString())
+    }
 
-//    inner class SpotlightEventParamsStage(parent: EditorStage) : EventParamsStage<SpotlightEvent>(parent, this@SpotlightEvent) {
-//
-//        init {
-//            contentStage.elements += object : TrueCheckbox<EditorScreen>(palette, contentStage, contentStage) {
-//                private val thisCheckbox: TrueCheckbox<EditorScreen> = this
-//                override fun onLeftClick(xPercent: Float, yPercent: Float) {
-//                    super.onLeftClick(xPercent, yPercent)
-//                    parent.editor.mutate(object : ReversibleAction<Editor> {
-//                        val checkbox: WeakReference<TrueCheckbox<EditorScreen>> = WeakReference(thisCheckbox)
-//                        val value = checked
-//                        override fun redo(context: Editor) {
-//                            event.fadeTransitions = value
-//                            checkbox.get()?.checked = value
-//                        }
-//
-//                        override fun undo(context: Editor) {
-//                            event.fadeTransitions = !value
-//                            checkbox.get()?.checked = !value
-//                        }
-//                    })
-//                }
-//            }.apply {
-//                this.checked = event.fadeTransitions
-//                this.textLabel.isLocalizationKey = true
-//                this.textLabel.text = "spotlightEvent.fadeTransitions"
-//                this.location.set(screenHeight = 0.1f, screenY = 0.9f)
-//            }
-//
-//            this.updatePositions()
-//        }
-//    }
+    inner class SpotlightEventParamsStage(parent: EditorStage) : EventParamsStage<SpotlightEvent>(parent, this@SpotlightEvent) {
+
+        init {
+            contentStage.elements += TextLabel(palette, contentStage, contentStage).apply {
+                this.textWrapping = false
+                this.text = "spotlightEvent.shadow"
+                this.isLocalizationKey = true
+                this.location.set(screenY = 0.9f, screenHeight = 0.1f)
+            }
+            val colourPicker = ColourPicker(palette, contentStage, contentStage, hasAlpha = true).apply {
+                this.setColor(this@SpotlightEvent.shadow)
+                this.location.set(screenY = 0.4f, screenHeight = 0.5f)
+                this.onColourChange = { c ->
+                    this@SpotlightEvent.shadow.set(c)
+                }
+            }
+            contentStage.elements += colourPicker
+
+            this.updatePositions()
+        }
+    }
     
 }
