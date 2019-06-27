@@ -44,6 +44,7 @@ class SpotlightEvent(engine: Engine, instantiator: Instantiator)
     }
 
     override fun toJson(node: ObjectNode) {
+        super.toJson(node)
         node.put("shadow", shadow.toJsonString())
     }
 
