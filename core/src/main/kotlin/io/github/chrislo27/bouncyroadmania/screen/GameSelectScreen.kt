@@ -267,7 +267,7 @@ class GameSelectScreen(main: BRManiaApp, labelText: String? = null)
                     label.text = Localization["closeChooser"]
                 }
             }
-            val file = initialFile ?: TinyFDWrapper.openFile(Localization["load.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath?.plus("/"), false, filter)
+            val file = initialFile ?: TinyFDWrapper.openFile(Localization["load.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath?.plus("/"), filter)
             if (file != null && file.exists()) {
                 val zipFile = ZipFile(file)
                 try {

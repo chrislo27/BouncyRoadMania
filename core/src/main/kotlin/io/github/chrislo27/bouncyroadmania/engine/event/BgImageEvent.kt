@@ -149,7 +149,7 @@ class BgImageEvent(engine: Engine, instantiator: Instantiator, val foreground: B
                     GlobalScope.launch {
                         val filter = TinyFDWrapper.Filter(listOf("*.png", "*.jpg", "*.bmp"), Localization["bgImageEvent.fileFilter"] + " (*.png, *.jpg, *.bmp)")
                         val file = TinyFDWrapper.openFile(Localization["bgImageEvent.fileChooserTitle"],
-                                attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_TEX)?.absolutePath?.plus("/"), false, filter)
+                                attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_TEX)?.absolutePath?.plus("/"), filter)
                         if (file != null && file.exists()) {
                             Gdx.app.postRunnable {
                                 try {

@@ -52,7 +52,7 @@ class LoadButton(val editor: Editor, palette: UIPalette, parent: Stage<EditorScr
 
                     GlobalScope.launch {
                         val filter = TinyFDWrapper.Filter(listOf("*.${BRMania.FILE_EXTENSION}"), Localization["save.fileFilter"] + " (.${BRMania.FILE_EXTENSION})")
-                        val file = initialFile ?: TinyFDWrapper.openFile(Localization["load.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath?.plus("/"), false, filter)
+                        val file = initialFile ?: TinyFDWrapper.openFile(Localization["load.fileChooserTitle"], attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)?.absolutePath?.plus("/"), filter)
                         if (file != null && file.exists()) {
                             val zipFile = ZipFile(file)
                             try {

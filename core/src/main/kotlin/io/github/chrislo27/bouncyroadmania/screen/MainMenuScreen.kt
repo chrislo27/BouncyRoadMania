@@ -426,7 +426,7 @@ class MainMenuScreen(main: BRManiaApp, playMusic: Boolean = true) : ToolboksScre
         )
         menus["test_tinyfd"] = listOf(
                 MenuItem("File open", isLocalizationKey = false) {
-                    println(TinyFDWrapper.openFile("Open a file", "", false, null))
+                    println(TinyFDWrapper.openFile("Open a file", "", null))
                 },
                 MenuItem("File save", isLocalizationKey = false) {
                     println(TinyFDWrapper.saveFile("Save to a file", "", null))
