@@ -1,4 +1,4 @@
-package io.github.chrislo27.rhre3.util
+package io.github.chrislo27.bouncyroadmania.util
 
 import com.badlogic.gdx.graphics.Color
 import org.lwjgl.PointerBuffer
