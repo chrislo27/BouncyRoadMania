@@ -1,8 +1,9 @@
-package io.github.chrislo27.bouncyroadmania.util
+package io.github.chrislo27.rhre3.util
 
 import com.badlogic.gdx.graphics.Color
 import org.lwjgl.PointerBuffer
 import org.lwjgl.system.MemoryStack
+import org.lwjgl.system.MemoryUtil.memAddress
 import org.lwjgl.util.tinyfd.TinyFileDialogs.*
 import java.io.File
 import java.nio.ByteBuffer
@@ -12,22 +13,42 @@ object TinyFDWrapper {
 
     data class Filter(val extensions: List<String>, val description: String)
 
-    fun openFile(title: String, defaultFile: String?, multipleSelection: Boolean, filter: Filter?): File? {
+    fun openFile(title: String, defaultFile: String?, filter: Filter?): File? {
         return if (filter == null) {
-            val path = tinyfd_openFileDialog(title, defaultFile, null, null, multipleSelection) ?: return null
+            val path = tinyfd_openFileDialog(title, defaultFile, null, null, false) ?: return null
             File(path)
         } else {
             val stack: MemoryStack = MemoryStack.stackPush()
             stack.use {
                 val filterPatterns: PointerBuffer = stack.mallocPointer(filter.extensions.size)
                 filter.extensions.forEach {
-                    filterPatterns.put(stack.UTF8(it))
+                    filterPatterns.put(memAddress(stack.UTF8(it)))
                 }
                 filterPatterns.flip()
 
-                val path = tinyfd_openFileDialog(title, defaultFile, filterPatterns, filter.description, multipleSelection)
+                val path = tinyfd_openFileDialog(title, defaultFile, filterPatterns, filter.description, false)
                         ?: return null
                 File(path)
+            }
+        }
+    }
+
+    fun openMultipleFiles(title: String, defaultFile: String?, filter: Filter?): List<File>? {
+        return if (filter == null) {
+            val path = tinyfd_openFileDialog(title, defaultFile, null, null, true) ?: return null
+            path.split('|').map { File(it) }
+        } else {
+            val stack: MemoryStack = MemoryStack.stackPush()
+            stack.use {
+                val filterPatterns: PointerBuffer = stack.mallocPointer(filter.extensions.size)
+                filter.extensions.forEach {
+                    filterPatterns.put(memAddress(stack.UTF8(it)))
+                }
+                filterPatterns.flip()
+
+                val path = tinyfd_openFileDialog(title, defaultFile, filterPatterns, filter.description, true)
+                        ?: return null
+                path.split('|').map { File(it) }
             }
         }
     }
@@ -41,7 +62,7 @@ object TinyFDWrapper {
             stack.use {
                 val filterPatterns: PointerBuffer = stack.mallocPointer(filter.extensions.size)
                 filter.extensions.forEach {
-                    filterPatterns.put(stack.UTF8(it))
+                    filterPatterns.put(memAddress(stack.UTF8(it)))
                 }
                 filterPatterns.flip()
 
